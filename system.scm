@@ -43,7 +43,11 @@
              (px packages throttled)
              (px services networking)
              (px packages bluetooth)
-	     (px packages images))
+	     (px packages images)
+	     
+	     (oci services grafana)
+	     (oci services prometheus)
+	     (gnu services monitoring))
 
 (use-service-modules docker
                      pm
@@ -182,7 +186,9 @@
     pavucontrol ;; pulseaudio gui
     pamixer ;; keyboard volume
     brightnessctl ;; keyboard backlight
+    xdg-desktop-portal
     xdg-desktop-portal-wlr
+    xdg-desktop-portal-gtk
     hicolor-icon-theme
     papirus-icon-theme
     gnome-themes-extra 
@@ -270,6 +276,17 @@
              (pcscd-configuration 
 	       (usb-drivers 
 		 (list acsccid))))
+
+    ;; Prometheus node exporter
+    (service prometheus-node-exporter-service-type)
+    ;; Prometheus OCI backed Shepherd service
+    (service oci-prometheus-service-type
+              (oci-prometheus-configuration
+                (network "host")))
+    ;; Grafana OCI backed Shepherd service
+    (service oci-grafana-service-type
+               (oci-grafana-configuration
+                (network "host")))
     
     %custom-desktop-services)))
  

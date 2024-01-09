@@ -32,6 +32,8 @@
                                             "syncthing"
                                             "trash-cli"
                                             "gsettings-desktop-schemas"
+					    "gnome-themes-extra"
+					    "file"
                                             "firefox"
                                             "glib:bin"
                                             "evince"
@@ -41,6 +43,7 @@
                                             "ublock-origin-chromium"
                                             "keychain"
                                             "icedove-wayland"
+					    "obs-pipewire-audio-capture"
                                             "obs-wlrobs"
                                             "obs"
 					    "dmenu"
@@ -122,6 +125,7 @@
 					    "tumbler"
 					    "libgsf"
 					    "thunar-archive-plugin"
+					    "font-google-material-design-icons"
 					    )))
 
   ;; Below is the list of Home services.  To search for available
@@ -148,6 +152,11 @@
 		    ("xfce4/xfconf/xfce-perchannel-xml/thunar.xml" ,(local-file "thunar.xml"))
 		    ("nvim/init.lua" ,(local-file "nvim/init.lua"))
 		    ("nvim/lua/plugins.lua", (local-file "nvim/lua/plugins.lua"))))
+	 (simple-service
+	   'env-vars home-environment-variables-service-type
+	   `(("QT_QPA_PLATFORM" . "wayland;xcb")
+             ("GTK_THEME" . "Yaru-dark")
+             ("SDL_VIDEODRIVER" . "wayland")))
 	 (service home-syncthing-service-type)
 	 (service home-dbus-service-type)
 	 (service home-pipewire-service-type)
