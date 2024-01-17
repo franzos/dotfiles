@@ -36,3 +36,4 @@ eval `keychain --eval --agents ssh franz`
 # Apps
 export EDITOR=nvim
 export QT_QPA_PLATFORM="wayland;xcb"
+export PATH=$PATH:~/.cargo/bin/

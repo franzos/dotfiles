@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Visual Studio Code
+Comment=Code Editing. Redefined.
+GenericName=Text Editor
+Exec=guix shell node pnpm -- code --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland
+Icon=vscode
+Type=Application
+StartupNotify=true
+StartupWMClass=Code
+Categories=TextEditor;Development;IDE;
+Actions=new-empty-window;
+Keywords=vscode;
+
