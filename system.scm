@@ -45,8 +45,8 @@
              (px packages bluetooth)
 	     (px packages images)
 	     
-	     (oci services grafana)
-	     (oci services prometheus)
+	     ;; (oci services grafana)
+	     ;; (oci services prometheus)
 	     (gnu services monitoring))
 
 (use-service-modules docker
@@ -188,7 +188,7 @@
     brightnessctl ;; keyboard backlight
     xdg-desktop-portal
     xdg-desktop-portal-wlr
-    xdg-desktop-portal-gtk
+    ;; xdg-desktop-portal-gtk
     hicolor-icon-theme
     papirus-icon-theme
     gnome-themes-extra 
@@ -278,15 +278,15 @@
 		 (list acsccid))))
 
     ;; Prometheus node exporter
-    (service prometheus-node-exporter-service-type)
+    ;; (service prometheus-node-exporter-service-type)
     ;; Prometheus OCI backed Shepherd service
-    (service oci-prometheus-service-type
-              (oci-prometheus-configuration
-                (network "host")))
+    ;; (service oci-prometheus-service-type
+    ;;           (oci-prometheus-configuration
+    ;;             (network "host")))
     ;; Grafana OCI backed Shepherd service
-    (service oci-grafana-service-type
-               (oci-grafana-configuration
-                (network "host")))
+    ;; (service oci-grafana-service-type
+    ;;            (oci-grafana-configuration
+    ;;             (network "host")))
     
     %custom-desktop-services)))
  
