@@ -1,7 +1,8 @@
 (use-modules (gnu)
              (gnu system)
              (gnu system setuid)
-
+	     
+	     (gnu services linux)
              (gnu services base)
              (gnu services mcron)
              (gnu services sysctl)
@@ -34,7 +35,7 @@
              (gnu packages web)
              (gnu packages networking)
 	     (gnu packages vim)
-
+	     
              (nongnu packages linux)
              (nongnu system linux-initrd)
 
@@ -43,10 +44,7 @@
              (px packages throttled)
              (px services networking)
              (px packages bluetooth)
-	     (px packages images)
-	     
-	     ;; (oci services grafana)
-	     ;; (oci services prometheus)
+	     (px packages images)	     
 	     (gnu services monitoring))
 
 (use-service-modules docker
@@ -62,9 +60,9 @@
 (define %backlight-udev-rule
   (udev-rule "90-backlight.rules"
              (string-append "ACTION==\"add\", SUBSYSTEM==\"backlight\", "
-              "RUN+=\"/run/current-system/profile/bin/chgrp video /sys/class/backlight/intel_backlight/brightness\""
-              "\n" "ACTION==\"add\", SUBSYSTEM==\"backlight\", "
-              "RUN+=\"/run/current-system/profile/bin/chmod g+w /sys/class/backlight/intel_backlight/brightness\"")))
+			    "RUN+=\"/run/current-system/profile/bin/chgrp video /sys/class/backlight/intel_backlight/brightness\""
+			    "\n" "ACTION==\"add\", SUBSYSTEM==\"backlight\", "
+			    "RUN+=\"/run/current-system/profile/bin/chmod g+w /sys/class/backlight/intel_backlight/brightness\"")))
 
 (define updatedb-job
   ;; Run 'updatedb' at 3AM every day.  Here we write the
@@ -81,18 +79,19 @@
          "guix gc -d 4m -F 10G"))
 
 (define %custom-desktop-services
-  (modify-services %px-desktop-core-services
-    (delete login-service-type)
-    (delete mingetty-service-type)
-    (delete pulseaudio-service-type)
-    (delete alsa-service-type)
-
-    (sysctl-service-type 
-      config =>
-      (sysctl-configuration 
-	(inherit config)
-	(settings (append '(("fs.inotify.max_user_watches" . "524288"))
-			  %default-sysctl-settings))))))
+  (modify-services
+   %px-desktop-core-services
+   (delete login-service-type)
+   (delete mingetty-service-type)
+   (delete pulseaudio-service-type)
+   (delete alsa-service-type)
+   
+   (sysctl-service-type 
+    config =>
+    (sysctl-configuration 
+     (inherit config)
+     (settings (append '(("fs.inotify.max_user_watches" . "524288"))
+		       %default-sysctl-settings))))))
 
 (px-desktop-os
  (operating-system
@@ -103,15 +102,15 @@
   (kernel linux)
   (initrd microcode-initrd)
   (firmware
-    (list linux-firmware))
+   (list linux-firmware))
   
   (initrd-modules
-    (cons* "i915"
-	   %base-initrd-modules))
+   (cons* "i915"
+	  %base-initrd-modules))
   
   (kernel-arguments 
-    (cons* "snd_hda_intel.dmic_detect=0"
-	   %default-kernel-arguments))
+   (cons* "snd_hda_intel.dmic_detect=0"
+	  %default-kernel-arguments))
   
   (bootloader (bootloader-configuration
                (bootloader grub-efi-bootloader)
@@ -179,16 +178,10 @@
     dunst ;; notifications
     wlr-randr ;; display
     kanshi ;; auso display management
-    wl-clipboard
-    clipman
-    grim ;; screenshot
     pinentry ;; pgp
     pavucontrol ;; pulseaudio gui
     pamixer ;; keyboard volume
     brightnessctl ;; keyboard backlight
-    xdg-desktop-portal
-    xdg-desktop-portal-wlr
-    ;; xdg-desktop-portal-gtk
     hicolor-icon-theme
     papirus-icon-theme
     gnome-themes-extra 
@@ -201,11 +194,15 @@
     thunar ;; files
     mpv ;; video
     qimgv ;; images
-
+    
     %px-desktop-core-packages))
   
   (services
    (cons*
+    (service zram-device-service-type
+	     (zram-device-configuration
+	      (size "8G")
+	      (priority 0)))
     (service screen-locker-service-type
              (screen-locker-configuration
 	      (name "swaylock")
@@ -274,19 +271,8 @@
     
     (service pcscd-service-type
              (pcscd-configuration 
-	       (usb-drivers 
+	      (usb-drivers 
 		 (list acsccid))))
-
-    ;; Prometheus node exporter
-    ;; (service prometheus-node-exporter-service-type)
-    ;; Prometheus OCI backed Shepherd service
-    ;; (service oci-prometheus-service-type
-    ;;           (oci-prometheus-configuration
-    ;;             (network "host")))
-    ;; Grafana OCI backed Shepherd service
-    ;; (service oci-grafana-service-type
-    ;;            (oci-grafana-configuration
-    ;;             (network "host")))
     
     %custom-desktop-services)))
  
