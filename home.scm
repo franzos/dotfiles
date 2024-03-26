@@ -150,7 +150,8 @@
 		 `((".gtkrc-2.0", (local-file "gtkrc-2.0"))
 		   (".local/share/applications/vscode.desktop", (local-file "apps/vscode.desktop"))
 		   (".local/share/applications/vscode_go.desktop", (local-file "apps/vscode_go.desktop"))
-		   (".local/share/applications/vscode_rust.desktop", (local-file "apps/vscode_rust.desktop"))))
+		   (".local/share/applications/vscode_rust.desktop", (local-file "apps/vscode_rust.desktop"))
+		   (".local/share/applications/vscode_cpp.desktop", (local-file "apps/vscode_cpp.desktop"))))
 	(service home-xdg-configuration-files-service-type
 		 `(("sway/config" ,(local-file "sway"))
 		   ("waybar/config", (local-file "waybar"))
