@@ -46,16 +46,16 @@
              (px packages bluetooth)
 	     (px packages images)	     
 	     (gnu services monitoring)
-       (guix packages)
-       (guix channels)
-       (guix git-download)
-       (guix build-system meson)
-       (gnu packages gtk)
-       (gnu packages xorg)
-       (gnu packages pcre)
-       (gnu packages gl)
-       (gnu packages pkg-config)
-       (gnu packages man))
+       	     (guix packages)
+       	     (guix channels)
+       	     (guix git-download)
+	     (guix build-system meson)
+	     (gnu packages gtk)
+	     (gnu packages xorg)
+	     (gnu packages pcre)
+	     (gnu packages gl)
+	     (gnu packages pkg-config)
+	     (gnu packages man))
 
 (use-service-modules docker
                      pm
@@ -70,55 +70,56 @@
   (package
    (inherit sway)
    (name "sway")
-    (version "1.8.1")
-    (source
-     (origin
-      (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/swaywm/sway")
-             (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1y7brfrsjnm9gksijgnr6zxqiqvn06mdiwsk5j87ggmxazxd66av"))))
-    (build-system meson-build-system)
-    (arguments
-     `(;; elogind is propagated by wlroots -> libseat
-       ;; and would otherwise shadow basu.
-       #:configure-flags
-       '("-Dsd-bus-provider=basu")
-       #:phases
-       (modify-phases %standard-phases
-		      (add-before 'configure 'hardcode-paths
-				  (lambda* (#:key inputs #:allow-other-keys)
-				    ;; Hardcode path to swaybg.
-				    (substitute* "sway/config.c"
-						 (("strdup..swaybg..")
-						  (string-append "strdup(\"" (assoc-ref inputs "swaybg")
-								 "/bin/swaybg\")")))
-				    ;; Hardcode path to scdoc.
-				    (substitute* "meson.build"
-						 (("scdoc.get_pkgconfig_variable..scdoc..")
-						  (string-append "'" (assoc-ref inputs "scdoc")
-								 "/bin/scdoc'")))
-				    #t)))))
-    (inputs (list basu
-                  cairo
-                  gdk-pixbuf
-                  json-c
-                  libevdev
-                  libinput-minimal
-                  libxkbcommon
-                  pango
-                  pcre2
-                  swaybg
-                  wayland
-                  wlroots-0.16))
-    (native-inputs
-     (cons* linux-pam mesa pkg-config scdoc wayland-protocols
-            (if (%current-target-system)
-		(list pkg-config-for-build
-                    wayland)
-		'())))))
+   (version "1.8.1")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/swaywm/sway")
+           (commit version)))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32 "1y7brfrsjnm9gksijgnr6zxqiqvn06mdiwsk5j87ggmxazxd66av"))))
+   (build-system meson-build-system)
+   (arguments
+    `(;; elogind is propagated by wlroots -> libseat
+      ;; and would otherwise shadow basu.
+      #:configure-flags
+      '("-Dsd-bus-provider=basu")
+      #:phases
+      (modify-phases
+       %standard-phases
+       (add-before 'configure 'hardcode-paths
+		   (lambda* (#:key inputs #:allow-other-keys)
+		     ;; Hardcode path to swaybg.
+		     (substitute* "sway/config.c"
+				  (("strdup..swaybg..")
+				   (string-append "strdup(\"" (assoc-ref inputs "swaybg")
+						  "/bin/swaybg\")")))
+		     ;; Hardcode path to scdoc.
+		     (substitute* "meson.build"
+				  (("scdoc.get_pkgconfig_variable..scdoc..")
+				   (string-append "'" (assoc-ref inputs "scdoc")
+						  "/bin/scdoc'")))
+		     #t)))))
+   (inputs (list basu
+                 cairo
+                 gdk-pixbuf
+                 json-c
+                 libevdev
+                 libinput-minimal
+                 libxkbcommon
+                 pango
+                 pcre2
+                 swaybg
+                 wayland
+                 wlroots-0.16))
+   (native-inputs
+    (cons* linux-pam mesa pkg-config scdoc wayland-protocols
+           (if (%current-target-system)
+	       (list pkg-config-for-build
+                     wayland)
+	       '())))))
 
 ;; Allow members of the "video" group to change the screen brightness.
 (define %backlight-udev-rule
@@ -144,25 +145,8 @@
 
 (define %custom-desktop-services
   (modify-services
-   %px-desktop-core-services
-   (delete login-service-type)
-   (delete mingetty-service-type)
-   (delete pulseaudio-service-type)
-   (delete alsa-service-type)
-
-   (guix-service-type config =>
-    (guix-configuration
-     (inherit config)
-      (channels (cons* (channel
-                 (name 'pantherx)
-                 (branch "master")
-                 (url "https://channels.pantherx.org/git/panther.git")
-                  (introduction
-                   (make-channel-introduction
-                   "54b4056ac571611892c743b65f4c47dc298c49da"
-                   (openpgp-fingerprint
-                   "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
-                   %default-channels))))
+   %px-desktop-minmal-services
+   ;; (delete login-service-type)
 			  
    (sysctl-service-type 
     config =>
@@ -274,7 +258,7 @@
     mpv ;; video
     qimgv ;; images
     
-    %px-desktop-core-packages))
+    %px-desktop-minimal-packages))
   
   (services
    (cons*

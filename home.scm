@@ -112,6 +112,7 @@
                                            "hunspell-dict-en"
                                            "hunspell-dict-en-us"
                                            "aspell-dict-en"
+					   "aspell-dict-de"
                                            "unicode-emoji"
                                            "aspell-dict-uk"
 					   "qpwgraph"
@@ -131,6 +132,8 @@
 					   "libgsf"
 					   "thunar-archive-plugin"
 					   "font-google-material-design-icons"
+					   "libreoffice"
+					   "openssh"
 					   )))
  
  ;; Below is the list of Home services.  To search for available
@@ -170,6 +173,7 @@
 	(service home-dbus-service-type)
 	(service home-pipewire-service-type)
 	(service home-openssh-service-type)
+	(service home-ssh-agent-service-type)
 	(service home-gpg-agent-service-type
 		 (home-gpg-agent-configuration
                   (pinentry-program
