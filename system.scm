@@ -58,12 +58,72 @@
 (define garbage-collector-job
   #~(job "5 0 * * *" "guix gc -d 4m -F 10G"))
 
+;; https://stackoverflow.com/a/77312416
+(define %nftables-ruleset
+  (plain-file "nftables.conf"
+              "# Firewall
+table inet filter {
+  chain input {
+    type filter hook input priority 0; policy drop;
+
+    # early drop of invalid connections
+    ct state invalid drop
+
+    # allow established/related connections
+    ct state { established, related } accept
+
+    # allow from loopback
+    iif lo accept
+    # drop connections to lo not coming from lo
+    iif != lo ip daddr 127.0.0.1/8 drop
+    iif != lo ip6 daddr ::1/128 drop
+
+    # allow icmp
+    ip protocol icmp accept
+    ip6 nexthdr icmpv6 accept
+
+    # allow ssh
+    tcp dport ssh accept
+
+    # allow 4001?
+    tcp dport 4001 accept
+
+    # allow 22000?
+    tcp dport 22000 accept
+
+    # allow 3000?
+    tcp dport 3000 accept
+
+    # reject everything else
+    reject with icmpx type port-unreachable
+  }
+  chain forward {
+    type filter hook forward priority 0; policy drop;
+
+    # Allow outgoing traffic, initiated by docker containers
+    # This includes container-container and container-world traffic 
+    # (assuming interface name is docker0)
+    iifname \"docker0\" accept
+
+    # Allow incoming traffic from established connections
+    # This includes container-world traffic
+    ct state vmap { established: accept, related: accept, invalid: drop }
+  }
+  chain output {
+    type filter hook output priority 0; policy accept;
+  }
+}
+"))
+
 (define %custom-desktop-services
   (modify-services %px-desktop-minmal-services
+       (nftables-service-type config =>
+        (nftables-configuration
+         (ruleset %nftables-ruleset)))
 		   (sysctl-service-type config =>
-                         (sysctl-configuration
+        (sysctl-configuration
 			  (inherit config)
-                          (settings
+        (settings
 			   (append '(("fs.inotify.max_user_watches" . "524288"))
                                    %default-sysctl-settings))))))
 
@@ -216,10 +276,12 @@
     
     (service pcscd-service-type
              (pcscd-configuration
-	      (usb-drivers (list
-                            acsccid))))
+	      (usb-drivers (list acsccid))))
+    
+    (service block-facebook-hosts-service-type)
+    ;; Comes with udisks-service-type
+    (service gvfs-service-type)
     
     %custom-desktop-services)))
  
- #:kernel 'custom
- #:open-ports '(("tcp" "4001" "22000" "3000")))
+ #:kernel 'custom)

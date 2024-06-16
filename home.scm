@@ -10,7 +10,9 @@
              (gnu services)
              (guix gexp)
              (guix profiles)
+	     (guix channels)
              (gnu home services)
+	     (gnu home services guix)
              (gnu home services ssh)
              (gnu home services gnupg)
              (gnu home services shells)
@@ -23,10 +25,10 @@
   ;; Home profile, under ~/.guix-home/profile.
  (packages
   (specifications->packages
-   (list "alacritty"
-         "qutebrowser"
-         "neovim"
-         "qalculate-gtk"
+   (list "alacritty"			;; terminal
+         "qutebrowser" 			;; kb browser
+         "neovim" 			;; editor
+         "qalculate-gtk" 		;; calculator
          "transmission"
          "vscode"
          "signal-desktop"
@@ -35,11 +37,10 @@
          "trash-cli"
          "gsettings-desktop-schemas"
          "gnome-themes-extra"
-         "file"
+         "file"				;; TODO: remove?
          "firefox"
          "glib:bin"
          "evince"
-         "telegram-desktop"
          "electrum-cc"
          "calibre"
          "ublock-origin-chromium"
@@ -48,27 +49,30 @@
          "obs-pipewire-audio-capture"
          ;; "xdg-desktop-portal"
          "xdg-desktop-portal-wlr"
+         ;; without this, the file dialog is properly styled
+         ;; "xdg-desktop-portal-gtk"
          "obs-wlrobs"
          "obs"
          "wl-clipboard"
          "clipman"
-         "grim"
+         "grim"				;; screenshot editing
          "dmenu"
          "recoll"
          "bitcoin-core"
          "qemu"
          "wireshark"
-         "kleopatra"
+         "kleopatra"			;; pgp
          "docker"
-         "quassel"
-         "linphone-desktop"
+         "quassel"			;; irc
+         "linphone-desktop"          	;; voip
          "libreoffice"
          "flatpak"
          "nheko"
          "monero"
-         "ungoogled-chromium"
-         "tomb"
-         "keepassxc"
+         "ungoogled-chromium"           ;; browser
+         "tomb"                         ;; secrets manager
+	       "steghide"
+         "keepassxc"			;; password manager
          "vlc"
          "guvcview"
          "gimp"
@@ -77,39 +81,37 @@
          "seahorse"
          "inkscape"
          "emacs"
-         "docker-compose"
+	       "docker-cli"
+         "docker-compose@2"
          "git"
          "tigervnc-client"
          "recutils"
          "curl"
-         "adb"
          "wget"
          "bind:utils"
          "rsync"
-         "graphicsmagick"
-         "imagemagick"
+         ;; "graphicsmagick"
+         ;; "imagemagick"
          "glances"
          "python"
          "nmap"
-         "steghide"
          "shellcheck"
          "emacs-geiser-guile"
-         "docker-cli"
          "bmon"
          "htop"
          "unzip"
          "aspell"
+         "wireplumber"
          "wireguard-tools"
          "zip"
          "lsof"
-         "pnpm"
          "font-linuxlibertine"
          "net-tools"
          "unrar"
          "libusb"
          "emacs-geiser"
          "font-openmoji"
-         "restic"
+         "restic"			;; backup
          "font-ibm-plex"
          "hunspell-dict-en"
          "hunspell-dict-en-us"
@@ -124,15 +126,10 @@
          "swappy"
          "wf-recorder"
          "playerctl"
-         "yaru-theme"
          "keychain"
          "dconf"
          "evince"
-         "ffmpegthumbnailer"
-         "webp-pixbuf-loader"
-         "tumbler" ;dbus
          "libgsf"
-         "thunar-archive-plugin"
          "font-google-material-design-icons"
          "libreoffice"
          "openssh"
@@ -140,23 +137,34 @@
          "swaylock"
          "swaybg"
          "bemenu"
-         "j4-dmenu-desktop" ;flatpak in bemenu
-         "waybar" ;status bar
-         "dunst" ;notifications
-         "pinentry" ;prompt for php, ssh, ...
-         "pavucontrol" ;audio control
-         "pamixer" ;keyboard audio volumne
-         "brightnessctl" ;keyboard display brightness
-         "hicolor-icon-theme"
+	       "blueman"
+         "j4-dmenu-desktop" 		;; flatpak in bemenu
+         "waybar" 			;; status bar
+         "dunst" 			;; notifications
+         "pinentry" 			;; prompt for php, ssh, ...
+         "pavucontrol" 			;; audio control
+         "pamixer" 			;; keyboard audio volumne
+         "brightnessctl" 		;; keyboard display brightness
+         "yaru-theme"
+	       "hicolor-icon-theme"
          "papirus-icon-theme"
          "gnome-themes-extra"
          "adwaita-icon-theme"
          "font-awesome"
-         "thunar" ;file manager
-         "xfconf" ;persist thunar changes
-         "qimgv" ;image viewer
-         "mpv" ;video player
-         "kanshi" ;auto display handling
+         "thunar" 			;; file manager
+         "thunar-vcs-plugin" 		;; git integration
+         "thunar-archive-plugin" 	;; archive integration
+         "xarchiver"       ;; archive manager
+         "thunar-media-tags-plugin" 	;; media tags
+         "xfconf" 			;; persist thunar changes
+         "catfish" 			;; file search
+         "ffmpegthumbnailer"
+         "webp-pixbuf-loader"		;; thunar thumbnails
+         "tumbler" 			;; thunar thumbnails dbus
+         "qimgv" 			;; image viewer
+         "mpv" 				;; video player
+         "kanshi" 			;; auto display handling
+         "throttled"
          )))
  
  ;; Below is the list of Home services.  To search for available
@@ -195,16 +203,39 @@
                                              "nvim/lua/plugins.lua"))))
         (simple-service 'env-vars home-environment-variables-service-type
                         `(("QT_QPA_PLATFORM" . "wayland;xcb")
-                           ("GTK_THEME" . "Yaru-dark")
-                           ("SDL_VIDEODRIVER" . "wayland")
-                           ("XDG_DATA_DIRS" . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")))
-         (service home-syncthing-service-type)
-         (service home-dbus-service-type)
-         (service home-pipewire-service-type)
-         (service home-openssh-service-type)
-         (service home-ssh-agent-service-type)
-         (service home-gpg-agent-service-type
-                  (home-gpg-agent-configuration
-		   (pinentry-program
-		    (file-append
-                     pinentry "/bin/pinentry")))))))
+                          ("GTK_THEME" . "Yaru-dark")
+                          ("SDL_VIDEODRIVER" . "wayland")
+                          ("XDG_DATA_DIRS" . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")
+			  ("XDG_CURRENT_DESKTOP" . "sway")
+			  ("XDG_SESSION_DESKTOP" . "sway")
+			  ("XDG_SESSION_TYPE" . "wayland")))
+	(simple-service 'variant-packages-service
+			 home-channels-service-type
+			 (cons* (channel
+				 (name 'pantherx)
+				 (branch "master")
+				 (url "https://channels.pantherx.org/git/panther.git")
+				 (introduction
+				  (make-channel-introduction
+				   "54b4056ac571611892c743b65f4c47dc298c49da"
+				   (openpgp-fingerprint
+				    "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
+				(channel
+				 (name 'small-guix)
+				 (url "https://gitlab.com/orang3/small-guix")
+				 (introduction
+				  (make-channel-introduction
+				   "f260da13666cd41ae3202270784e61e062a3999c"
+				   (openpgp-fingerprint
+				    "8D10 60B9 6BB8 292E 829B  7249 AED4 1CC1 93B7 01E2"))))
+				%default-channels))
+        (service home-syncthing-service-type)
+        (service home-dbus-service-type)
+        (service home-pipewire-service-type)
+        (service home-openssh-service-type)
+        (service home-ssh-agent-service-type)
+        (service home-gpg-agent-service-type
+                 (home-gpg-agent-configuration
+		  (pinentry-program
+		   (file-append
+                    pinentry "/bin/pinentry")))))))
