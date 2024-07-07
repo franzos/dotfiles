@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Icedove GPG
+Exec=LD_LIBRARY_PATH="$(guix build gpgme)/lib" icedove %u
+Icon=icedove
+GenericName=Mail/News Client
+Categories=Network;Email;
+Terminal=false
+StartupNotify=true
+MimeType=x-scheme-handler/mailto;
+Type=Application
+Actions=ComposeMessage;
+[Desktop Action ComposeMessage]
+Name=Write new message
+Exec=LD_LIBRARY_PATH="$(guix build gpgme)/lib" icedove -compose

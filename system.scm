@@ -276,7 +276,7 @@ table inet filter {
     
     (service pcscd-service-type
              (pcscd-configuration
-	      (usb-drivers (list acsccid))))
+	      (usb-drivers (list acsccid ccid))))
     
     (service block-facebook-hosts-service-type)
     ;; Comes with udisks-service-type
