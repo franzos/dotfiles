@@ -25,13 +25,15 @@
   ;; Home profile, under ~/.guix-home/profile.
  (packages
   (specifications->packages
-   (list "alacritty"			;; terminal
-         "qutebrowser" 			;; kb browser
-         "neovim" 			;; editor
-         "qalculate-gtk" 		;; calculator
+   (list "alacritty"                ;; terminal
+         "qutebrowser"              ;; kb browser
+         "neovim"                   ;; editor
+         "qalculate-gtk"            ;; calculator
+         "mousepad"                 ;; text editor
+         "logseq"
          "transmission"
          "vscode"
-         "signal-desktop"
+         ;; "signal-desktop"
          "vscodium"
          "syncthing"
          "trash-cli"
@@ -41,9 +43,10 @@
          "firefox"
          "glib:bin"
          "evince"
-         "electrum-cc"
+         ;; "electrum-cc"
          "calibre"
          "ublock-origin-chromium"
+         "gpgme"
          "keychain"
          "icedove-wayland"
          "obs-pipewire-audio-capture"
@@ -55,24 +58,24 @@
          "obs"
          "wl-clipboard"
          "clipman"
-         "grim"				;; screenshot editing
+         "grim"                      ;; screenshot editing
          "dmenu"
          "recoll"
-         "bitcoin-core"
+         ;; "bitcoin-core"
          "qemu"
          "wireshark"
-         "kleopatra"			;; pgp
+         "kleopatra"                 ;; pgp
          "docker"
-         "quassel"			;; irc
-         "linphone-desktop"          	;; voip
+         "quassel"                   ;; irc
+         "linphone-desktop"          ;; voip
          "libreoffice"
          "flatpak"
          "nheko"
          "monero"
-         "ungoogled-chromium"           ;; browser
-         "tomb"                         ;; secrets manager
-	       "steghide"
-         "keepassxc"			;; password manager
+         "ungoogled-chromium"        ;; browser
+         "tomb"                      ;; secrets manager
+         "steghide"
+         "keepassxc"                 ;; password manager
          "vlc"
          "guvcview"
          "gimp"
@@ -81,7 +84,7 @@
          "seahorse"
          "inkscape"
          "emacs"
-	       "docker-cli"
+         "docker-cli"
          "docker-compose@2"
          "git"
          "tigervnc-client"
@@ -111,7 +114,7 @@
          "libusb"
          "emacs-geiser"
          "font-openmoji"
-         "restic"			;; backup
+         "restic"                    ;; backup
          "font-ibm-plex"
          "hunspell-dict-en"
          "hunspell-dict-en-us"
@@ -137,35 +140,37 @@
          "swaylock"
          "swaybg"
          "bemenu"
-	       "blueman"
-         "j4-dmenu-desktop" 		;; flatpak in bemenu
-         "waybar" 			;; status bar
-         "dunst" 			;; notifications
-         "pinentry" 			;; prompt for php, ssh, ...
-         "pavucontrol" 			;; audio control
-         "pamixer" 			;; keyboard audio volumne
-         "brightnessctl" 		;; keyboard display brightness
+         "blueman"
+         "j4-dmenu-desktop"          ;; flatpak in bemenu
+         "waybar"                    ;; status bar
+         "dunst"                     ;; notifications
+         "pinentry"                  ;; prompt for php, ssh, ...
+         "pavucontrol"               ;; audio control
+         "pamixer"                   ;; keyboard audio volumne
+         "brightnessctl"             ;; keyboard display brightness
          "yaru-theme"
-	       "hicolor-icon-theme"
+         "hicolor-icon-theme"
          "papirus-icon-theme"
          "gnome-themes-extra"
          "adwaita-icon-theme"
          "font-awesome"
-         "thunar" 			;; file manager
-         "thunar-vcs-plugin" 		;; git integration
-         "thunar-archive-plugin" 	;; archive integration
-         "xarchiver"       ;; archive manager
-         "thunar-media-tags-plugin" 	;; media tags
-         "xfconf" 			;; persist thunar changes
-         "catfish" 			;; file search
+         "thunar"                    ;; file manager
+         "thunar-vcs-plugin"         ;; git integration
+         "thunar-archive-plugin"     ;; archive integration
+         "xarchiver"                 ;; archive manager
+         "thunar-media-tags-plugin"  ;; media tags
+         "thunar-volman"             ;; removable media manager
+         "xfconf"                    ;; persist thunar changes
+         "catfish"                   ;; file search
          "ffmpegthumbnailer"
-         "webp-pixbuf-loader"		;; thunar thumbnails
-         "tumbler" 			;; thunar thumbnails dbus
-         "qimgv" 			;; image viewer
-         "mpv" 				;; video player
-         "kanshi" 			;; auto display handling
+         "webp-pixbuf-loader"        ;; thunar thumbnails
+         "tumbler"                   ;; thunar thumbnails dbus
+         "qimgv"                     ;; image viewer
+         "mpv" 				               ;; video player
+         "kanshi" 			             ;; auto display handling
          "throttled"
-         )))
+         "xdg-utils"
+	 )))
  
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
