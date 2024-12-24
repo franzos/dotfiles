@@ -22,8 +22,10 @@
              (gnu packages gnome)
              (gnu packages freedesktop)
              (gnu packages vim)
+             (gnu packages security-token)
 
              (nongnu packages linux)
+             (nongnu packages firmware)
              (nongnu system linux-initrd)
 
              (px system config)
@@ -130,7 +132,7 @@ table inet filter {
 (px-desktop-os
  (operating-system
   (host-name "panther")
-  (timezone "Europe/Lisbon")
+  (timezone "Europe/Paris")
   (locale "en_US.utf8")
   
   (kernel linux)
@@ -266,11 +268,16 @@ table inet filter {
 	      (mail-location
                "maildir:~/.mail")))
     
+    (service containerd-service-type)
     (service docker-service-type)
     (service nebula-service-type)
     (simple-service 'my-cron-jobs mcron-service-type
                     (list garbage-collector-job
                           updatedb-job))
+
+    ;; https://www.reddit.com/r/GUIX/comments/xjjmtr/comment/iqs6cwe/
+    (simple-service 'fwupd-polkit polkit-service-type
+                (list fwupd-nonfree))
     
     (udev-rules-service 'backlight %backlight-udev-rule)
     
