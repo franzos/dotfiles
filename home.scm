@@ -10,9 +10,9 @@
              (gnu services)
              (guix gexp)
              (guix profiles)
-	     (guix channels)
+             (guix channels)
              (gnu home services)
-	     (gnu home services guix)
+             (gnu home services guix)
              (gnu home services ssh)
              (gnu home services gnupg)
              (gnu home services shells)
@@ -26,7 +26,6 @@
  (packages
   (specifications->packages
    (list "alacritty"                ;; terminal
-         "qutebrowser"              ;; kb browser
          "neovim"                   ;; editor
          "qalculate-gtk"            ;; calculator
          "mousepad"                 ;; text editor
@@ -34,18 +33,17 @@
          "transmission"
          "vscode"
          ;; "signal-desktop"
-         "vscodium"
+         ;; "vscodium"
          "syncthing"
-         "trash-cli"
+         ;; failing build
+         ;; "trash-cli"
          "gsettings-desktop-schemas"
          "gnome-themes-extra"
-         "file"				;; TODO: remove?
-         "firefox"
+         "file"	                    ;; file type guesser
+         "librewolf"
          "glib:bin"
          "evince"
-         ;; "electrum-cc"
          "calibre"
-         "ublock-origin-chromium"
          "gpgme"
          "keychain"
          "icedove-wayland"
@@ -59,9 +57,13 @@
          "wl-clipboard"
          "clipman"
          "grim"                      ;; screenshot editing
-         "dmenu"
-         "recoll"
-         ;; "bitcoin-core"
+         ;; should be replaced by rofi
+	       "dmenu"
+	       "j4-dmenu-desktop"          ;; flatpak integration
+         ;; dmenu replacement
+         "rofi-wayland"
+         "pinentry-rofi"
+	       "recoll"
          "qemu"
          "wireshark"
          "kleopatra"                 ;; pgp
@@ -72,7 +74,6 @@
          "flatpak"
          "nheko"
          "monero"
-         "ungoogled-chromium"        ;; browser
          "tomb"                      ;; secrets manager
          "steghide"
          "keepassxc"                 ;; password manager
@@ -93,8 +94,6 @@
          "wget"
          "bind:utils"
          "rsync"
-         ;; "graphicsmagick"
-         ;; "imagemagick"
          "glances"
          "python"
          "nmap"
@@ -135,13 +134,14 @@
          "libgsf"
          "font-google-material-design-icons"
          "libreoffice"
-         "openssh"
+         "openssh-sans-x"
          "swayidle"
          "swaylock"
          "swaybg"
+         "wlsunset"                  ;; Night light
          "bemenu"
          "blueman"
-         "j4-dmenu-desktop"          ;; flatpak in bemenu
+         ;; "j4-dmenu-desktop"          ;; flatpak in bemenu
          "waybar"                    ;; status bar
          "dunst"                     ;; notifications
          "pinentry"                  ;; prompt for php, ssh, ...
@@ -170,7 +170,7 @@
          "kanshi" 			             ;; auto display handling
          "throttled"
          "xdg-utils"
-	 )))
+   )))
  
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
@@ -211,29 +211,30 @@
                           ("GTK_THEME" . "Yaru-dark")
                           ("SDL_VIDEODRIVER" . "wayland")
                           ("XDG_DATA_DIRS" . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")
-			  ("XDG_CURRENT_DESKTOP" . "sway")
-			  ("XDG_SESSION_DESKTOP" . "sway")
-			  ("XDG_SESSION_TYPE" . "wayland")))
-	(simple-service 'variant-packages-service
-			 home-channels-service-type
-			 (cons* (channel
-				 (name 'pantherx)
-				 (branch "master")
-				 (url "https://channels.pantherx.org/git/panther.git")
-				 (introduction
-				  (make-channel-introduction
-				   "54b4056ac571611892c743b65f4c47dc298c49da"
-				   (openpgp-fingerprint
-				    "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
-				(channel
-				 (name 'small-guix)
-				 (url "https://gitlab.com/orang3/small-guix")
-				 (introduction
-				  (make-channel-introduction
-				   "f260da13666cd41ae3202270784e61e062a3999c"
-				   (openpgp-fingerprint
-				    "8D10 60B9 6BB8 292E 829B  7249 AED4 1CC1 93B7 01E2"))))
-				%default-channels))
+                          ("XDG_CURRENT_DESKTOP" . "sway")
+                          ("XDG_SESSION_DESKTOP" . "sway")
+                          ("XDG_SESSION_TYPE" . "wayland")))
+        (simple-service 'variant-packages-service
+         home-channels-service-type
+          (cons* 
+           (channel
+            (name 'pantherx)
+             (branch "master")
+              (url "https://channels.pantherx.org/git/panther.git")
+               (introduction
+                (make-channel-introduction
+                 "54b4056ac571611892c743b65f4c47dc298c49da"
+                 (openpgp-fingerprint
+                  "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
+           (channel
+            (name 'small-guix)
+             (url "https://gitlab.com/orang3/small-guix")
+              (introduction
+               (make-channel-introduction
+                "f260da13666cd41ae3202270784e61e062a3999c"
+                 (openpgp-fingerprint
+                  "8D10 60B9 6BB8 292E 829B  7249 AED4 1CC1 93B7 01E2"))))
+         %default-channels))
         (service home-syncthing-service-type)
         (service home-dbus-service-type)
         (service home-pipewire-service-type)
@@ -241,6 +242,8 @@
         (service home-ssh-agent-service-type)
         (service home-gpg-agent-service-type
                  (home-gpg-agent-configuration
-		  (pinentry-program
-		   (file-append
-                    pinentry "/bin/pinentry")))))))
+                  (pinentry-program
+                    (file-append
+                     pinentry "/bin/pinentry")))))))
+                    
+        ; %base-home-services)))

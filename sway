@@ -111,6 +111,9 @@ exec swayidle -w \
     timeout 1800 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
     before-sleep 'swaylock -f -c 000000'
 
+# Night Light (LIS lat/long)
+exec wlsunset -l 38.7 -L -9.2
+
 # xwayland version
 for_window [class="Firefox"] inhibit_idle fullscreen
 
