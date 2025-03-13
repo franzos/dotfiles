@@ -21,5 +21,11 @@ return require('packer').startup(function(use)
        "williamboman/mason-lspconfig.nvim",
        "neovim/nvim-lspconfig",
   }
+  use {
+       'mrcjkb/rustaceanvim',
+       version = '^3', -- Recommended
+       ft = { 'rust' },
+  }
+	
 end)
 

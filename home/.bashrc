@@ -31,7 +31,7 @@ alias ll='ls -l'
 alias grep='grep --color=auto'
 
 # SSH key
-eval `keychain --eval --agents ssh franz`
+eval `keychain --eval --agents ssh franz yk1 yk1.no-pin yk2 yk2.no-pin`
 
 # Apps
 export EDITOR=nvim
