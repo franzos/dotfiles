@@ -172,10 +172,10 @@
                   (aliases '(("grep" . "grep --color=auto") ("ll" . "ls -l")
                              ("ls" . "ls -p --color=auto")))
                   (bashrc (list (local-file
-                                 "/home/franz/src/guix-config/.bashrc"
+                                 ".bashrc"
                                  "bashrc")))
                   (bash-profile (list (local-file
-                                       "/home/franz/src/guix-config/.bash_profile"
+                                       ".bash_profile"
                                        "bash_profile")))))
         (service home-files-service-type
                  `((".gtkrc-2.0" ,(local-file "gtkrc-2.0"))

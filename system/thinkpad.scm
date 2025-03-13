@@ -3,6 +3,7 @@
   #:use-module (gnu)
   #:use-module (guix)
   #:use-module (gnu services xorg)
+  #:use-module (gnu services ssh)
   #:use-module (gnu services pm)             ;; tlp-service-type
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
@@ -59,6 +60,7 @@
 
  (services
   (cons*
+   (service openssh-service-type)
    (udev-rules-service 'backlight %backlight-udev-rule)
    (service tlp-service-type
             (tlp-configuration

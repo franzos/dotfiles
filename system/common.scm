@@ -65,14 +65,8 @@ table inet filter {
     # allow ssh
     tcp dport ssh accept
 
-    # allow 4001?
-    tcp dport 4001 accept
-
-    # allow 22000?
+    # syncthing
     tcp dport 22000 accept
-
-    # allow 3000?
-    tcp dport 3000 accept
 
     # reject everything else
     reject with icmpx type port-unreachable

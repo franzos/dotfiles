@@ -1,4 +1,4 @@
-(define-module (thinkpad)
+(define-module (framework)
   #:use-module (common)
   #:use-module (gnu)
   #:use-module (guix)

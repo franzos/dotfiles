@@ -30,10 +30,7 @@ exec dunst
 # Disk mounting
 exec udiskie
 
-# Keep stuff in sync
-# exec syncthing
-
-#  
+# daemon that provides settings to Xorg applications
 exec xsettingsd
 
 # music player daemon
@@ -42,8 +39,8 @@ exec xsettingsd
 # start/stop audio
 exec playerctld daemon
 
-### Blue light
-# khexec wlsunset -l 38.7441844 -L -9.242138
+# Night Light (LIS lat/long)
+exec wlsunset -l 38.7 -L -9.2
 
 # SwayFX
 #blur enable
@@ -58,7 +55,7 @@ exec playerctld daemon
 
 
 # Wallpaper
-output "*" bg ~/Desktop/Wallpaper/sebastian-staines-Jk4b7zztsek-unsplash.jpg fill
+output "*" bg ~/dotfiles/home/sebastian-staines-Jk4b7zztsek-unsplash.jpg fill
 
 # Theme for Gnome-apps
 set $gnome-schema org.gnome.desktop.interface
@@ -110,9 +107,6 @@ exec swayidle -w \
     timeout 1200 'swaylock -f -c 000000' \
     timeout 1800 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
     before-sleep 'swaylock -f -c 000000'
-
-# Night Light (LIS lat/long)
-exec wlsunset -l 38.7 -L -9.2
 
 # xwayland version
 for_window [class="Firefox"] inhibit_idle fullscreen
