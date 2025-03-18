@@ -4,18 +4,19 @@ My .dotfiles; A work in progress.
 
 ```bash
 sudo su - root
-SYS_CONF=/home/franz/src/config/system guix system -L $SYS_CONF reconfigure $SYS_CONF/thinkpad.scm
+export SYS_CONF=/home/franz/dotfiles/system && guix system -L $SYS_CONF reconfigure $SYS_CONF/thinkpad.scm
+export SYS_CONF=/home/franz/dotfiles/system && guix system -L $SYS_CONF reconfigure $SYS_CONF/framework.scm
 ```
 
 Debug
 
 ```bash
-SYS_CONF=/home/franz/src/config/system guix repl -L $SYS_CONF $SYS_CONF/thinkpad.scm
+SYS_CONF=/home/franz/dotfiles/system guix repl -L $SYS_CONF $SYS_CONF/thinkpad.scm
 ```
 
 ## Home Configuration
 
 ```bash
-cd /home/franz/src/config/home
+cd /home/franz/dotfiles/home
 guix home reconfigure home.scm
 ```

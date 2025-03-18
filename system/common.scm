@@ -74,17 +74,30 @@ table inet filter {
   chain forward {
     type filter hook forward priority 0; policy drop;
 
-    # Allow outgoing traffic, initiated by docker containers
-    # This includes container-container and container-world traffic 
-    # (assuming interface name is docker0)
-    iifname \"docker0\" accept
-
-    # Allow incoming traffic from established connections
-    # This includes container-world traffic
-    ct state vmap { established: accept, related: accept, invalid: drop }
+    # Allow established/related connections
+    ct state {established, related} accept
+    
+    # Allow all traffic from Docker networks
+    iifname \"docker*\" accept
+    iifname \"br-*\" accept
+    
+    # Allow all return traffic to Docker networks
+    oifname \"docker*\" accept
+    oifname \"br-*\" accept
   }
   chain output {
     type filter hook output priority 0; policy accept;
+  }
+}
+
+# NAT for Docker
+table ip nat {
+  chain postrouting {
+    type nat hook postrouting priority 100; policy accept;
+    
+    # Masquerade Docker subnets
+    ip saddr 172.17.0.0/16 oifname != \"docker0\" counter masquerade
+    ip saddr 172.18.0.0/16 oifname != \"br-*\" counter masquerade
   }
 }
 "))
@@ -92,11 +105,6 @@ table inet filter {
 (define %common-services
  (append
   (list
-   (service zram-device-service-type
-            (zram-device-configuration
-             (size "8G")
-             (priority 0)))
-   
    (service screen-locker-service-type
             (screen-locker-configuration
              (name "swaylock")
@@ -165,7 +173,7 @@ table inet filter {
    
    (service nftables-service-type
     (nftables-configuration
-     (ruleset %nftables-ruleset)))
+    (ruleset %nftables-ruleset)))
 
    (service bluetooth-service-type
             (bluetooth-configuration 

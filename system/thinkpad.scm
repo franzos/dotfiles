@@ -5,6 +5,7 @@
   #:use-module (gnu services xorg)
   #:use-module (gnu services ssh)
   #:use-module (gnu services pm)             ;; tlp-service-type
+  #:use-module (gnu services linux)          ;; zram-device-service-type
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd))
@@ -60,12 +61,21 @@
 
  (services
   (cons*
-   (service openssh-service-type)
+   (service zram-device-service-type
+            (zram-device-configuration
+             (size "8G")
+             (priority 0)))
+   (service openssh-service-type
+         (openssh-configuration
+           (x11-forwarding? #f)
+           (permit-root-login #f)
+           (password-authentication? #f)))
    (udev-rules-service 'backlight %backlight-udev-rule)
    (service tlp-service-type
             (tlp-configuration
-             (cpu-scaling-governor-on-ac (list "performance"))
-             ;; little faster, a lot hotter
+             (cpu-scaling-governor-on-ac (list "balanced"))
              ;; (cpu-boost-on-ac? #t)
+             (cpu-scaling-governor-on-bat (list "low-power"))
+             (cpu-boost-on-bat? #f)
              (sched-powersave-on-bat? #t)))
    %common-services)))
