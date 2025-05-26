@@ -20,3 +20,9 @@ SYS_CONF=/home/franz/dotfiles/system guix repl -L $SYS_CONF $SYS_CONF/thinkpad.s
 cd /home/franz/dotfiles/home
 guix home reconfigure home.scm
 ```
+
+## Mail
+
+```bash
+echo "Subject: Hi" | msmtp -a f-a.nz m@f-a.nz -v
+```

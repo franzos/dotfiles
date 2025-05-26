@@ -8,17 +8,23 @@
              (gnu home services)
              (gnu home services guix)
              (gnu home services ssh)
+             (gnu home services mail)
+             (gnu home services mcron)
              (gnu home services gnupg)
              (gnu home services shells)
              (gnu home services sound)
              (gnu home services desktop)
              (gnu home services syncthing))
 
+(define mcron-job-pimsync
+  #~(job '(next-minute '(0 10 20 30 40 50))
+         "pimsync sync"
+         #:user "franz"))
+
 (home-environment
  (packages
   (specifications->packages
-   (list "alacritty"                ;; terminal
-         "neovim"                   ;; editor
+   (list "neovim"                   ;; editor
          "qalculate-gtk"            ;; calculator
          "mousepad"                 ;; text editor
          "logseq"
@@ -32,6 +38,7 @@
          "gsettings-desktop-schemas"
          "gnome-themes-extra"
          "file"	                    ;; file type guesser
+         "google-chrome-stable"
          "librewolf"
          "glib:bin"
          "evince"
@@ -127,6 +134,9 @@
          "font-google-material-design-icons"
          "libreoffice"
          "openssh-sans-x"
+         "newsboat"
+         "mullvad-vpn-desktop"
+         "sway"
          "swayidle"
          "swaylock"
          "swaybg"
@@ -160,8 +170,17 @@
          "qimgv"                     ;; image viewer
          "mpv" 				               ;; video player
          "kanshi" 			             ;; auto display handling
-         "throttled"
          "xdg-utils"
+         ;; Emailing
+         "aerc"
+         "w3m"
+         "isync"
+         "msmtp"
+         "libsecret"
+         "pimsync"
+         "khal"
+         ;; Fan Control
+         "fw-fanctrl"
    )))
  
  ;; Below is the list of Home services.  To search for available
@@ -205,7 +224,9 @@
                           ("XDG_DATA_DIRS" . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")
                           ("XDG_CURRENT_DESKTOP" . "sway")
                           ("XDG_SESSION_DESKTOP" . "sway")
-                          ("XDG_SESSION_TYPE" . "wayland")))
+                          ("XDG_SESSION_TYPE" . "wayland")
+                          ;; Unknown terminal: foot
+                          ("TERM" . "xterm")))
         (simple-service 'variant-packages-service
          home-channels-service-type
           (cons* 
@@ -227,10 +248,31 @@
                  (openpgp-fingerprint
                   "8D10 60B9 6BB8 292E 829B  7249 AED4 1CC1 93B7 01E2"))))
          %default-channels))
+        (service home-msmtp-service-type
+         (home-msmtp-configuration
+          (accounts
+           (list
+            (msmtp-account
+             (name "f-a.nz")
+             (configuration
+              (msmtp-configuration
+               (auth? #t)
+               (tls? #t)
+               (tls-starttls? #f)
+               (host "smtp.fastmail.com")
+               (port 465)
+               (user "m@f-a.nz")
+               (from "m@f-a.nz")
+               (password-eval "secret-tool lookup Title smtp.fastmail.com_f-a.nz"))))))))
+        (service home-mcron-service-type
+         (home-mcron-configuration
+          (jobs (list
+                 mcron-job-pimsync))))
         (service home-syncthing-service-type)
         (service home-dbus-service-type)
         (service home-pipewire-service-type)
-        (service home-openssh-service-type)
+        ;; I want to manage SSH keys manually for now
+        ;; (service home-openssh-service-type)
         (service home-ssh-agent-service-type)
         (service home-gpg-agent-service-type
                  (home-gpg-agent-configuration

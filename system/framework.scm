@@ -3,14 +3,13 @@
   #:use-module (gnu)
   #:use-module (guix)
   #:use-module (gnu services xorg)
-  #:use-module (gnu services ssh)
-  #:use-module (gnu services pm)             ;; tlp-service-type
-  #:use-module (gnu services linux)          ;; zram-device-service-type
+  #:use-module (gnu services pm)              ;; tlp-service-type
+  #:use-module (gnu services linux)           ;; zram-device-service-type
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
-  #:use-module (nongnu system linux-initrd))
+  #:use-module (nongnu system linux-initrd)
+  #:use-module (small-guix services mullvad)) ;; mullvad-daemon-service-type
 
-;; https://repo.fo.am/zzkt/guix/src/branch/endless/config/framework13-system.scm
 (operating-system
  (inherit %common-os)
  (host-name "framework")
@@ -55,16 +54,12 @@
             (zram-device-configuration
              (size "24G")
              (priority 0)))
-   (service openssh-service-type
-         (openssh-configuration
-           (x11-forwarding? #f)
-           (permit-root-login #f)
-           (password-authentication? #f)))
    (service tlp-service-type
             (tlp-configuration
              (cpu-scaling-governor-on-ac (list "balanced" "performance"))
-             (cpu-boost-on-ac? #t)
+             (cpu-boost-on-ac? #f)
              (cpu-scaling-governor-on-bat (list "low-power"))
              (cpu-boost-on-bat? #f)
              (sched-powersave-on-bat? #t)))
+   (service mullvad-daemon-service-type)
    %common-services)))

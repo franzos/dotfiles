@@ -1,0 +1,6 @@
+# Not included in home.scm yet for quick testing
+
+# SwayFX
+blur enable
+shadows enable
+corner_radius 1

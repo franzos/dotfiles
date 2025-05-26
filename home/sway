@@ -11,7 +11,7 @@ set $up k
 set $right l
 
 # Terminal
-set $term alacritty
+set $term foot
 
 # App launcher
 set $menu dmenu_path | j4-dmenu-desktop --dmenu="bemenu --ignorecase" | xargs swaymsg exec --
