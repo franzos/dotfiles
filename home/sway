@@ -55,7 +55,7 @@ exec wlsunset -l 38.7 -L -9.2
 
 
 # Wallpaper
-output "*" bg ~/dotfiles/home/sebastian-staines-Jk4b7zztsek-unsplash.jpg fill
+output "*" bg ~/dotfiles/home/wallpaper/braxton-apana-8SVW7RrImEo-unsplash.jpg fill
 
 # Theme for Gnome-apps
 set $gnome-schema org.gnome.desktop.interface
