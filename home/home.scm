@@ -93,8 +93,11 @@
          "wget"
          "bind:utils"
          "rsync"
-         "glances"
+         "ripgrep"                   ;; better grep
+         "glances"                   ;; system monitor
          "python"
+         "scribus"                   ;; inDesign alternative
+         "python:tk"                 ;; for Scribus
          "nmap"
          "shellcheck"
          "emacs-geiser-guile"
@@ -186,10 +189,13 @@
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
  (services
-  (list (service home-bash-service-type
+  (append (list (service home-bash-service-type
                  (home-bash-configuration
-                  (aliases '(("grep" . "grep --color=auto") ("ll" . "ls -l")
-                             ("ls" . "ls -p --color=auto")))
+                  (aliases '(("grep" . "grep --color=auto") 
+                             ("ll" . "ls -l")
+                             ("ls" . "ls -p --color=auto")
+                             ("ccs" . "guix shell node pnpm -- pnpm dlx @anthropic-ai/claude-code")
+                             ("cc" . "pnpm dlx @anthropic-ai/claude-code")))
                   (bashrc (list (local-file
                                  ".bashrc"
                                  "bashrc")))
@@ -247,22 +253,13 @@
               "f260da13666cd41ae3202270784e61e062a3999c"
               (openpgp-fingerprint
                "8D10 60B9 6BB8 292E 829B  7249 AED4 1CC1 93B7 01E2"))))
-           (channel
-            (name 'divya-lambda)
-            (url "https://codeberg.org/divyaranjan/divya-lambda.git")
-            (branch "master")
-            (introduction
-             (make-channel-introduction
-              "fe2010125fcbe003de42436b1a73ab53cc5e8288"
-              (openpgp-fingerprint
-               "F0B3 1A69 8006 8FB8 096A  2F12 B245 10C6 108C 8D4A"))))
            %default-channels))
         (service home-msmtp-service-type
          (home-msmtp-configuration
           (accounts
            (list
             (msmtp-account
-             (name "f-a.nz")
+             (name "gofranz.com")
              (configuration
               (msmtp-configuration
                (auth? #t)
@@ -270,9 +267,9 @@
                (tls-starttls? #f)
                (host "smtp.fastmail.com")
                (port 465)
-               (user "m@f-a.nz")
-               (from "m@f-a.nz")
-               (password-eval "secret-tool lookup Title smtp.fastmail.com_f-a.nz"))))))))
+               (user "mail@gofranz.com")
+               (from "mail@gofranz.com")
+               (password-eval "secret-tool lookup Title smtp.fastmail.com_gofranz.com"))))))))
         (service home-mcron-service-type
          (home-mcron-configuration
           (jobs (list
@@ -287,6 +284,6 @@
                  (home-gpg-agent-configuration
                   (pinentry-program
                     (file-append
-                     pinentry "/bin/pinentry")))))))
+                     pinentry "/bin/pinentry")))))
                     
-        ; %base-home-services)))
+        %base-home-services)))

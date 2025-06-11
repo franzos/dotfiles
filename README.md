@@ -24,5 +24,5 @@ guix home reconfigure home.scm
 ## Mail
 
 ```bash
-echo "Subject: Hi" | msmtp -a f-a.nz m@f-a.nz -v
+echo "Subject: Hi" | msmtp -a gofranz.com mail@gofranz.com -v
 ```
