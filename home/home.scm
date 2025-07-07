@@ -115,6 +115,8 @@
          "libusb"
          "emacs-geiser"
          "font-openmoji"
+         "font-google-noto"
+         "font-google-noto-emoji"
          "restic"                    ;; backup
          "font-ibm-plex"
          "hunspell-dict-en"
@@ -134,7 +136,6 @@
          "dconf"
          "evince"
          "libgsf"
-         "font-google-material-design-icons"
          "libreoffice"
          "openssh-sans-x"
          "newsboat"
@@ -184,6 +185,7 @@
          "khal"
          ;; Fan Control
          "fw-fanctrl"
+         "activitywatch"
    )))
  
  ;; Below is the list of Home services.  To search for available
