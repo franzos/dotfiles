@@ -33,6 +33,9 @@ exec udiskie
 # daemon that provides settings to Xorg applications
 exec xsettingsd
 
+# Usage statistics (activitywatch)
+exec sh -c 'while ! pgrep waybar >/dev/null; do sleep 0.5; done; aw-qt &'
+
 # music player daemon
 # exec mpd
 
@@ -63,7 +66,7 @@ exec_always {
     gsettings set $gnome-schema gtk-theme 'Yaru'
     gsettings set $gnome-schema icon-theme 'Yaru'
     gsettings set $gnome-schema cursor-theme 'Yaru'
-    gsettings set $gnome-schema font-name 'IBM Plex Sans 9'
+    gsettings set $gnome-schema font-name 'Noto Sans 9'
 }
 
 ### Auto-float
