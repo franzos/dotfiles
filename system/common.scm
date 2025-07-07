@@ -187,7 +187,12 @@ table ip nat {
              (auto-enable? #t)))
 
    (service thermald-service-type))
-  %panther-desktop-services-minimal))
+
+  (modify-services %panther-desktop-services-minimal
+    ;; https://stackoverflow.com/questions/76830848/redis-warning-memory-overcommit-must-be-enabled
+    (sysctl-service-type config => (sysctl-configuration
+                                    (inherit config)
+                                    (settings '(("vm.overcommit_memory" . "1"))))))))
 
 (define %common-os
  (operating-system
