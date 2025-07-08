@@ -10,6 +10,7 @@
        (channel
         (name 'small-guix)
         (url "https://codeberg.org/fishinthecalculator/small-guix.git")
+        (branch "main")
         (introduction
          (make-channel-introduction
           "f260da13666cd41ae3202270784e61e062a3999c"

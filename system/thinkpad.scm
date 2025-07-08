@@ -19,6 +19,9 @@
 	      "\n" "ACTION==\"add\", SUBSYSTEM==\"backlight\", "
 	      "RUN+=\"/run/current-system/profile/bin/chmod g+w /sys/class/backlight/intel_backlight/brightness\"")))
 
+(define %franz-ssh-key
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7gcLZzs2JiEx2kWCc8lTHOC0Gqpgcudv0QVJ4QydPg franz")
+
 (operating-system
  (inherit %common-os)
  (host-name "thinkpad")
@@ -69,7 +72,9 @@
          (openssh-configuration
            (x11-forwarding? #f)
            (permit-root-login #f)
-           (password-authentication? #f)))
+           (password-authentication? #f)
+           (authorized-keys
+            `(("franz" ,(plain-file "franz.pub" %franz-ssh-key))))))
    (udev-rules-service 'backlight %backlight-udev-rule)
    (service tlp-service-type
             (tlp-configuration
