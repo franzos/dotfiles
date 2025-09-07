@@ -2,6 +2,7 @@
   #:use-module (gnu)
   #:use-module (gnu system)
   #:use-module (gnu system setuid)
+  #:use-module (gnu system accounts)           ;; for 'subid-range'
   #:use-module (gnu services linux)
   #:use-module (gnu services base)
   #:use-module (gnu services mcron)
@@ -10,17 +11,15 @@
   #:use-module (gnu services xorg)
   #:use-module (gnu services virtualization)
   #:use-module (gnu services desktop)           ;; gvfs-service-type
-  #:use-module (gnu services docker)
+  #:use-module (gnu services containers)
   #:use-module (gnu services pm)
   #:use-module (gnu services web)
   #:use-module (gnu services security-token)
-  #:use-module (gnu services sysctl)
   #:use-module (gnu services networking)
   #:use-module (gnu services mail)
   #:use-module (gnu services admin)
 
   #:use-module (gnu packages emacs)
-  #:use-module (gnu packages docker)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages terminals)
   #:use-module (gnu packages shells)
@@ -28,6 +27,8 @@
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages vim)
+  #:use-module (gnu packages python-xyz)
+  #:use-module (gnu packages containers)
   #:use-module (gnu packages security-token)
 
   #:use-module (nongnu packages firmware)       ;; fwupd-nonfree
@@ -101,6 +102,29 @@ table ip nat {
 }
 "))
 
+(define %iptables-ipv4-rules
+  (plain-file "iptables.rules" "*filter
+:INPUT ACCEPT
+:FORWARD ACCEPT
+:OUTPUT ACCEPT
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp --dport 22000 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-port-unreachable
+COMMIT
+"))
+
+(define %iptables-ipv6-rules
+  (plain-file "ip6tables.rules" "*filter
+:INPUT ACCEPT
+:FORWARD ACCEPT
+:OUTPUT ACCEPT
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p tcp --dport 22000 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp6-port-unreachable
+COMMIT
+"))
+
 (define %common-services
  (append
   (list
@@ -161,9 +185,6 @@ table ip nat {
             (dovecot-configuration
              (mail-location "maildir:~/.mail")))
    
-   (service containerd-service-type)
-   (service docker-service-type)
-   
    ;; https://www.reddit.com/r/GUIX/comments/xjjmtr/comment/iqs6cwe/
    (simple-service 'fwupd-polkit polkit-service-type
                    (list fwupd-nonfree))
@@ -177,16 +198,24 @@ table ip nat {
    ;; Support for trash, ftp, sftp ... in Thunar
    ;; Includes udisks-service-type
    (service gvfs-service-type)
-   
-   (service nftables-service-type
-    (nftables-configuration
-    (ruleset %nftables-ruleset)))
 
    (service bluetooth-service-type
             (bluetooth-configuration 
              (auto-enable? #t)))
 
-   (service thermald-service-type))
+   (service thermald-service-type)
+
+   (service iptables-service-type
+         (iptables-configuration
+          (ipv4-rules %iptables-ipv4-rules)
+          (ipv6-rules %iptables-ipv6-rules)))
+
+   (service rootless-podman-service-type
+            (rootless-podman-configuration
+             (subgids
+              (list (subid-range (name "franz"))))
+             (subuids
+              (list (subid-range (name "franz")))))))
 
   (modify-services %panther-desktop-services-minimal
     ;; https://stackoverflow.com/questions/76830848/redis-warning-memory-overcommit-must-be-enabled
@@ -209,7 +238,7 @@ table ip nat {
      (group "users")
      (supplementary-groups '("wheel"
                              "netdev"
-                             "docker"
+                             "cgroup"
                              "kvm"
                              "audio"
                              "video"
@@ -220,9 +249,9 @@ table ip nat {
   
   (packages 
    (cons* emacs
-    ; docker
-    containerd
-    ; docker-cli
+    podman
+    podman-compose
+    buildah
     libinput
     neovim
     foot ;terminal
