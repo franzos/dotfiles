@@ -31,7 +31,6 @@
          "transmission"
          "vscode"
          ;; "signal-desktop"
-         ;; "vscodium"
          "syncthing"
          ;; failing build
          ;; "trash-cli"
@@ -60,15 +59,14 @@
 	       "dmenu"
 	       "j4-dmenu-desktop"          ;; flatpak integration
          ;; dmenu replacement
-         "rofi-wayland"
-         "pinentry-rofi"
+        ;  "rofi-wayland"
+        ;  "pinentry-rofi"
 	       "recoll"
          "qemu"
          "wireshark"
          "kleopatra"                 ;; pgp
-         "docker"
-         "quassel"                   ;; irc
-         "linphone-desktop"          ;; voip
+        ;  "quassel"                   ;; irc
+        ;  "linphone-desktop"          ;; voip
          "libreoffice"
          "flatpak"
          "nheko"
@@ -77,17 +75,13 @@
          "steghide"
          "keepassxc"                 ;; password manager
          "vlc"
-         "guvcview"
          "gimp"
          "mpv"
          "yt-dlp"
          "seahorse"
          "inkscape"
          "emacs"
-         "docker-cli"
-         "docker-compose@2"
          "git"
-         "tigervnc-client"
          "recutils"
          "curl"
          "wget"
@@ -127,7 +121,7 @@
          "aspell-dict-uk"
          "qpwgraph"
          "sed"
-         "mit-scheme"
+        ;  "mit-scheme"
          "qtwayland"
          "swappy"
          "wf-recorder"
@@ -185,7 +179,6 @@
          "khal"
          ;; Fan Control
          "fw-fanctrl"
-         "activitywatch"
    )))
  
  ;; Below is the list of Home services.  To search for available

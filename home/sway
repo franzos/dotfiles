@@ -33,9 +33,6 @@ exec udiskie
 # daemon that provides settings to Xorg applications
 exec xsettingsd
 
-# Usage statistics (activitywatch)
-exec sh -c 'while ! pgrep waybar >/dev/null; do sleep 0.5; done; aw-qt &'
-
 # music player daemon
 # exec mpd
 
