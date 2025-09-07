@@ -9,7 +9,8 @@
             "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
        (channel
         (name 'small-guix)
-        (url "https://codeberg.org/fishinthecalculator/small-guix.git")
+        (branch "main")
+	(url "https://codeberg.org/fishinthecalculator/small-guix.git")
          (introduction
           (make-channel-introduction
            "f260da13666cd41ae3202270784e61e062a3999c"
