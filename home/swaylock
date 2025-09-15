@@ -1,0 +1,36 @@
+# Swaylock configuration for Yaru-dark theme
+# Place this in ~/.config/swaylock/config
+
+# Colors (Yaru-dark theme)
+color=2B2928
+ring-color=5E4B42
+key-hl-color=E95420
+bs-hl-color=CC0000
+text-color=FFFFFF
+inside-color=2B2928
+ring-ver-color=87CEEB
+ring-wrong-color=CC0000
+text-caps-lock-color=FFFFFF
+
+# Visual effects
+effect-blur=7x5
+effect-vignette=0.5:0.5
+fade-in=0.3
+
+# Layout
+clock
+timestr=%H:%M:%S
+datestr=%A, %B %d
+font=Ubuntu
+font-size=18
+
+# Position
+indicator-radius=120
+indicator-thickness=12
+indicator-caps-lock
+
+# Behavior
+ignore-empty-password
+show-failed-attempts
+show-keyboard-layout
+disable-caps-lock-text

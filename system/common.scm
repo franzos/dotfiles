@@ -63,7 +63,7 @@ table inet filter {
     ip6 nexthdr icmpv6 accept
 
     # allow ssh
-    tcp dport ssh accept
+    # tcp dport ssh accept
 
     # syncthing
     tcp dport 22000 accept
@@ -221,7 +221,8 @@ COMMIT
     ;; https://stackoverflow.com/questions/76830848/redis-warning-memory-overcommit-must-be-enabled
     (sysctl-service-type config => (sysctl-configuration
                                     (inherit config)
-                                    (settings '(("vm.overcommit_memory" . "1"))))))))
+                                    (settings '(("vm.overcommit_memory" . "1")
+                                               ("net.ipv4.ip_forward" . "1"))))))))
 
 (define %common-os
  (operating-system
@@ -252,13 +253,14 @@ COMMIT
     podman
     podman-compose
     buildah
+    passt           ;; podman networking: provides pasta binary for rootless networking
     libinput
     neovim
-    foot ;terminal
-    wlr-randr ;display
-    xsettingsd ;xwayland, java
-    gvfs ;for thunar to show trash, removable media and so on
-    udiskie ;auto-mounts
+    foot            ;; terminal
+    wlr-randr       ;; display
+    xsettingsd      ;; xwayland, java
+    gvfs            ;; for thunar to show trash, removable media and so on
+    udiskie         ;; auto-mounts
     %panther-base-packages))
   
   (services

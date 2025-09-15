@@ -32,8 +32,7 @@
          "vscode"
          ;; "signal-desktop"
          "syncthing"
-         ;; failing build
-         ;; "trash-cli"
+         "trash-cli"
          "gsettings-desktop-schemas"
          "gnome-themes-extra"
          "file"	                    ;; file type guesser
@@ -46,10 +45,8 @@
          "keychain"
          "icedove-wayland"
          "obs-pipewire-audio-capture"
-         ;; "xdg-desktop-portal"
+         "xdg-desktop-portal-gtk"
          "xdg-desktop-portal-wlr"
-         ;; without this, the file dialog is properly styled
-         ;; "xdg-desktop-portal-gtk"
          "obs-wlrobs"
          "obs"
          "wl-clipboard"
@@ -140,6 +137,7 @@
          "swaybg"
          "wlsunset"                  ;; Night light
          "bemenu"
+         "slurp"                     ;; screen area selection
          "blueman"
          ;; "j4-dmenu-desktop"          ;; flatpak in bemenu
          "waybar"                    ;; status bar
@@ -154,6 +152,8 @@
          "gnome-themes-extra"
          "adwaita-icon-theme"
          "font-awesome"
+
+         ;; thunar
          "thunar"                    ;; file manager
          "thunar-vcs-plugin"         ;; git integration
          "thunar-archive-plugin"     ;; archive integration
@@ -168,7 +168,7 @@
          "qimgv"                     ;; image viewer
          "mpv" 				               ;; video player
          "kanshi" 			             ;; auto display handling
-         "xdg-utils"
+         "xdg-utils"                 ;; xdg-open
          ;; Emailing
          "aerc"
          "w3m"
@@ -190,7 +190,8 @@
                              ("ll" . "ls -l")
                              ("ls" . "ls -p --color=auto")
                              ("ccs" . "guix shell node pnpm -- pnpm dlx @anthropic-ai/claude-code")
-                             ("cc" . "pnpm dlx @anthropic-ai/claude-code")))
+                             ("cc" . "pnpm dlx @anthropic-ai/claude-code")
+                             ("pms" . "podman system service --time=0 unix:///tmp/podman.sock")))
                   (bashrc (list (local-file
                                  ".bashrc"
                                  "bashrc")))
@@ -210,14 +211,14 @@
         (service home-xdg-configuration-files-service-type
                  `(("sway/config" ,(local-file "sway"))
                    ("waybar/config" ,(local-file "waybar"))
-                   ("gtk-3.0/settings.ini" ,(local-file
-                                             "gtk-3.0-settings.ini"))
+                   ("gtk-3.0/settings.ini" ,(local-file "gtk-3.0-settings.ini"))
                    ("kanshi/config" ,(local-file "kanshi"))
-                   ("xfce4/xfconf/xfce-perchannel-xml/thunar.xml" ,(local-file
-                                                                    "thunar.xml"))
+                   ("xfce4/xfconf/xfce-perchannel-xml/thunar.xml" ,(local-file "thunar.xml"))
                    ("nvim/init.lua" ,(local-file "nvim/init.lua"))
-                   ("nvim/lua/plugins.lua" ,(local-file
-                                             "nvim/lua/plugins.lua"))))
+                   ("nvim/lua/plugins.lua" ,(local-file "nvim/lua/plugins.lua"))
+                   ("xdg-desktop-portal/portals.conf" ,(local-file "portals.conf"))
+                   ("dunst/dunstrc" ,(local-file "dunstrc"))
+                   ("swaylock/config" ,(local-file "swaylock"))))
         (simple-service 'env-vars home-environment-variables-service-type
                         `(("QT_QPA_PLATFORM" . "wayland;xcb")
                           ("GTK_THEME" . "Yaru-dark")
@@ -226,6 +227,14 @@
                           ("XDG_CURRENT_DESKTOP" . "sway")
                           ("XDG_SESSION_DESKTOP" . "sway")
                           ("XDG_SESSION_TYPE" . "wayland")
+                          ;; Performance environment variables for Wayland
+                          ("ELECTRON_OZONE_PLATFORM_HINT" . "wayland")
+                          ("MOZ_ENABLE_WAYLAND" . "1")
+                          ("NIXOS_OZONE_WL" . "1")
+                          ("GDK_BACKEND" . "wayland")
+                          ("CLUTTER_BACKEND" . "wayland")
+                          ;; podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock
+                          ("DOCKER_HOST" . "unix:///run/user/$(id -u)/podman/podman.sock")
                           ;; Unknown terminal: foot
                           ("TERM" . "xterm")))
         (simple-service 'variant-packages-service
