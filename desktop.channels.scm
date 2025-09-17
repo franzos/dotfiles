@@ -1,6 +1,6 @@
 (cons* (channel
         (name 'pantherx)
-        (url "https://channels.pantherx.org/git/panther.git")
+        (url "https://codeberg.org/gofranz/panther.git")
         (branch "master")
         (introduction
          (make-channel-introduction
