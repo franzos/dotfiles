@@ -6,6 +6,7 @@
   #:use-module (gnu services ssh)
   #:use-module (gnu services pm)             ;; tlp-service-type
   #:use-module (gnu services linux)          ;; zram-device-service-type
+  #:use-module (gnu services networking)     ;; iptables-service-type
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd))
@@ -21,6 +22,31 @@
 
 (define %franz-ssh-key
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7gcLZzs2JiEx2kWCc8lTHOC0Gqpgcudv0QVJ4QydPg franz")
+
+(define %thinkpad-iptables-ipv4-rules
+  (plain-file "iptables.rules" "*filter
+:INPUT ACCEPT
+:FORWARD ACCEPT
+:OUTPUT ACCEPT
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp --dport 22000 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-port-unreachable
+COMMIT
+"))
+
+(define %thinkpad-iptables-ipv6-rules
+  (plain-file "ip6tables.rules" "*filter
+:INPUT ACCEPT
+:FORWARD ACCEPT
+:OUTPUT ACCEPT
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp --dport 22000 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp6-port-unreachable
+COMMIT
+"))
 
 (operating-system
  (inherit %common-os)
@@ -63,24 +89,29 @@
    %base-file-systems))
 
  (services
-  (cons*
-   (service zram-device-service-type
-            (zram-device-configuration
-             (size "8G")
-             (priority 0)))
-   (service openssh-service-type
-         (openssh-configuration
-           (x11-forwarding? #f)
-           (permit-root-login #f)
-           (password-authentication? #f)
-           (authorized-keys
-            `(("franz" ,(plain-file "franz.pub" %franz-ssh-key))))))
-   (udev-rules-service 'backlight %backlight-udev-rule)
-   (service tlp-service-type
-            (tlp-configuration
-             (cpu-scaling-governor-on-ac (list "balanced"))
-             ;; (cpu-boost-on-ac? #t)
-             (cpu-scaling-governor-on-bat (list "low-power"))
-             (cpu-boost-on-bat? #f)
-             (sched-powersave-on-bat? #t)))
-   %common-services)))
+  (modify-services
+    (cons*
+     (service zram-device-service-type
+              (zram-device-configuration
+               (size "8G")
+               (priority 0)))
+     (service openssh-service-type
+           (openssh-configuration
+             (x11-forwarding? #f)
+             (permit-root-login #f)
+             (password-authentication? #f)
+             (authorized-keys
+              `(("franz" ,(plain-file "franz.pub" %franz-ssh-key))))))
+     (udev-rules-service 'backlight %backlight-udev-rule)
+     (service tlp-service-type
+              (tlp-configuration
+               (cpu-scaling-governor-on-ac (list "balanced"))
+               ;; (cpu-boost-on-ac? #t)
+               (cpu-scaling-governor-on-bat (list "low-power"))
+               (cpu-boost-on-bat? #f)
+               (sched-powersave-on-bat? #t)))
+     %common-services)
+    (iptables-service-type config =>
+      (iptables-configuration
+       (ipv4-rules %thinkpad-iptables-ipv4-rules)
+       (ipv6-rules %thinkpad-iptables-ipv6-rules))))))
