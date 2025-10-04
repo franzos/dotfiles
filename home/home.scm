@@ -27,7 +27,7 @@
    (list "neovim"                   ;; editor
          "qalculate-gtk"            ;; calculator
          "mousepad"                 ;; text editor
-         "logseq"
+        ;  "logseq"
          "transmission"
          "vscode"
          ;; "signal-desktop"
@@ -39,16 +39,14 @@
          "google-chrome-stable"
          "librewolf"
          "glib:bin"
-         "evince"
-         "calibre"
+         "calibre"                  ;; E-Books
          "gpgme"
-         "keychain"
-         "icedove-wayland"
-         "obs-pipewire-audio-capture"
+        ;  "icedove-wayland"
+        ;  "obs-pipewire-audio-capture"
          "xdg-desktop-portal-gtk"
          "xdg-desktop-portal-wlr"
-         "obs-wlrobs"
-         "obs"
+        ;  "obs-wlrobs"
+        ;  "obs"
          "wl-clipboard"
          "clipman"
          "grim"                      ;; screenshot editing
@@ -61,21 +59,19 @@
 	       "recoll"
          "qemu"
          "wireshark"
-         "kleopatra"                 ;; pgp
+        ;  "kleopatra"                 ;; pgp
         ;  "quassel"                   ;; irc
         ;  "linphone-desktop"          ;; voip
-         "libreoffice"
          "flatpak"
-         "nheko"
-         "monero"
+        ;  "nheko"
+        ;  "monero"
          "tomb"                      ;; secrets manager
          "steghide"
          "keepassxc"                 ;; password manager
          "vlc"
          "gimp"
-         "mpv"
          "yt-dlp"
-         "seahorse"
+        ;  "seahorse"
          "inkscape"
          "emacs"
          "git"
@@ -87,8 +83,8 @@
          "ripgrep"                   ;; better grep
          "glances"                   ;; system monitor
          "python"
-         "scribus"                   ;; inDesign alternative
-         "python:tk"                 ;; for Scribus
+        ;  "scribus"                   ;; inDesign alternative
+        ;  "python:tk"                 ;; for Scribus
          "nmap"
          "shellcheck"
          "emacs-geiser-guile"
@@ -121,13 +117,14 @@
         ;  "mit-scheme"
          "qtwayland"
          "swappy"
-         "wf-recorder"
-         "playerctl"
+        ;  "wf-recorder"             ;; Screen Recording
+        ;  "playerctl"
          "keychain"
          "dconf"
-         "evince"
          "libgsf"
          "libreoffice"
+         "evince"                    ;; PDF Reader
+         "mpv"
          "openssh-sans-x"
          "newsboat"
          "mullvad-vpn-desktop"
@@ -142,14 +139,13 @@
          ;; "j4-dmenu-desktop"          ;; flatpak in bemenu
          "waybar"                    ;; status bar
          "dunst"                     ;; notifications
-         "pinentry"                  ;; prompt for php, ssh, ...
+         "pinentry"                  ;; prompt for pgp, ssh, ...
          "pavucontrol"               ;; audio control
          "pamixer"                   ;; keyboard audio volumne
          "brightnessctl"             ;; keyboard display brightness
          "yaru-theme"
          "hicolor-icon-theme"
          "papirus-icon-theme"
-         "gnome-themes-extra"
          "adwaita-icon-theme"
          "font-awesome"
 
@@ -166,7 +162,6 @@
          "webp-pixbuf-loader"        ;; thunar thumbnails
          "tumbler"                   ;; thunar thumbnails dbus
          "qimgv"                     ;; image viewer
-         "mpv" 				               ;; video player
          "kanshi" 			             ;; auto display handling
          "xdg-utils"                 ;; xdg-open
          ;; Emailing
@@ -233,6 +228,9 @@
                           ("NIXOS_OZONE_WL" . "1")
                           ("GDK_BACKEND" . "wayland")
                           ("CLUTTER_BACKEND" . "wayland")
+                          ;; Cursor theme
+                          ("XCURSOR_THEME" . "Adwaita")
+                          ("XCURSOR_SIZE" . "24")
                           ;; podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock
                           ("DOCKER_HOST" . "unix:///run/user/$(id -u)/podman/podman.sock")
                           ;; Unknown terminal: foot

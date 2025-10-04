@@ -61,12 +61,15 @@ exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DE
 # Wallpaper
 output "*" bg ~/dotfiles/home/wallpaper/braxton-apana-8SVW7RrImEo-unsplash.jpg fill
 
+# Cursor theme
+seat * xcursor_theme Adwaita 24
+
 # Theme for Gnome-apps
 set $gnome-schema org.gnome.desktop.interface
 exec_always {
     gsettings set $gnome-schema gtk-theme 'Yaru'
     gsettings set $gnome-schema icon-theme 'Yaru'
-    gsettings set $gnome-schema cursor-theme 'Yaru'
+    gsettings set $gnome-schema cursor-theme 'Adwaita'
     gsettings set $gnome-schema font-name 'Noto Sans 9'
 }
 

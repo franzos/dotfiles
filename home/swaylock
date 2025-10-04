@@ -1,5 +1,4 @@
-# Swaylock configuration for Yaru-dark theme
-# Place this in ~/.config/swaylock/config
+# Swaylock configuration
 
 # Colors (Yaru-dark theme)
 color=2B2928
@@ -21,7 +20,7 @@ fade-in=0.3
 clock
 timestr=%H:%M:%S
 datestr=%A, %B %d
-font=Ubuntu
+font=Noto Sans
 font-size=18
 
 # Position
