@@ -105,11 +105,12 @@ COMMIT
      (udev-rules-service 'backlight %backlight-udev-rule)
      (service tlp-service-type
               (tlp-configuration
-               (cpu-scaling-governor-on-ac (list "balanced"))
-               ;; (cpu-boost-on-ac? #t)
+               (cpu-scaling-governor-on-ac (list "balanced" "performance"))
+               (cpu-boost-on-ac? #f)
                (cpu-scaling-governor-on-bat (list "low-power"))
                (cpu-boost-on-bat? #f)
                (sched-powersave-on-bat? #t)))
+     (service mullvad-daemon-service-type)
      %common-services)
     (iptables-service-type config =>
       (iptables-configuration
