@@ -30,6 +30,9 @@ exec dunst
 # Disk mounting
 exec udiskie
 
+# Polkit authentication agent
+exec lxqt-policykit-agent
+
 # daemon that provides settings to Xorg applications
 exec xsettingsd
 

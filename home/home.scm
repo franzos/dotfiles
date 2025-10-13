@@ -27,7 +27,7 @@
    (list "neovim"                   ;; editor
          "qalculate-gtk"            ;; calculator
          "mousepad"                 ;; text editor
-        ;  "logseq"
+         "logseq"
          "transmission"
          "vscode"
          ;; "signal-desktop"
@@ -174,6 +174,8 @@
          "khal"
          ;; Fan Control
          "fw-fanctrl"
+         ;; Polkit
+         "lxqt-policykit"
    )))
  
  ;; Below is the list of Home services.  To search for available
