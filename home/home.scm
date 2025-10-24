@@ -81,6 +81,7 @@
          "bind:utils"
          "rsync"
          "ripgrep"                   ;; better grep
+         "broot"                     ;; file explorer
          "glances"                   ;; system monitor
          "python"
         ;  "scribus"                   ;; inDesign alternative
@@ -149,6 +150,11 @@
          "adwaita-icon-theme"
          "font-awesome"
 
+         "curlie"                    ;; like curl
+         ;; "just"
+         ;; "himalaya"               ;; not packaged
+         "tealdeer"                  ;; tdlr
+
          ;; thunar
          "thunar"                    ;; file manager
          "thunar-vcs-plugin"         ;; git integration
@@ -215,7 +221,19 @@
                    ("nvim/lua/plugins.lua" ,(local-file "nvim/lua/plugins.lua"))
                    ("xdg-desktop-portal/portals.conf" ,(local-file "portals.conf"))
                    ("dunst/dunstrc" ,(local-file "dunstrc"))
-                   ("swaylock/config" ,(local-file "swaylock"))))
+                   ("swaylock/config" ,(local-file "swaylock"))
+                   ;; broot
+                   ("broot/conf.hjson" ,(local-file "broot/conf.hjson"))
+                   ("broot/verbs.hjson" ,(local-file "broot/verbs.hjson"))
+                   ("broot/skins/catppuccin-macchiato.hjson" ,(local-file "broot/skins/catppuccin-macchiato.hjson"))
+                   ("broot/skins/catppuccin-mocha.hjson" ,(local-file "broot/skins/catppuccin-mocha.hjson"))
+                   ("broot/skins/dark-blue.hjson" ,(local-file "broot/skins/dark-blue.hjson"))
+                   ("broot/skins/dark-gruvbox.hjson" ,(local-file "broot/skins/dark-gruvbox.hjson"))
+                   ("broot/skins/dark-orange.hjson" ,(local-file "broot/skins/dark-orange.hjson"))
+                   ("broot/skins/native-16.hjson" ,(local-file "broot/skins/native-16.hjson"))
+                   ("broot/skins/solarized-dark.hjson" ,(local-file "broot/skins/solarized-dark.hjson"))
+                   ("broot/skins/solarized-light.hjson" ,(local-file "broot/skins/solarized-light.hjson"))
+                   ("broot/skins/white.hjson" ,(local-file "broot/skins/white.hjson"))))
         (simple-service 'env-vars home-environment-variables-service-type
                         `(("QT_QPA_PLATFORM" . "wayland;xcb")
                           ("GTK_THEME" . "Yaru-dark")

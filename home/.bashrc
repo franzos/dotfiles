@@ -31,9 +31,28 @@ alias ll='ls -l'
 alias grep='grep --color=auto'
 
 # SSH key
-eval `keychain --eval --agents ssh franz yk1 yk1.no-pin yk2 yk2.no-pin`
+eval `keychain --eval ssh franz yk1 yk1.no-pin yk2 yk2.no-pin`
 
 # Apps
 export EDITOR=nvim
 export QT_QPA_PLATFORM="wayland;xcb"
 export PATH=$PATH:~/.cargo/bin/
+
+# broot shell function
+# This function starts broot and executes the command
+# it produces, if any.
+# It's needed because some shell commands, like `cd`,
+# have no useful effect if executed in a subshell.
+function br {
+    local cmd cmd_file code
+    cmd_file=$(mktemp)
+    if broot --outcmd "$cmd_file" "$@"; then
+        cmd=$(<"$cmd_file")
+        command rm -f "$cmd_file"
+        eval "$cmd"
+    else
+        code=$?
+        command rm -f "$cmd_file"
+        return "$code"
+    fi
+}
