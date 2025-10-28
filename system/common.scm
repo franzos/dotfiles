@@ -138,7 +138,7 @@ COMMIT
    (service greetd-service-type
             (greetd-configuration
              (greeter-supplementary-groups
-              (list "video" "input" "users"))
+              (list "video" "input"))
              (terminals
               (list 
                (greetd-terminal-configuration
@@ -250,6 +250,7 @@ COMMIT
   
   (packages 
    (cons* emacs
+    sway
     podman
     podman-compose
     buildah

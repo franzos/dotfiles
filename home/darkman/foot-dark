@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Switch foot terminal to dark theme using SIGUSR1 signal
+# Targets foot server process to update all clients instantly
+
+set -euo pipefail
+
+# Send SIGUSR1 to foot server to switch to [colors] section (dark theme)
+# This switches all current terminals AND sets the theme for new terminals
+kill -SIGUSR1 $(pgrep -x foot) 2>/dev/null || true

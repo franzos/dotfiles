@@ -11,7 +11,7 @@ set $up k
 set $right l
 
 # Terminal
-set $term foot
+set $term footclient
 
 # App launcher
 set $menu dmenu_path | j4-dmenu-desktop --dmenu="bemenu --ignorecase" | xargs swaymsg exec --
@@ -32,6 +32,9 @@ exec udiskie
 
 # Polkit authentication agent
 exec lxqt-policykit-agent
+
+# Foot terminal server
+exec foot --server
 
 # daemon that provides settings to Xorg applications
 exec xsettingsd
@@ -67,10 +70,10 @@ output "*" bg ~/dotfiles/home/wallpaper/braxton-apana-8SVW7RrImEo-unsplash.jpg f
 # Cursor theme
 seat * xcursor_theme Adwaita 24
 
-# Theme for Gnome-apps
+# Theme for Gnome-apps - managed by darkman
+# Cursor and icon settings remain static
 set $gnome-schema org.gnome.desktop.interface
 exec_always {
-    gsettings set $gnome-schema gtk-theme 'Yaru'
     gsettings set $gnome-schema icon-theme 'Yaru'
     gsettings set $gnome-schema cursor-theme 'Adwaita'
     gsettings set $gnome-schema font-name 'Noto Sans 9'
@@ -114,8 +117,8 @@ for_window [shell="xwayland"] title_format "%title [XWayland]"
 
 ### Idle configuration
 exec swayidle -w \
-    timeout 1200 'swaylock -f -c 000000' \
-    timeout 1800 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+    timeout 2400 'swaylock -f -c 000000' \
+    timeout 3600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
     before-sleep 'swaylock -f -c 000000'
 
 # xwayland version
@@ -285,8 +288,11 @@ bindsym $mod+r mode "resize"
     bindsym XF86AudioPlay exec playerctl play-pause
     bindsym XF86AudioNext exec playerctl next
     bindsym XF86AudioPrev exec playerctl previous
-    
+
     bindsym Print exec grim - | swappy -f -
+
+    # Theme toggle
+    bindsym $mod+t exec darkman toggle
 
 bar {
 	swaybar_command waybar

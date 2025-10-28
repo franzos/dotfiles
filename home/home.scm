@@ -14,7 +14,9 @@
              (gnu home services shells)
              (gnu home services sound)
              (gnu home services desktop)
-             (gnu home services syncthing))
+             (gnu home services syncthing)
+             (px home services darkman)
+             (px home services foot))
 
 (define mcron-job-pimsync
   #~(job '(next-minute '(0 10 20 30 40 50))
@@ -27,6 +29,7 @@
    (list "neovim"                   ;; editor
          "qalculate-gtk"            ;; calculator
          "mousepad"                 ;; text editor
+         "kitty"
          "logseq"
          "transmission"
          "vscode"
@@ -154,6 +157,7 @@
          ;; "just"
          ;; "himalaya"               ;; not packaged
          "tealdeer"                  ;; tdlr
+         "jq"                        ;; json processor (darkman vscode)
 
          ;; thunar
          "thunar"                    ;; file manager
@@ -182,6 +186,8 @@
          "fw-fanctrl"
          ;; Polkit
          "lxqt-policykit"
+         ;; Darkman
+         "darkman"
    )))
  
  ;; Below is the list of Home services.  To search for available
@@ -203,6 +209,8 @@
                                        "bash_profile")))))
         (service home-files-service-type
                  `((".gtkrc-2.0" ,(local-file "gtkrc-2.0"))
+                   (".local/share/applications/lock.desktop" ,(local-file
+                                                               "apps/lock.desktop"))
                    (".local/share/applications/vscode.desktop" ,(local-file
                                                                  "apps/vscode.desktop"))
                    (".local/share/applications/vscode_go.desktop" ,(local-file
@@ -210,17 +218,32 @@
                    (".local/share/applications/vscode_rust.desktop" ,(local-file
                                                                       "apps/vscode_rust.desktop"))
                    (".local/share/applications/vscode_cpp.desktop" ,(local-file
-                                                                     "apps/vscode_cpp.desktop"))))
+                                                                     "apps/vscode_cpp.desktop"))
+                   ;; GTK-3 theme templates for darkman
+                   (".local/share/gtk-themes/settings-dark.ini" ,(local-file "gtk-3.0-settings-dark.ini"))
+                   (".local/share/gtk-themes/settings-light.ini" ,(local-file "gtk-3.0-settings-light.ini"))
+                   ;; Darkman theme switching scripts
+                   (".local/share/dark-mode.d/gtk" ,(local-file "darkman/gtk-dark" #:recursive? #t))
+                   (".local/share/dark-mode.d/foot" ,(local-file "darkman/foot-dark" #:recursive? #t))
+                   (".local/share/dark-mode.d/dunst" ,(local-file "darkman/dunst-dark" #:recursive? #t))
+                   (".local/share/dark-mode.d/vscode" ,(local-file "darkman/vscode-dark" #:recursive? #t))
+                   (".local/share/light-mode.d/gtk" ,(local-file "darkman/gtk-light" #:recursive? #t))
+                   (".local/share/light-mode.d/foot" ,(local-file "darkman/foot-light" #:recursive? #t))
+                   (".local/share/light-mode.d/dunst" ,(local-file "darkman/dunst-light" #:recursive? #t))
+                   (".local/share/light-mode.d/vscode" ,(local-file "darkman/vscode-light" #:recursive? #t))))
         (service home-xdg-configuration-files-service-type
                  `(("sway/config" ,(local-file "sway"))
                    ("waybar/config" ,(local-file "waybar"))
-                   ("gtk-3.0/settings.ini" ,(local-file "gtk-3.0-settings.ini"))
                    ("kanshi/config" ,(local-file "kanshi"))
                    ("xfce4/xfconf/xfce-perchannel-xml/thunar.xml" ,(local-file "thunar.xml"))
                    ("nvim/init.lua" ,(local-file "nvim/init.lua"))
                    ("nvim/lua/plugins.lua" ,(local-file "nvim/lua/plugins.lua"))
+                   ("nvim/lua/core/options.lua" ,(local-file "nvim/lua/core/options.lua"))
+                   ("nvim/lua/core/keymaps.lua" ,(local-file "nvim/lua/core/keymaps.lua"))
                    ("xdg-desktop-portal/portals.conf" ,(local-file "portals.conf"))
                    ("dunst/dunstrc" ,(local-file "dunstrc"))
+                   ("foot/foot.ini" ,(local-file "foot.ini"))
+                   ("foot/foot-light.ini" ,(local-file "foot-light.ini"))
                    ("swaylock/config" ,(local-file "swaylock"))
                    ;; broot
                    ("broot/conf.hjson" ,(local-file "broot/conf.hjson"))
@@ -236,7 +259,6 @@
                    ("broot/skins/white.hjson" ,(local-file "broot/skins/white.hjson"))))
         (simple-service 'env-vars home-environment-variables-service-type
                         `(("QT_QPA_PLATFORM" . "wayland;xcb")
-                          ("GTK_THEME" . "Yaru-dark")
                           ("SDL_VIDEODRIVER" . "wayland")
                           ("XDG_DATA_DIRS" . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")
                           ("XDG_CURRENT_DESKTOP" . "sway")
@@ -306,6 +328,11 @@
                  (home-gpg-agent-configuration
                   (pinentry-program
                     (file-append
-                     pinentry "/bin/pinentry")))))
-                    
+                     pinentry "/bin/pinentry"))))
+        (service home-darkman-service-type
+                 (home-darkman-configuration
+                  (latitude 38.7)       ;; Lisbon coordinates from wlsunset
+                  (longitude -9.2)
+                  (use-geoclue? #f))))  ;; Manual coords for privacy
+
         %base-home-services)))

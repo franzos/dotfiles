@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Switch dunst notification daemon to dark theme
+
+set -euo pipefail
+
+CONFIG="$HOME/.config/dunst/dunstrc"
+
+# Update colors for dark theme (Yaru-dark)
+sed -i 's/^    background = .*/    background = "#2B2928"/' "$CONFIG"
+sed -i 's/^    foreground = .*/    foreground = "#FFFFFF"/' "$CONFIG"
+sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/background = .*/background = "#2B2928"/' "$CONFIG"
+sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/foreground = .*/foreground = "#FFFFFF"/' "$CONFIG"
+sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/background = .*/background = "#2B2928"/' "$CONFIG"
+sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/foreground = .*/foreground = "#FFFFFF"/' "$CONFIG"
+
+# Restart dunst to apply changes
+killall dunst 2>/dev/null || true
