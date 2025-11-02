@@ -1,0 +1,100 @@
+#!/bin/sh
+# Bluetooth Profile Toggle Script
+# Toggles between available Bluetooth profiles for Nothing Ear headphones
+
+# Notification function (tries dunstify, falls back to echo)
+notify() {
+    if command -v dunstify >/dev/null 2>&1; then
+        dunstify -u normal -t 3000 "$1" "$2"
+    else
+        echo "$1: $2"
+    fi
+}
+
+# Find the Nothing Ear Bluetooth card
+CARD=$(pactl list cards | grep -B 20 "device.description = \"Nothing Ear\"" | grep "Name:" | head -1 | awk '{print $2}')
+
+# If not found, try any bluez card
+if [ -z "$CARD" ]; then
+    CARD=$(pactl list cards short | grep -i "bluez_card" | head -1 | awk '{print $2}')
+fi
+
+if [ -z "$CARD" ]; then
+    notify "Bluetooth" "Bluetooth headset not found or not connected"
+    exit 1
+fi
+
+# Get current active profile
+CURRENT_PROFILE=$(pactl list cards | grep -A 50 "$CARD" | grep "Active Profile:" | awk '{print $3}')
+
+# Get all available profiles (excluding 'off')
+# Parse profiles from the Profiles: section
+PROFILES=$(pactl list cards | awk "/Name: $CARD/,/Active Profile:/" | grep -E "^\s+[a-z][a-z0-9-]*:" | grep -v "off:" | sed 's/:.*//')
+
+if [ -z "$PROFILES" ]; then
+    notify "Bluetooth" "No profiles available"
+    exit 1
+fi
+
+# Convert to array and count
+PROFILE_LIST=""
+PROFILE_COUNT=0
+for p in $PROFILES; do
+    PROFILE_COUNT=$((PROFILE_COUNT + 1))
+    PROFILE_LIST="$PROFILE_LIST $p"
+done
+
+if [ $PROFILE_COUNT -eq 0 ]; then
+    notify "Bluetooth" "No profiles available"
+    exit 1
+fi
+
+# Find current profile index
+INDEX=1
+FOUND=0
+for p in $PROFILE_LIST; do
+    if [ "$p" = "$CURRENT_PROFILE" ]; then
+        FOUND=1
+        break
+    fi
+    INDEX=$((INDEX + 1))
+done
+
+# If current profile not found in list, start at 1
+if [ $FOUND -eq 0 ]; then
+    INDEX=0
+fi
+
+# Calculate next profile index (cycle through)
+NEXT_INDEX=$((INDEX % PROFILE_COUNT + 1))
+
+# Get next profile
+CNT=0
+NEXT_PROFILE=""
+for p in $PROFILE_LIST; do
+    CNT=$((CNT + 1))
+    if [ $CNT -eq $NEXT_INDEX ]; then
+        NEXT_PROFILE="$p"
+        break
+    fi
+done
+
+if [ -z "$NEXT_PROFILE" ]; then
+    notify "Bluetooth" "Error selecting next profile"
+    exit 1
+fi
+
+# Switch to next profile
+pactl set-card-profile "$CARD" "$NEXT_PROFILE"
+
+# Get profile description for notification
+PROFILE_DESC=$(pactl list cards | awk "/Name: $CARD/,/Active Profile:/" | grep "^\s*$NEXT_PROFILE:" | sed "s/^\s*$NEXT_PROFILE:\s*//" | sed 's/ (sinks.*//')
+
+# Send notification
+if [ -n "$PROFILE_DESC" ]; then
+    notify "Bluetooth Profile" "Switched to: $PROFILE_DESC"
+else
+    notify "Bluetooth Profile" "Switched to: $NEXT_PROFILE"
+fi
+
+exit 0

@@ -19,7 +19,7 @@
              (px home services foot))
 
 (define mcron-job-pimsync
-  #~(job '(next-minute '(0 10 20 30 40 50))
+  #~(job '(next-hour '(0 3 6 9 12 15 18 21))
          "pimsync sync"
          #:user "franz"))
 
@@ -97,6 +97,7 @@
          "unzip"
          "aspell"
          "wireplumber"
+         "noise-suppression-for-voice"
          "wireguard-tools"
          "zip"
          "lsof"
@@ -188,6 +189,7 @@
          "lxqt-policykit"
          ;; Darkman
          "darkman"
+         "bluetuith"                 ;; Bluetooth TUI
    )))
  
  ;; Below is the list of Home services.  To search for available
@@ -209,6 +211,9 @@
                                        "bash_profile")))))
         (service home-files-service-type
                  `((".gtkrc-2.0" ,(local-file "gtkrc-2.0"))
+                   ;; Bluetooth profile management scripts
+                   (".local/bin/bt-toggle-profile" ,(local-file "bt-toggle-profile" #:recursive? #t))
+                   (".local/bin/bt-profile-status" ,(local-file "bt-profile-status" #:recursive? #t))
                    (".local/share/applications/lock.desktop" ,(local-file
                                                                "apps/lock.desktop"))
                    (".local/share/applications/vscode.desktop" ,(local-file
@@ -234,6 +239,7 @@
         (service home-xdg-configuration-files-service-type
                  `(("sway/config" ,(local-file "sway"))
                    ("waybar/config" ,(local-file "waybar"))
+                   ("waybar/style.css" ,(local-file "waybar-style.css"))
                    ("kanshi/config" ,(local-file "kanshi"))
                    ("xfce4/xfconf/xfce-perchannel-xml/thunar.xml" ,(local-file "thunar.xml"))
                    ("nvim/init.lua" ,(local-file "nvim/init.lua"))
@@ -245,6 +251,11 @@
                    ("foot/foot.ini" ,(local-file "foot.ini"))
                    ("foot/foot-light.ini" ,(local-file "foot-light.ini"))
                    ("swaylock/config" ,(local-file "swaylock"))
+                   ;; WirePlumber Bluetooth configuration for A2DP preference
+                   ("wireplumber/bluetooth.lua.d/51-bluez-config.lua" ,(local-file "wireplumber-bluetooth.lua"))
+                   ;; PipeWire echo cancellation and noise suppression
+                   ;; ("pipewire/pipewire.conf.d/60-echo-cancel.conf" ,(local-file "pipewire-echo-cancel.conf"))
+                   ;; ("pipewire/pipewire.conf.d/99-noise-suppression.conf" ,(local-file "pipewire-noise-suppression.conf"))
                    ;; broot
                    ("broot/conf.hjson" ,(local-file "broot/conf.hjson"))
                    ("broot/verbs.hjson" ,(local-file "broot/verbs.hjson"))

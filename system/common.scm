@@ -201,7 +201,9 @@ COMMIT
 
    (service bluetooth-service-type
             (bluetooth-configuration 
-             (auto-enable? #t)))
+             (auto-enable? #t)
+             (experimental #t)          ;; Enable experimental features for modern devices
+             (multi-profile 'multiple))) ;; Enable multiple profiles (A2DP + HFP/HSP)
 
    (service thermald-service-type)
 

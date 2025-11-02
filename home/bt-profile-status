@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# bt-profile-status - Display current Bluetooth profile for Waybar
+# Returns JSON with icon, text, and tooltip based on active profile
+
+# Find Nothing Ear device or fallback to any BlueZ card
+CARD=$(pactl list cards | grep -B 1 "device.description = \"Nothing Ear\"" | grep "Name:" | awk '{print $2}')
+
+# Fallback to any BlueZ card if Nothing Ear not found
+if [ -z "$CARD" ]; then
+    CARD=$(pactl list cards | grep "Name:" | grep "bluez_card" | head -n 1 | awk '{print $2}')
+fi
+
+# If no Bluetooth card found, show disconnected state
+if [ -z "$CARD" ]; then
+    echo '{"text":"","tooltip":"No Bluetooth audio device connected","class":"disconnected"}'
+    exit 0
+fi
+
+# Get active profile
+PROFILE=$(pactl list cards | grep -A 20 "Name: $CARD" | grep "Active Profile:" | awk -F': ' '{print $2}')
+
+# Determine icon and text based on profile
+case "$PROFILE" in
+    *a2dp*)
+        # A2DP = High-quality audio (music)
+        ICON="🎵"
+        TEXT="A2DP"
+        TOOLTIP="High-quality audio mode (A2DP)\nClick to switch to calling mode"
+        CLASS="a2dp"
+        ;;
+    *headset*|*hsp*|*hfp*)
+        # HSP/HFP = Headset/calling mode
+        ICON="📞"
+        TEXT="HSP"
+        TOOLTIP="Calling mode (HFP/HSP)\nClick to switch to music mode"
+        CLASS="headset"
+        ;;
+    off)
+        # Profile is off
+        ICON=""
+        TEXT="OFF"
+        TOOLTIP="Bluetooth audio profile off\nClick to cycle profiles"
+        CLASS="off"
+        ;;
+    *)
+        # Unknown profile
+        ICON=""
+        TEXT="${PROFILE:0:8}"
+        TOOLTIP="Profile: $PROFILE\nClick to cycle profiles"
+        CLASS="unknown"
+        ;;
+esac
+
+# Output JSON for Waybar
+echo "{\"text\":\"$ICON\",\"tooltip\":\"$TOOLTIP\",\"class\":\"$CLASS\"}"

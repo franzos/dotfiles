@@ -49,7 +49,7 @@ exec playerctld daemon
 exec wlsunset -l 38.7 -L -9.2
 
 # Screen Sharing https://lists.gnu.org/archive/html/help-guix/2025-03/msg00092.html
-exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+# exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
 # SwayFX
