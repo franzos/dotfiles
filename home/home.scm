@@ -16,7 +16,8 @@
              (gnu home services desktop)
              (gnu home services syncthing)
              (px home services darkman)
-             (px home services foot))
+             (px home services foot)
+             (px packages audio))
 
 (define mcron-job-pimsync
   #~(job '(next-hour '(0 3 6 9 12 15 18 21))
@@ -34,6 +35,8 @@
          "transmission"
          "vscode"
          ;; "signal-desktop"
+         "discord"
+         "slack-desktop"
          "syncthing"
          "trash-cli"
          "gsettings-desktop-schemas"
@@ -96,6 +99,7 @@
          "htop"
          "unzip"
          "aspell"
+         "pipewire"
          "wireplumber"
          "noise-suppression-for-voice"
          "wireguard-tools"
@@ -224,6 +228,8 @@
                                                                       "apps/vscode_rust.desktop"))
                    (".local/share/applications/vscode_cpp.desktop" ,(local-file
                                                                      "apps/vscode_cpp.desktop"))
+                   (".local/share/applications/google-chrome-hw.desktop" ,(local-file
+                                                                           "apps/google-chrome-hw.desktop"))
                    ;; GTK-3 theme templates for darkman
                    (".local/share/gtk-themes/settings-dark.ini" ,(local-file "gtk-3.0-settings-dark.ini"))
                    (".local/share/gtk-themes/settings-light.ini" ,(local-file "gtk-3.0-settings-light.ini"))
@@ -251,7 +257,7 @@
                    ("foot/foot.ini" ,(local-file "foot.ini"))
                    ("foot/foot-light.ini" ,(local-file "foot-light.ini"))
                    ("swaylock/config" ,(local-file "swaylock"))
-                   ;; WirePlumber Bluetooth configuration for A2DP preference
+                   ;; WirePlumber Bluetooth configuration for A2DP preference (WirePlumber 0.5+)
                    ("wireplumber/bluetooth.lua.d/51-bluez-config.lua" ,(local-file "wireplumber-bluetooth.lua"))
                    ;; PipeWire echo cancellation and noise suppression
                    ;; ("pipewire/pipewire.conf.d/60-echo-cancel.conf" ,(local-file "pipewire-echo-cancel.conf"))
@@ -331,7 +337,10 @@
                  mcron-job-pimsync))))
         (service home-syncthing-service-type)
         (service home-dbus-service-type)
-        (service home-pipewire-service-type)
+        (service home-pipewire-service-type
+                 (home-pipewire-configuration
+                  (pipewire pipewire)
+                  (wireplumber wireplumber)))
         ;; I want to manage SSH keys manually for now
         ;; (service home-openssh-service-type)
         (service home-ssh-agent-service-type)

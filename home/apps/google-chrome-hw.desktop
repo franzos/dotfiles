@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Google Chrome HW
+Comment=Web Browser with Hardware Acceleration
+GenericName=Web Browser
+Exec=google-chrome --use-angle=vulkan --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiIgnoreDriverChecks,Vulkan,VulkanFromANGLE,DefaultANGLEVulkan,UseMultiPlaneFormatForHardwareVideo
+Icon=google-chrome
+Type=Application
+StartupNotify=true
+StartupWMClass=Google-chrome
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+Keywords=web;browser;internet;

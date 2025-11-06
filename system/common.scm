@@ -35,6 +35,7 @@
 
   #:use-module (px system panther)
   #:use-module (px packages security-token)     ;; acsccid
+  #:use-module (px packages linux)              ;; bluez 5.83
 
   #:export (%common-os %common-services))
 
@@ -201,6 +202,7 @@ COMMIT
 
    (service bluetooth-service-type
             (bluetooth-configuration 
+             (bluez bluez)
              (auto-enable? #t)
              (experimental #t)          ;; Enable experimental features for modern devices
              (multi-profile 'multiple))) ;; Enable multiple profiles (A2DP + HFP/HSP)
