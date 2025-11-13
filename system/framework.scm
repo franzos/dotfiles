@@ -3,8 +3,9 @@
   #:use-module (gnu)
   #:use-module (guix)
   #:use-module (gnu services xorg)
-  #:use-module (gnu services pm)              ;; tlp-service-type
+  #:use-module (gnu services pm)              ;; power-profiles-daemon-service-type
   #:use-module (gnu services linux)           ;; zram-device-service-type
+  #:use-module (gnu services base)            ;; udev-service-type
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd)
@@ -19,8 +20,13 @@
                  amdgpu-firmware
                  amd-microcode))
  
- (kernel-arguments 
-  (cons* "modprobe.blacklist=hid_sensor_hub"
+ (kernel-arguments
+  (cons* "amd_pstate=active"                      ;; AMD Ryzen EPP power management
+         "pcie_aspm.policy=powersupersave"        ;; Aggressive PCIe power saving
+         "amdgpu.ppfeaturemask=0xffffffff"        ;; Enable all GPU power features
+         "amdgpu.abmlevel=3"                      ;; Adaptive backlight management
+         "nmi_watchdog=0"                         ;; Disable NMI watchdog for power saving
+         "modprobe.blacklist=hid_sensor_hub"
    %default-kernel-arguments))
   
  (bootloader 
@@ -54,12 +60,37 @@
             (zram-device-configuration
              (size "24G")
              (priority 0)))
-   (service tlp-service-type
-            (tlp-configuration
-             (cpu-scaling-governor-on-ac (list "balanced" "performance"))
-             (cpu-boost-on-ac? #f)
-             (cpu-scaling-governor-on-bat (list "low-power"))
-             (cpu-boost-on-bat? #f)
-             (sched-powersave-on-bat? #t)))
+   ;; powerprofilesctl set power-saver
+   (service power-profiles-daemon-service-type)
+   (simple-service 'amdgpu-power-auto udev-service-type
+                   (list (udev-rule "90-amdgpu-power.rules"
+                                    (string-append
+                                     "KERNEL==\"card[0-9]\", SUBSYSTEM==\"drm\", "
+                                     "DRIVERS==\"amdgpu\", "
+                                     "ATTR{device/power_dpm_force_performance_level}=\"auto\"\n"))))
+
+   ;; Enable USB autosuspend for Framework HDMI expansion card and YubiKey
+   (simple-service 'usb-autosuspend udev-service-type
+                   (list (udev-rule "90-usb-autosuspend.rules"
+                                    (string-append
+                                     ;; Framework HDMI Expansion Card
+                                     "ACTION==\"add\", SUBSYSTEM==\"usb\", "
+                                     "ATTR{product}==\"HDMI Expansion Card\", "
+                                     "ATTR{manufacturer}==\"Framework\", "
+                                     "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"
+                                     ;; YubiKey FIDO+CCID
+                                     "ACTION==\"add\", SUBSYSTEM==\"usb\", "
+                                     "ATTR{idVendor}==\"1050\", "  ;; Yubico
+                                     "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
+
+   ;; Enable PCI Runtime PM for NVMe SSD
+   (simple-service 'nvme-runtime-pm udev-service-type
+                   (list (udev-rule "90-nvme-power.rules"
+                                    (string-append
+                                     "ACTION==\"add\", SUBSYSTEM==\"pci\", "
+                                     "ATTR{vendor}==\"0x144d\", "  ;; Samsung
+                                     "ATTR{class}==\"0x010802\", "  ;; NVMe controller
+                                     "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
+
    (service mullvad-daemon-service-type)
    %common-services)))
