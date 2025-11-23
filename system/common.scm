@@ -209,6 +209,8 @@ COMMIT
 
    (service thermald-service-type)
 
+   (service earlyoom-service-type)
+
    (service iptables-service-type
          (iptables-configuration
           (ipv4-rules %iptables-ipv4-rules)
@@ -222,6 +224,16 @@ COMMIT
               (list (subid-range (name "franz")))))))
 
   (modify-services %panther-desktop-services-minimal
+    ;; Configure elogind for suspend-then-hibernate
+    (elogind-service-type config =>
+      (elogind-configuration
+        (inherit config)
+        (handle-lid-switch 'suspend-then-hibernate)
+        (hibernate-delay-seconds 3600)))  ;; Auto-hibernate after 60 minutes in suspend
+        ;; TODO: Add WiFi/Bluetooth blocking hook later
+        ;; (system-sleep-hook-files
+        ;;   (list (local-file "system/suspend-wifi-bluetooth-hook.sh")))
+
     ;; https://stackoverflow.com/questions/76830848/redis-warning-memory-overcommit-must-be-enabled
     (sysctl-service-type config => (sysctl-configuration
                                     (inherit config)

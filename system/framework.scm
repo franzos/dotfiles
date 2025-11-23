@@ -6,6 +6,7 @@
   #:use-module (gnu services pm)              ;; power-profiles-daemon-service-type
   #:use-module (gnu services linux)           ;; zram-device-service-type
   #:use-module (gnu services base)            ;; udev-service-type
+  #:use-module (gnu system file-systems)      ;; swap-space
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd)
@@ -21,7 +22,9 @@
                  amd-microcode))
  
  (kernel-arguments
-  (cons* "amd_pstate=active"                      ;; AMD Ryzen EPP power management
+  (cons* "resume=/dev/mapper/cryptroot"           ;; Resume from hibernation
+         "resume_offset=317310976"                ;; Swap file offset for hibernation
+         "amd_pstate=active"                      ;; AMD Ryzen EPP power management
          "pcie_aspm.policy=powersupersave"        ;; Aggressive PCIe power saving
          "amdgpu.ppfeaturemask=0xffffffff"        ;; Enable all GPU power features
          "amdgpu.abmlevel=3"                      ;; Adaptive backlight management
@@ -41,7 +44,7 @@
           (target "cryptroot")
           (type luks-device-mapping))))
 
-  (file-systems 
+  (file-systems
    (cons* (file-system
            (mount-point "/boot/efi")
            (device (uuid "71CB-FDB7"
@@ -51,15 +54,23 @@
             (mount-point "/")
             (device "/dev/mapper/cryptroot")
             (type "ext4")
-            (dependencies mapped-devices)) 
+            (dependencies mapped-devices))
            %base-file-systems))
+
+ (swap-devices
+  (list
+   (swap-space
+    (target "/swapfile")
+    (dependencies (filter (file-system-mount-point-predicate "/")
+                          file-systems))
+    (priority 10))))  ;; Low priority - only used for hibernation and overflow
 
  (services
   (cons*
    (service zram-device-service-type
             (zram-device-configuration
              (size "24G")
-             (priority 0)))
+             (priority 100)))  ;; High priority - use zram first for performance
    ;; powerprofilesctl set power-saver
    (service power-profiles-daemon-service-type)
    (simple-service 'amdgpu-power-auto udev-service-type

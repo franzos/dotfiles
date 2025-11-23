@@ -39,6 +39,9 @@ exec foot --server
 # daemon that provides settings to Xorg applications
 exec xsettingsd
 
+# Mullvad VPN
+exec mullvad-vpn
+
 # music player daemon
 # exec mpd
 

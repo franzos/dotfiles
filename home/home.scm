@@ -81,6 +81,7 @@
          "inkscape"
          "emacs"
          "git"
+         "jj-vcs"
          "recutils"
          "curl"
          "wget"
@@ -127,7 +128,8 @@
          "qtwayland"
          "swappy"
         ;  "wf-recorder"             ;; Screen Recording
-        ;  "playerctl"
+         "playerctl"                 ;; media control
+         "tidal-hifi"
          "keychain"
          "dconf"
          "libgsf"
@@ -205,7 +207,7 @@
                              ("ll" . "ls -l")
                              ("ls" . "ls -p --color=auto")
                              ("ccs" . "guix shell node pnpm -- pnpm dlx @anthropic-ai/claude-code")
-                             ("cc" . "pnpm dlx @anthropic-ai/claude-code")
+                             ("ccss" . "guix shell node pnpm -- pnpm dlx @anthropic-ai/claude-code --dangerously-skip-permissions")
                              ("pms" . "podman system service --time=0 unix:///tmp/podman.sock")))
                   (bashrc (list (local-file
                                  ".bashrc"

@@ -40,6 +40,8 @@ echo "Subject: Hi" | msmtp -a gofranz.com mail@gofranz.com -v
 - **LUKS encryption** - Full disk encryption
 - **TLP** - Power management with custom AC/battery profiles
 - **ZRAM** - Compressed swap (8G thinkpad, 24G framework)
+- **Chrome** with Hardware Acceleration
+- **Hibernation** Hibernate to disk after 60m standby
 
 ### Security
 - Smart card support (pcscd)
