@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Zed
+Comment=A high-performance, multiplayer code editor.
+GenericName=Text Editor
+Exec=guix shell zed -- zed %U
+Icon=zed
+Type=Application
+StartupNotify=true
+StartupWMClass=Zed
+Categories=TextEditor;Development;IDE;
+Keywords=zed;

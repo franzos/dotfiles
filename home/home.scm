@@ -60,17 +60,13 @@
 	       "dmenu"
 	       "j4-dmenu-desktop"          ;; flatpak integration
          ;; dmenu replacement
-        ;  "rofi-wayland"
+        ;  "rofi"
         ;  "pinentry-rofi"
 	       "recoll"
          "qemu"
          "wireshark"
-        ;  "kleopatra"                 ;; pgp
-        ;  "quassel"                   ;; irc
-        ;  "linphone-desktop"          ;; voip
+         "kleopatra"                 ;; pgp
          "flatpak"
-        ;  "nheko"
-        ;  "monero"
          "tomb"                      ;; secrets manager
          "steghide"
          "keepassxc"                 ;; password manager
@@ -196,6 +192,13 @@
          ;; Darkman
          "darkman"
          "bluetuith"                 ;; Bluetooth TUI
+         "direnv"
+
+         ;;Zed
+         "zed"
+         "wakatime-cli"
+         "wakatime-ls"
+         "package-version-server"
    )))
  
  ;; Below is the list of Home services.  To search for available
@@ -203,11 +206,11 @@
  (services
   (append (list (service home-bash-service-type
                  (home-bash-configuration
-                  (aliases '(("grep" . "grep --color=auto") 
+                  (aliases '(("grep" . "grep --color=auto")
                              ("ll" . "ls -l")
                              ("ls" . "ls -p --color=auto")
-                             ("ccs" . "guix shell node pnpm -- pnpm dlx @anthropic-ai/claude-code")
-                             ("ccss" . "guix shell node pnpm -- pnpm dlx @anthropic-ai/claude-code --dangerously-skip-permissions")
+                             ("ccs" . "guix shell node pnpm gh -- pnpm dlx @anthropic-ai/claude-code")
+                             ("ccss" . "guix shell node pnpm gh -- pnpm dlx @anthropic-ai/claude-code --dangerously-skip-permissions")
                              ("pms" . "podman system service --time=0 unix:///tmp/podman.sock")))
                   (bashrc (list (local-file
                                  ".bashrc"
@@ -232,6 +235,10 @@
                                                                      "apps/vscode_cpp.desktop"))
                    (".local/share/applications/google-chrome-hw.desktop" ,(local-file
                                                                            "apps/google-chrome-hw.desktop"))
+                   (".local/share/applications/mullvad-vpn.desktop" ,(local-file
+                                                                      "apps/mullvad-vpn.desktop"))
+                   (".local/share/applications/zed.desktop" ,(local-file
+                                                                  "apps/zed.desktop"))
                    ;; GTK-3 theme templates for darkman
                    (".local/share/gtk-themes/settings-dark.ini" ,(local-file "gtk-3.0-settings-dark.ini"))
                    (".local/share/gtk-themes/settings-light.ini" ,(local-file "gtk-3.0-settings-light.ini"))
@@ -295,7 +302,12 @@
                           ;; podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock
                           ("DOCKER_HOST" . "unix:///run/user/$(id -u)/podman/podman.sock")
                           ;; Unknown terminal: foot
-                          ("TERM" . "xterm")))
+                          ("TERM" . "xterm")
+                          ;; Disable version enforcement
+                          ("COREPACK_ENABLE_STRICT" . "0")
+                          ;; Do Not Track: ex. Turborepo
+                          ("DO_NOT_TRACK" . "1")
+                          ("NEXT_TELEMETRY_DISABLED" . "1")))
         (simple-service 'variant-packages-service
          home-channels-service-type
           (cons* 

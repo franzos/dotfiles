@@ -146,7 +146,9 @@ COMMIT
                 (terminal-vt "1")
                 (terminal-switch #t)
                 (default-session-command
-                 (greetd-wlgreet-sway-session)))
+                 (greetd-wlgreet-sway-session))
+                (initial-session-user "franz")
+                (initial-session-command (greetd-user-session)))
                (greetd-terminal-configuration
                 (terminal-vt "2"))
                (greetd-terminal-configuration
@@ -201,7 +203,7 @@ COMMIT
    (service gvfs-service-type)
 
    (service bluetooth-service-type
-            (bluetooth-configuration 
+            (bluetooth-configuration
              (bluez bluez)
              (auto-enable? #t)
              (experimental #t)          ;; Enable experimental features for modern devices
@@ -229,10 +231,7 @@ COMMIT
       (elogind-configuration
         (inherit config)
         (handle-lid-switch 'suspend-then-hibernate)
-        (hibernate-delay-seconds 3600)))  ;; Auto-hibernate after 60 minutes in suspend
-        ;; TODO: Add WiFi/Bluetooth blocking hook later
-        ;; (system-sleep-hook-files
-        ;;   (list (local-file "system/suspend-wifi-bluetooth-hook.sh")))
+        (hibernate-delay-seconds 3600)))
 
     ;; https://stackoverflow.com/questions/76830848/redis-warning-memory-overcommit-must-be-enabled
     (sysctl-service-type config => (sysctl-configuration

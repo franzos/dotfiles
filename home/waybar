@@ -4,7 +4,7 @@
     "spacing": 4,
     "modules-left": ["sway/workspaces", "sway/mode", "sway/scratchpad", "custom/media"],
     "modules-center": ["sway/window"],
-    "modules-right": ["cpu", "idle_inhibitor", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "battery#bat2", "clock", "clock#gmt1", "tray"],
+    "modules-right": ["cpu", "idle_inhibitor", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "battery#bat2", "clock", "clock#gmt1", "custom/gpg", "tray"],
     "sway/mode": {
         "format": "<span style=\"italic\">{}</span>"
     },
@@ -26,7 +26,6 @@
         "spacing": 10
     },
     "clock": {
-        // "timezone": "America/New_York",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
         "format-alt": "{:%Y-%m-%d}"
     },
@@ -39,7 +38,7 @@
     "cpu": {
         "format": "{usage}% ",
         "tooltip": false,
-        "interval": 10,
+        "interval": 5,
         "states": {
             "warning": 70,
             "critical": 90
@@ -50,21 +49,16 @@
         "format": "{}% "
     },
     "temperature": {
-        // "thermal-zone": 2,
-        // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
         "critical-threshold": 80,
-        // "format-critical": "{temperatureC}°C {icon}",
         "format": "{temperatureC}°C {icon}",
         "format-icons": ["", "", ""]
     },
     "backlight": {
-        // "device": "acpi_video1",
         "format": "{percent}% {icon}",
         "format-icons": ["", "", "", "", "", "", "", "", ""]
     },
     "battery": {
         "states": {
-            // "good": 95,
             "warning": 30,
             "critical": 15
         },
@@ -72,15 +66,12 @@
         "format-charging": "{capacity}% ",
         "format-plugged": "{capacity}% ",
         "format-alt": "{time} {icon}",
-        // "format-good": "", // An empty format will hide the module
-        // "format-full": "",
         "format-icons": ["", "", "", "", ""]
     },
     "battery#bat2": {
         "bat": "BAT2"
     },
     "network": {
-        // "interface": "wlp2*", // (Optional) To force the use of this interface
         "format-wifi": "{essid} ({signalStrength}%) ",
         "format-ethernet": "{ipaddr}/{cidr} ",
         "tooltip-format": "{ifname} via {gwaddr} ",
@@ -89,7 +80,6 @@
         "format-alt": "{ifname}: {ipaddr}/{cidr}"
     },
     "pulseaudio": {
-        // "scroll-step": 1, // %, can be a float
         "format": "{volume}% {icon} {format_source}",
         "format-bluetooth": "{volume}% {icon} {format_source}",
         "format-bluetooth-muted": " {icon} {format_source}",
@@ -132,6 +122,12 @@
         "on-click": "$HOME/.local/bin/bt-toggle-profile",
         "tooltip": true
     },
+    "custom/gpg": {
+        "format": "",
+        "tooltip": true,
+        "tooltip-format": "Click to reload Yubikey",
+        "on-click": "gpg-connect-agent 'scd serialno' 'learn --force' /bye && notify-send 'GPG' 'Yubikey reloaded'"
+    },
     "custom/media": {
         "format": "{icon} {}",
         "return-type": "json",
@@ -141,8 +137,6 @@
             "default": "🎜"
         },
         "escape": true,
-        "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
-        // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
+        "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null"
     }
 }
-

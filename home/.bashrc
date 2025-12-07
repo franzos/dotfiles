@@ -31,7 +31,8 @@ alias ll='ls -l'
 alias grep='grep --color=auto'
 
 # SSH key
-eval `keychain --eval ssh franz yk1 yk1.no-pin yk2 yk2.no-pin`
+# eval `keychain --eval ssh franz yk1 yk1.no-pin yk2 yk2.no-pin`
+eval `keychain --eval franz`
 
 # Apps
 export EDITOR=nvim
@@ -56,3 +57,19 @@ function br {
         return "$code"
     fi
 }
+
+# direnv (.envrc)
+_direnv_hook() {
+  local previous_exit_status=$?;
+  trap -- '' SIGINT;
+  eval "$("/gnu/store/imi8rfkq6rd68wgjxj028g5mn8h22g89-direnv-2.37.1/bin/direnv" export bash)";
+  trap - SIGINT;
+  return $previous_exit_status;
+};
+if [[ ";${PROMPT_COMMAND[*]:-};" != *";_direnv_hook;"* ]]; then
+  if [[ "$(declare -p PROMPT_COMMAND 2>&1)" == "declare -a"* ]]; then
+    PROMPT_COMMAND=(_direnv_hook "${PROMPT_COMMAND[@]}")
+  else
+    PROMPT_COMMAND="_direnv_hook${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
+  fi
+fi
