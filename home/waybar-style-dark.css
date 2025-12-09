@@ -1,13 +1,13 @@
-/* macOS Classic Theme - Light */
+/* macOS Classic Theme - Dark */
 * {
     font-family: "Noto Sans", "FontAwesome", sans-serif;
     font-size: 13px;
 }
 
 window#waybar {
-    background-color: #F7F7F7;
-    border-bottom: 1px solid #D2D2D2;
-    color: #000000;
+    background-color: #1E1D1E;
+    border-bottom: 1px solid #404040;
+    color: #DDDDDD;
 }
 
 window#waybar.hidden {
@@ -21,39 +21,39 @@ button {
 }
 
 button:hover {
-    background: #E0E0E0;
+    background: #3A3A3A;
 }
 
 /* Workspaces */
 #workspaces button {
     padding: 0 8px;
     background-color: transparent;
-    color: #000000;
-    border-right: 1px solid #D2D2D2;
+    color: #DDDDDD;
+    border-right: 1px solid #404040;
 }
 
 #workspaces button:first-child {
-    border-left: 1px solid #D2D2D2;
+    border-left: 1px solid #404040;
 }
 
 #workspaces button:hover {
-    background: #E0E0E0;
+    background: #3A3A3A;
 }
 
 #workspaces button.focused,
 #workspaces button.active {
-    background-color: #C7DEFF;
-    color: #000000;
+    background-color: #353436;
+    color: #DDDDDD;
 }
 
 #workspaces button.urgent {
-    background-color: #FBEAE5;
-    color: #C5060B;
+    background-color: #46190C;
+    color: #DDDDDD;
 }
 
 #mode {
-    background-color: #C7DEFF;
-    color: #000000;
+    background-color: #353436;
+    color: #DDDDDD;
     padding: 0 10px;
 }
 
@@ -78,12 +78,12 @@ button:hover {
 #custom-gpg,
 #mpd {
     padding: 0 10px;
-    color: #000000;
+    color: #DDDDDD;
     background-color: transparent;
 }
 
 #window {
-    color: #505050;
+    color: #9E9E9E;
     font-weight: 500;
 }
 
@@ -102,8 +102,8 @@ button:hover {
 
 /* Clock */
 #clock {
-    background-color: #F9F9F9;
-    border-left: 1px solid #D2D2D2;
+    background-color: #131313;
+    border-left: 1px solid #404040;
 }
 
 /* Battery states */
@@ -113,23 +113,23 @@ button:hover {
 
 #battery.charging,
 #battery.plugged {
-    background-color: #E5FFE5;
-    color: #000000;
+    background-color: #0C4619;
+    color: #DDDDDD;
 }
 
 #battery.warning {
-    background-color: #FFFBE5;
-    color: #C99401;
+    background-color: #3A310E;
+    color: #DDDDDD;
 }
 
 #battery.critical:not(.charging) {
-    background-color: #FBEAE5;
-    color: #C5060B;
+    background-color: #46190C;
+    color: #DDDDDD;
     animation: blink 1s steps(2) infinite;
 }
 
 @keyframes blink {
-    50% { background-color: #C5060B; color: #ffffff; }
+    50% { background-color: #802207; }
 }
 
 /* CPU states */
@@ -138,13 +138,13 @@ button:hover {
 }
 
 #cpu.warning {
-    background-color: #FFFBE5;
-    color: #C99401;
+    background-color: #3A310E;
+    color: #DDDDDD;
 }
 
 #cpu.critical {
-    background-color: #FBEAE5;
-    color: #C5060B;
+    background-color: #46190C;
+    color: #DDDDDD;
 }
 
 /* Network */
@@ -153,8 +153,8 @@ button:hover {
 }
 
 #network.disconnected {
-    background-color: #FBEAE5;
-    color: #C5060B;
+    background-color: #46190C;
+    color: #DDDDDD;
 }
 
 /* Audio */
@@ -163,12 +163,12 @@ button:hover {
 }
 
 #pulseaudio:hover {
-    background-color: #E0E0E0;
+    background-color: #3A3A3A;
 }
 
 #pulseaudio.muted {
-    background-color: #F9F9F9;
-    color: #929292;
+    background-color: #131313;
+    color: #9E9E9E;
 }
 
 #wireplumber {
@@ -176,8 +176,8 @@ button:hover {
 }
 
 #wireplumber.muted {
-    background-color: #F9F9F9;
-    color: #929292;
+    background-color: #131313;
+    color: #9E9E9E;
 }
 
 /* Bluetooth */
@@ -190,24 +190,24 @@ button:hover {
 }
 
 #custom-bt-profile.a2dp {
-    background-color: #E5FFE5;
-    color: #000000;
+    background-color: #0C4619;
+    color: #DDDDDD;
 }
 
 #custom-bt-profile.headset {
-    background-color: #FFFBE5;
-    color: #000000;
+    background-color: #3A310E;
+    color: #DDDDDD;
 }
 
 #custom-bt-profile.disconnected,
 #custom-bt-profile.off {
     background-color: transparent;
-    color: #929292;
+    color: #9E9E9E;
 }
 
 #custom-bt-profile.unknown {
     background-color: transparent;
-    color: #929292;
+    color: #9E9E9E;
 }
 
 /* Backlight */
@@ -221,14 +221,14 @@ button:hover {
 }
 
 #temperature.critical {
-    background-color: #FBEAE5;
-    color: #C5060B;
+    background-color: #46190C;
+    color: #DDDDDD;
 }
 
 /* Media */
 #custom-media {
     background-color: transparent;
-    color: #505050;
+    color: #9E9E9E;
     min-width: 100px;
 }
 
@@ -243,23 +243,23 @@ button:hover {
 
 #tray > .needs-attention {
     -gtk-icon-effect: highlight;
-    background-color: #E5EAFF;
+    background-color: #0C194D;
 }
 
 /* Idle inhibitor */
 #idle_inhibitor {
     background-color: transparent;
-    color: #929292;
+    color: #9E9E9E;
 }
 
 #idle_inhibitor.activated {
-    background-color: #C7DEFF;
-    color: #000000;
+    background-color: #353436;
+    color: #DDDDDD;
 }
 
 /* Scratchpad */
 #scratchpad {
-    background-color: #E5EAFF;
+    background-color: #0C194D;
 }
 
 #scratchpad.empty {
@@ -272,8 +272,8 @@ button:hover {
 }
 
 #power-profiles-daemon.performance {
-    background-color: #FBEAE5;
-    color: #C5060B;
+    background-color: #46190C;
+    color: #DDDDDD;
 }
 
 #power-profiles-daemon.balanced {
@@ -281,8 +281,8 @@ button:hover {
 }
 
 #power-profiles-daemon.power-saver {
-    background-color: #E5FFE5;
-    color: #000000;
+    background-color: #0C4619;
+    color: #DDDDDD;
 }
 
 /* Memory/Disk */
@@ -300,15 +300,15 @@ button:hover {
 }
 
 #mpd.disconnected {
-    color: #929292;
+    color: #9E9E9E;
 }
 
 #mpd.stopped {
-    color: #929292;
+    color: #9E9E9E;
 }
 
 #mpd.paused {
-    color: #505050;
+    color: #9E9E9E;
 }
 
 /* Language */
@@ -332,7 +332,7 @@ button:hover {
 }
 
 #keyboard-state > label.locked {
-    background-color: #E0E0E0;
+    background-color: #3A3A3A;
 }
 
 /* Privacy */
@@ -342,23 +342,23 @@ button:hover {
 
 #privacy-item {
     padding: 0 5px;
-    background-color: #FBEAE5;
-    color: #C5060B;
+    background-color: #46190C;
+    color: #DDDDDD;
 }
 
 #privacy-item.screenshare {
-    background-color: #FFFBE5;
-    color: #C99401;
+    background-color: #3A310E;
+    color: #DDDDDD;
 }
 
 #privacy-item.audio-in {
-    background-color: #E5FFE5;
-    color: #000000;
+    background-color: #0C4619;
+    color: #DDDDDD;
 }
 
 #privacy-item.audio-out {
-    background-color: #E5EAFF;
-    color: #000000;
+    background-color: #0C194D;
+    color: #DDDDDD;
 }
 
 /* GPG/Yubikey */

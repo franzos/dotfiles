@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Switch sway window colors to light (macOS Classic) theme
+
+export SWAYSOCK="/run/user/1000/sway-ipc.1000.$(pgrep -x sway).sock"
+
+swaymsg client.focused '#D2D2D2' '#F7F7F7' '#000000' '#C7DEFF' '#D2D2D2'
+swaymsg client.focused_inactive '#E0E0E0' '#F9F9F9' '#505050' '#E0E0E0' '#E0E0E0'
+swaymsg client.unfocused '#E0E0E0' '#F9F9F9' '#929292' '#E0E0E0' '#E0E0E0'
+swaymsg client.urgent '#C5060B' '#FBEAE5' '#C5060B' '#C5060B' '#C5060B'
+swaymsg client.background '#ffffff'

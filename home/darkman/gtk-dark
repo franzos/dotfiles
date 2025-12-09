@@ -14,3 +14,4 @@ GTK3_CONFIG="$HOME/.config/gtk-3.0/settings.ini"
 
 mkdir -p "$(dirname "$GTK3_CONFIG")"
 cp "$TEMPLATE" "$GTK3_CONFIG"
+chmod 644 "$GTK3_CONFIG"

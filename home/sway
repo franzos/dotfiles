@@ -18,7 +18,7 @@ set $menu dmenu_path | j4-dmenu-desktop --dmenu="bemenu --ignorecase" | xargs sw
 
 # Display management
 # .config/kanshi/config
-exec kanshi
+exec_always pkill -x kanshi; kanshi
 
 # Clipboard
 # exec wl-paste -t text --watch clipman store --no-persist
@@ -297,8 +297,24 @@ bindsym $mod+r mode "resize"
     # Theme toggle
     bindsym $mod+t exec darkman toggle
 
+# Window decoration colors - macOS Classic style
+# class                 border  backgr  text    indicator child_border
+client.focused          #D2D2D2 #F7F7F7 #000000 #C7DEFF   #D2D2D2
+client.focused_inactive #E0E0E0 #F9F9F9 #505050 #E0E0E0   #E0E0E0
+client.unfocused        #E0E0E0 #F9F9F9 #929292 #E0E0E0   #E0E0E0
+client.urgent           #C5060B #FBEAE5 #C5060B #C5060B   #C5060B
+client.placeholder      #D2D2D2 #F7F7F7 #000000 #D2D2D2   #D2D2D2
+client.background       #ffffff
+
+# Title bar font
+font pango:Noto Sans 9
+
 bar {
 	swaybar_command waybar
 }
 
 include @sysconfdir@/sway/config
+
+# Default border style (after include to ensure it takes precedence)
+default_border normal 2
+default_floating_border normal 2

@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
-# Switch dunst notification daemon to dark theme
+# Switch dunst notification daemon to dark (macOS Classic) theme
 
 set -euo pipefail
 
 CONFIG="$HOME/.config/dunst/dunstrc"
 
-# Update colors for dark theme (Yaru-dark)
-sed -i 's/^    background = .*/    background = "#2B2928"/' "$CONFIG"
-sed -i 's/^    foreground = .*/    foreground = "#FFFFFF"/' "$CONFIG"
-sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/background = .*/background = "#2B2928"/' "$CONFIG"
-sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/foreground = .*/foreground = "#FFFFFF"/' "$CONFIG"
-sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/background = .*/background = "#2B2928"/' "$CONFIG"
-sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/foreground = .*/foreground = "#FFFFFF"/' "$CONFIG"
+# Update colors for dark theme (macOS Classic Dark)
+sed -i 's/^    background = .*/    background = "#1E1D1E"/' "$CONFIG"
+sed -i 's/^    foreground = .*/    foreground = "#DDDDDD"/' "$CONFIG"
+sed -i 's/^    frame_color = .*/    frame_color = "#404040"/' "$CONFIG"
+sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/background = .*/background = "#1E1D1E"/' "$CONFIG"
+sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/foreground = .*/foreground = "#9E9E9E"/' "$CONFIG"
+sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/background = .*/background = "#1E1D1E"/' "$CONFIG"
+sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/foreground = .*/foreground = "#DDDDDD"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/background = .*/background = "#46190C"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/foreground = .*/foreground = "#DDDDDD"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/frame_color = .*/frame_color = "#802207"/' "$CONFIG"
 
 # Restart dunst to apply changes
 killall dunst 2>/dev/null || true

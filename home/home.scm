@@ -200,7 +200,7 @@
          "wakatime-ls"
          "package-version-server"
    )))
- 
+
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
  (services
@@ -250,11 +250,18 @@
                    (".local/share/light-mode.d/gtk" ,(local-file "darkman/gtk-light" #:recursive? #t))
                    (".local/share/light-mode.d/foot" ,(local-file "darkman/foot-light" #:recursive? #t))
                    (".local/share/light-mode.d/dunst" ,(local-file "darkman/dunst-light" #:recursive? #t))
-                   (".local/share/light-mode.d/vscode" ,(local-file "darkman/vscode-light" #:recursive? #t))))
+                   (".local/share/light-mode.d/vscode" ,(local-file "darkman/vscode-light" #:recursive? #t))
+                   (".local/share/light-mode.d/waybar" ,(local-file "darkman/waybar-light" #:recursive? #t))
+                   (".local/share/light-mode.d/sway" ,(local-file "darkman/sway-light" #:recursive? #t))
+                   (".local/share/dark-mode.d/waybar" ,(local-file "darkman/waybar-dark" #:recursive? #t))
+                   (".local/share/dark-mode.d/sway" ,(local-file "darkman/sway-dark" #:recursive? #t))
+                   ;; Waybar theme files for darkman switching
+                   (".local/share/waybar-themes/style-light.css" ,(local-file "waybar-style.css"))
+                   (".local/share/waybar-themes/style-dark.css" ,(local-file "waybar-style-dark.css"))))
         (service home-xdg-configuration-files-service-type
                  `(("sway/config" ,(local-file "sway"))
                    ("waybar/config" ,(local-file "waybar"))
-                   ("waybar/style.css" ,(local-file "waybar-style.css"))
+                   ;; waybar/style.css managed by darkman scripts, not guix home
                    ("kanshi/config" ,(local-file "kanshi"))
                    ("xfce4/xfconf/xfce-perchannel-xml/thunar.xml" ,(local-file "thunar.xml"))
                    ("nvim/init.lua" ,(local-file "nvim/init.lua"))
@@ -268,9 +275,6 @@
                    ("swaylock/config" ,(local-file "swaylock"))
                    ;; WirePlumber Bluetooth configuration for A2DP preference (WirePlumber 0.5+)
                    ("wireplumber/bluetooth.lua.d/51-bluez-config.lua" ,(local-file "wireplumber-bluetooth.lua"))
-                   ;; PipeWire echo cancellation and noise suppression
-                   ;; ("pipewire/pipewire.conf.d/60-echo-cancel.conf" ,(local-file "pipewire-echo-cancel.conf"))
-                   ;; ("pipewire/pipewire.conf.d/99-noise-suppression.conf" ,(local-file "pipewire-noise-suppression.conf"))
                    ;; broot
                    ("broot/conf.hjson" ,(local-file "broot/conf.hjson"))
                    ("broot/verbs.hjson" ,(local-file "broot/verbs.hjson"))
@@ -296,6 +300,9 @@
                           ("NIXOS_OZONE_WL" . "1")
                           ("GDK_BACKEND" . "wayland")
                           ("CLUTTER_BACKEND" . "wayland")
+                          ;; Hardware acceleration
+                          ("LIBVA_DRIVER_NAME" . "radeonsi")
+                          ("ANGLE_DEFAULT_PLATFORM" . "vulkan")
                           ;; Cursor theme
                           ("XCURSOR_THEME" . "Adwaita")
                           ("XCURSOR_SIZE" . "24")
@@ -310,7 +317,7 @@
                           ("NEXT_TELEMETRY_DISABLED" . "1")))
         (simple-service 'variant-packages-service
          home-channels-service-type
-          (cons* 
+          (cons*
            (channel
             (name 'pantherx)
             (url "https://channels.pantherx.org/git/panther.git")
