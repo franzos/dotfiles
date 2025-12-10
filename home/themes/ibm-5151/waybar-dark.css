@@ -1,0 +1,370 @@
+/* IBM 5151 Theme - Dark (monochrome green CRT) */
+* {
+    font-family: "Noto Sans", "FontAwesome", sans-serif;
+    font-size: 13px;
+}
+
+window#waybar {
+    background-color: #001000;
+    border-bottom: 1px solid #006400;
+    color: #09cc50;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+button {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+}
+
+button:hover {
+    background: rgba(9, 204, 80, 0.25);
+}
+
+/* Workspaces */
+#workspaces button {
+    padding: 0 8px;
+    background-color: transparent;
+    color: #09cc50;
+    border-right: 1px solid #006400;
+}
+
+#workspaces button:first-child {
+    border-left: 1px solid #006400;
+}
+
+#workspaces button:hover {
+    background: rgba(9, 204, 80, 0.25);
+}
+
+#workspaces button.focused,
+#workspaces button.active {
+    background-color: rgba(9, 204, 80, 0.25);
+    color: #09cc50;
+}
+
+#workspaces button.urgent {
+    background-color: #09cc50;
+    color: #001000;
+}
+
+#mode {
+    background-color: rgba(9, 204, 80, 0.25);
+    color: #09cc50;
+    padding: 0 10px;
+}
+
+/* Common module styling */
+#clock,
+#battery,
+#cpu,
+#memory,
+#disk,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#wireplumber,
+#custom-media,
+#tray,
+#idle_inhibitor,
+#scratchpad,
+#power-profiles-daemon,
+#bluetooth,
+#custom-bt-profile,
+#custom-gpg,
+#mpd {
+    padding: 0 10px;
+    color: #09cc50;
+    background-color: transparent;
+}
+
+#window {
+    color: #006400;
+    font-weight: 500;
+}
+
+#window,
+#workspaces {
+    margin: 0 4px;
+}
+
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+/* Clock */
+#clock {
+    background-color: #001000;
+    border-left: 1px solid #006400;
+}
+
+/* Battery states */
+#battery {
+    background-color: transparent;
+}
+
+#battery.charging,
+#battery.plugged {
+    background-color: rgba(9, 204, 80, 0.25);
+    color: #09cc50;
+}
+
+#battery.warning {
+    background-color: rgba(9, 204, 80, 0.19);
+    color: #09cc50;
+}
+
+#battery.critical:not(.charging) {
+    background-color: #09cc50;
+    color: #001000;
+    animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink {
+    50% {
+        background-color: #001000;
+        color: #09cc50;
+    }
+}
+
+/* CPU states */
+#cpu {
+    background-color: transparent;
+}
+
+#cpu.warning {
+    background-color: rgba(9, 204, 80, 0.19);
+    color: #09cc50;
+}
+
+#cpu.critical {
+    background-color: #09cc50;
+    color: #001000;
+}
+
+/* Network */
+#network {
+    background-color: transparent;
+}
+
+#network.disconnected {
+    background-color: #09cc50;
+    color: #001000;
+}
+
+/* Audio */
+#pulseaudio {
+    background-color: transparent;
+}
+
+#pulseaudio:hover {
+    background-color: rgba(9, 204, 80, 0.25);
+}
+
+#pulseaudio.muted {
+    background-color: #001000;
+    color: #006400;
+}
+
+#wireplumber {
+    background-color: transparent;
+}
+
+#wireplumber.muted {
+    background-color: #001000;
+    color: #006400;
+}
+
+/* Bluetooth */
+#bluetooth {
+    background-color: transparent;
+}
+
+#custom-bt-profile {
+    background-color: transparent;
+}
+
+#custom-bt-profile.a2dp {
+    background-color: rgba(9, 204, 80, 0.25);
+    color: #09cc50;
+}
+
+#custom-bt-profile.headset {
+    background-color: rgba(9, 204, 80, 0.19);
+    color: #09cc50;
+}
+
+#custom-bt-profile.disconnected,
+#custom-bt-profile.off {
+    background-color: transparent;
+    color: #006400;
+}
+
+#custom-bt-profile.unknown {
+    background-color: transparent;
+    color: #006400;
+}
+
+/* Backlight */
+#backlight {
+    background-color: transparent;
+}
+
+/* Temperature */
+#temperature {
+    background-color: transparent;
+}
+
+#temperature.critical {
+    background-color: #09cc50;
+    color: #001000;
+}
+
+/* Media */
+#custom-media {
+    background-color: transparent;
+    color: #006400;
+    min-width: 100px;
+}
+
+/* Tray */
+#tray {
+    background-color: transparent;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: rgba(9, 204, 80, 0.25);
+}
+
+/* Idle inhibitor */
+#idle_inhibitor {
+    background-color: transparent;
+    color: #006400;
+}
+
+#idle_inhibitor.activated {
+    background-color: rgba(9, 204, 80, 0.25);
+    color: #09cc50;
+}
+
+/* Scratchpad */
+#scratchpad {
+    background-color: rgba(9, 204, 80, 0.25);
+}
+
+#scratchpad.empty {
+    background-color: transparent;
+}
+
+/* Power profiles */
+#power-profiles-daemon {
+    padding-right: 15px;
+}
+
+#power-profiles-daemon.performance {
+    background-color: #09cc50;
+    color: #001000;
+}
+
+#power-profiles-daemon.balanced {
+    background-color: transparent;
+}
+
+#power-profiles-daemon.power-saver {
+    background-color: rgba(9, 204, 80, 0.25);
+    color: #09cc50;
+}
+
+/* Memory/Disk */
+#memory {
+    background-color: transparent;
+}
+
+#disk {
+    background-color: transparent;
+}
+
+/* MPD */
+#mpd {
+    background-color: transparent;
+}
+
+#mpd.disconnected {
+    color: #006400;
+}
+
+#mpd.stopped {
+    color: #006400;
+}
+
+#mpd.paused {
+    color: #006400;
+}
+
+/* Language */
+#language {
+    background-color: transparent;
+    padding: 0 5px;
+    margin: 0 5px;
+    min-width: 16px;
+}
+
+/* Keyboard state */
+#keyboard-state {
+    background-color: transparent;
+    padding: 0;
+    margin: 0 5px;
+    min-width: 16px;
+}
+
+#keyboard-state > label {
+    padding: 0 5px;
+}
+
+#keyboard-state > label.locked {
+    background-color: rgba(9, 204, 80, 0.25);
+}
+
+/* Privacy */
+#privacy {
+    padding: 0;
+}
+
+#privacy-item {
+    padding: 0 5px;
+    background-color: #09cc50;
+    color: #001000;
+}
+
+#privacy-item.screenshare {
+    background-color: rgba(9, 204, 80, 0.38);
+    color: #09cc50;
+}
+
+#privacy-item.audio-in {
+    background-color: rgba(9, 204, 80, 0.25);
+    color: #09cc50;
+}
+
+#privacy-item.audio-out {
+    background-color: rgba(9, 204, 80, 0.25);
+    color: #09cc50;
+}
+
+/* GPG/Yubikey */
+#custom-gpg {
+    background-color: transparent;
+}

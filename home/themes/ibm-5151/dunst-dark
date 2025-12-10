@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Switch dunst notification daemon to dark (IBM 5151) theme
+
+set -euo pipefail
+
+CONFIG="$HOME/.config/dunst/dunstrc"
+
+# Update colors for dark theme (IBM 5151)
+sed -i 's/^    background = .*/    background = "#001000"/' "$CONFIG"
+sed -i 's/^    foreground = .*/    foreground = "#09CC50"/' "$CONFIG"
+sed -i 's/^    frame_color = .*/    frame_color = "#006400"/' "$CONFIG"
+sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/background = .*/background = "#001000"/' "$CONFIG"
+sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/foreground = .*/foreground = "#006400"/' "$CONFIG"
+sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/background = .*/background = "#001000"/' "$CONFIG"
+sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/foreground = .*/foreground = "#09CC50"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/background = .*/background = "#09CC50"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/foreground = .*/foreground = "#001000"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/frame_color = .*/frame_color = "#09CC50"/' "$CONFIG"
+
+# Restart dunst to apply changes
+killall dunst 2>/dev/null || true

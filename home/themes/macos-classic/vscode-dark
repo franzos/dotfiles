@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Switch VSCode to dark theme
+# This is a fallback if the freedesktop portal integration doesn't work
+
+set -euo pipefail
+
+FILE="$HOME/.config/Code/User/settings.json"
+THEME="Default Dark Modern"
+
+# Check if jq is available
+if ! command -v jq &> /dev/null; then
+    exit 0  # VSCode should use portal integration instead
+fi
+
+# Use jq to update the theme setting
+jq --arg theme "$THEME" '.["workbench.colorTheme"] = $theme' "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"

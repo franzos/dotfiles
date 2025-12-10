@@ -1,0 +1,8 @@
+# IBM 5151 green phosphor CRT theme - sway window colors
+# class                 border  backgr  text    indicator child_border
+client.focused          #006400 #001000 #09CC50 #09CC50   #006400
+client.focused_inactive #006400 #000800 #006400 #006400   #006400
+client.unfocused        #006400 #000800 #006400 #006400   #006400
+client.urgent           #09CC50 #09CC50 #001000 #09CC50   #09CC50
+client.placeholder      #006400 #001000 #09CC50 #006400   #006400
+client.background       #001000

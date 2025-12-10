@@ -27,6 +27,20 @@ guix home reconfigure home.scm
 echo "Subject: Hi" | msmtp -a gofranz.com mail@gofranz.com -v
 ```
 
+## Themes
+
+Available: `ibm-5151`, `macos-classic`
+
+Change theme in `home/home.scm`:
+```scheme
+(define current-theme "ibm-5151")
+```
+
+To add a new theme, create `home/themes/<name>/` with:
+- `foot.ini`, `sway-colors`, `waybar-light.css`, `waybar-dark.css`
+- `gtk-settings-light.ini`, `gtk-settings-dark.ini`
+- Darkman scripts: `foot-dark`, `foot-light`, `sway-dark`, `sway-light`, `waybar-dark`, `waybar-light`, `dunst-dark`, `dunst-light`, `vscode-dark`, `vscode-light`, `gtk-dark`, `gtk-light`
+
 ## Features
 
 - **Darkman** - Automatic dark/light theme switching at sunrise/sunset (toggle: `darkman toggle` or Mod+T)

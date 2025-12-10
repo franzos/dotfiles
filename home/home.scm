@@ -19,6 +19,9 @@
              (px home services foot)
              (px packages audio))
 
+;; Theme configuration
+(define current-theme "ibm-5151")
+
 (define mcron-job-pimsync
   #~(job '(next-hour '(0 3 6 9 12 15 18 21))
          "pimsync sync"
@@ -219,7 +222,8 @@
                                        ".bash_profile"
                                        "bash_profile")))))
         (service home-files-service-type
-                 `((".gtkrc-2.0" ,(local-file "gtkrc-2.0"))
+                 `((".gitconfig" ,(local-file "gitconfig"))
+                   (".gtkrc-2.0" ,(local-file "gtkrc-2.0"))
                    ;; Bluetooth profile management scripts
                    (".local/bin/bt-toggle-profile" ,(local-file "bt-toggle-profile" #:recursive? #t))
                    (".local/bin/bt-profile-status" ,(local-file "bt-profile-status" #:recursive? #t))
@@ -240,26 +244,27 @@
                    (".local/share/applications/zed.desktop" ,(local-file
                                                                   "apps/zed.desktop"))
                    ;; GTK-3 theme templates for darkman
-                   (".local/share/gtk-themes/settings-dark.ini" ,(local-file "gtk-3.0-settings-dark.ini"))
-                   (".local/share/gtk-themes/settings-light.ini" ,(local-file "gtk-3.0-settings-light.ini"))
+                   (".local/share/gtk-themes/settings-dark.ini" ,(local-file (string-append "themes/" current-theme "/gtk-settings-dark.ini")))
+                   (".local/share/gtk-themes/settings-light.ini" ,(local-file (string-append "themes/" current-theme "/gtk-settings-light.ini")))
                    ;; Darkman theme switching scripts
-                   (".local/share/dark-mode.d/gtk" ,(local-file "darkman/gtk-dark" #:recursive? #t))
-                   (".local/share/dark-mode.d/foot" ,(local-file "darkman/foot-dark" #:recursive? #t))
-                   (".local/share/dark-mode.d/dunst" ,(local-file "darkman/dunst-dark" #:recursive? #t))
-                   (".local/share/dark-mode.d/vscode" ,(local-file "darkman/vscode-dark" #:recursive? #t))
-                   (".local/share/light-mode.d/gtk" ,(local-file "darkman/gtk-light" #:recursive? #t))
-                   (".local/share/light-mode.d/foot" ,(local-file "darkman/foot-light" #:recursive? #t))
-                   (".local/share/light-mode.d/dunst" ,(local-file "darkman/dunst-light" #:recursive? #t))
-                   (".local/share/light-mode.d/vscode" ,(local-file "darkman/vscode-light" #:recursive? #t))
-                   (".local/share/light-mode.d/waybar" ,(local-file "darkman/waybar-light" #:recursive? #t))
-                   (".local/share/light-mode.d/sway" ,(local-file "darkman/sway-light" #:recursive? #t))
-                   (".local/share/dark-mode.d/waybar" ,(local-file "darkman/waybar-dark" #:recursive? #t))
-                   (".local/share/dark-mode.d/sway" ,(local-file "darkman/sway-dark" #:recursive? #t))
+                   (".local/share/dark-mode.d/gtk" ,(local-file (string-append "themes/" current-theme "/gtk-dark") #:recursive? #t))
+                   (".local/share/dark-mode.d/foot" ,(local-file (string-append "themes/" current-theme "/foot-dark") #:recursive? #t))
+                   (".local/share/dark-mode.d/dunst" ,(local-file (string-append "themes/" current-theme "/dunst-dark") #:recursive? #t))
+                   (".local/share/dark-mode.d/vscode" ,(local-file (string-append "themes/" current-theme "/vscode-dark") #:recursive? #t))
+                   (".local/share/dark-mode.d/waybar" ,(local-file (string-append "themes/" current-theme "/waybar-dark") #:recursive? #t))
+                   (".local/share/dark-mode.d/sway" ,(local-file (string-append "themes/" current-theme "/sway-dark") #:recursive? #t))
+                   (".local/share/light-mode.d/gtk" ,(local-file (string-append "themes/" current-theme "/gtk-light") #:recursive? #t))
+                   (".local/share/light-mode.d/foot" ,(local-file (string-append "themes/" current-theme "/foot-light") #:recursive? #t))
+                   (".local/share/light-mode.d/dunst" ,(local-file (string-append "themes/" current-theme "/dunst-light") #:recursive? #t))
+                   (".local/share/light-mode.d/vscode" ,(local-file (string-append "themes/" current-theme "/vscode-light") #:recursive? #t))
+                   (".local/share/light-mode.d/waybar" ,(local-file (string-append "themes/" current-theme "/waybar-light") #:recursive? #t))
+                   (".local/share/light-mode.d/sway" ,(local-file (string-append "themes/" current-theme "/sway-light") #:recursive? #t))
                    ;; Waybar theme files for darkman switching
-                   (".local/share/waybar-themes/style-light.css" ,(local-file "waybar-style.css"))
-                   (".local/share/waybar-themes/style-dark.css" ,(local-file "waybar-style-dark.css"))))
+                   (".local/share/waybar-themes/style-light.css" ,(local-file (string-append "themes/" current-theme "/waybar-light.css")))
+                   (".local/share/waybar-themes/style-dark.css" ,(local-file (string-append "themes/" current-theme "/waybar-dark.css")))))
         (service home-xdg-configuration-files-service-type
                  `(("sway/config" ,(local-file "sway"))
+                   ("sway/colors" ,(local-file (string-append "themes/" current-theme "/sway-colors")))
                    ("waybar/config" ,(local-file "waybar"))
                    ;; waybar/style.css managed by darkman scripts, not guix home
                    ("kanshi/config" ,(local-file "kanshi"))
@@ -270,8 +275,7 @@
                    ("nvim/lua/core/keymaps.lua" ,(local-file "nvim/lua/core/keymaps.lua"))
                    ("xdg-desktop-portal/portals.conf" ,(local-file "portals.conf"))
                    ("dunst/dunstrc" ,(local-file "dunstrc"))
-                   ("foot/foot.ini" ,(local-file "foot.ini"))
-                   ("foot/foot-light.ini" ,(local-file "foot-light.ini"))
+                   ("foot/foot.ini" ,(local-file (string-append "themes/" current-theme "/foot.ini")))
                    ("swaylock/config" ,(local-file "swaylock"))
                    ;; WirePlumber Bluetooth configuration for A2DP preference (WirePlumber 0.5+)
                    ("wireplumber/bluetooth.lua.d/51-bluez-config.lua" ,(local-file "wireplumber-bluetooth.lua"))

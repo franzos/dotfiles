@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Switch sway window colors to light (IBM 5151) theme
+
+export SWAYSOCK="/run/user/1000/sway-ipc.1000.$(pgrep -x sway).sock"
+
+swaymsg client.focused '#006400' '#001000' '#09CC50' '#09CC50' '#006400'
+swaymsg client.focused_inactive '#006400' '#000800' '#006400' '#006400' '#006400'
+swaymsg client.unfocused '#006400' '#000800' '#006400' '#006400' '#006400'
+swaymsg client.urgent '#09CC50' '#09CC50' '#001000' '#09CC50' '#09CC50'
+swaymsg client.background '#001000'

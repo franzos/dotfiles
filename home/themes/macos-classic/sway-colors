@@ -1,0 +1,8 @@
+# macOS Classic light theme - sway window colors
+# class                 border  backgr  text    indicator child_border
+client.focused          #D2D2D2 #F7F7F7 #000000 #C7DEFF   #D2D2D2
+client.focused_inactive #E0E0E0 #F9F9F9 #505050 #E0E0E0   #E0E0E0
+client.unfocused        #E0E0E0 #F9F9F9 #929292 #E0E0E0   #E0E0E0
+client.urgent           #C5060B #FBEAE5 #C5060B #C5060B   #C5060B
+client.placeholder      #D2D2D2 #F7F7F7 #000000 #D2D2D2   #D2D2D2
+client.background       #ffffff

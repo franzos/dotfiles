@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Switch GTK applications to light theme
+
+set -euo pipefail
+
+# Update gsettings (for apps that use dconf/gsettings)
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
+gsettings set org.gnome.desktop.interface gtk-theme 'Yaru'
+
+# Update GTK-3 config file (for apps that read settings.ini directly, like Thunar)
+# Copy from Guix-managed template to active config
+TEMPLATE="$HOME/.local/share/gtk-themes/settings-light.ini"
+GTK3_CONFIG="$HOME/.config/gtk-3.0/settings.ini"
+
+mkdir -p "$(dirname "$GTK3_CONFIG")"
+cp "$TEMPLATE" "$GTK3_CONFIG"
+chmod 644 "$GTK3_CONFIG"
