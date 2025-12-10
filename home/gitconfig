@@ -1,0 +1,19 @@
+[user]
+	email = mail@gofranz.com
+	name = Franz Geffke
+	signingkey = 1B3418BA53820C4C
+[commit]
+	gpgsign = true
+[core]
+	editor = nvim
+[init]
+	defaultBranch = master
+[credential]
+	helper = store
+[sendemail]
+	smtpserver = smtp.fastmail.com
+	smtpserverport = 465
+	smtpencryption = ssl
+	smtpuser = mail@gofranz.com
+[http]
+	postBuffer = 157286400
