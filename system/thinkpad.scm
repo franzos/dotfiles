@@ -9,7 +9,8 @@
   #:use-module (gnu services networking)     ;; iptables-service-type
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
-  #:use-module (nongnu system linux-initrd))
+  #:use-module (nongnu system linux-initrd)
+  #:use-module (small-guix services mullvad)) ;; mullvad-daemon-service-type
 
 ;; Allow members of the "video" group to change the screen brightness.
 (define %backlight-udev-rule
