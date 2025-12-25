@@ -29,7 +29,8 @@
   #:use-module (gnu packages vim)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages containers)
-  #:use-module (gnu packages security-token)
+  #:use-module (gnu packages security-token)  ;; ccid
+  #:use-module (gnu packages authentication)  ;; yubico-pam
 
   #:use-module (nongnu packages firmware)       ;; fwupd-nonfree
 
@@ -223,7 +224,23 @@ COMMIT
              (subgids
               (list (subid-range (name "franz"))))
              (subuids
-              (list (subid-range (name "franz")))))))
+              (list (subid-range (name "franz"))))))
+
+   ;; Yubikey challenge-response for sudo (touch only, no password)
+   (simple-service 'yubico-pam-sudo
+     pam-root-service-type
+     (list (pam-extension
+            (transformer
+             (lambda (pam)
+               (if (member (pam-service-name pam) '("sudo"))
+                   (pam-service
+                    (inherit pam)
+                    (auth (cons (pam-entry
+                                 (control "sufficient")
+                                 (module (file-append yubico-pam "/lib/security/pam_yubico.so"))
+                                 (arguments '("mode=challenge-response")))
+                                (pam-service-auth pam))))
+                   pam)))))))
 
   (modify-services %panther-desktop-services-minimal
     ;; Configure elogind for suspend-then-hibernate

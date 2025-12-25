@@ -61,6 +61,28 @@ To add a new theme, create `home/themes/<name>/` with:
 - Smart card support (pcscd)
 - lxqt-policykit agent
 - block-facebook-hosts
+- Yubikey challenge-response for sudo
+
+#### Yubikey Setup (Challenge-Response for sudo)
+
+Enable slot 2:
+
+```bash
+guix shell python-yubikey-manager -- ykman config usb --enable OTP
+```
+
+Program slot 2:
+
+```bash
+# openssl rand -hex 20
+guix shell python-yubikey-manager -- ykman otp chalresp --touch 2 <your-secret-hex>
+```
+
+Generate challenge file (once, with any key):
+
+```bash
+guix shell yubico-pam -- ykpamcfg -2 -v
+```
 
 ### Hardware-specific
 - **Framework**: AMD GPU, fw-fanctrl
