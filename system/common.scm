@@ -18,6 +18,7 @@
   #:use-module (gnu services networking)
   #:use-module (gnu services mail)
   #:use-module (gnu services admin)
+  #:use-module (gnu system pam)
 
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages wm)
