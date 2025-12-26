@@ -267,6 +267,7 @@ COMMIT
     (elogind-service-type config =>
       (elogind-configuration
         (inherit config)
+        (handle-power-key 'ignore)
         (handle-lid-switch 'suspend-then-hibernate)
         (hibernate-delay-seconds 3600)))
 
