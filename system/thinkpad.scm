@@ -52,29 +52,29 @@ COMMIT
 (operating-system
  (inherit %common-os)
  (host-name "thinkpad")
- 
+
  (initrd microcode-initrd)
- (firmware (list linux-firmware 
+ (firmware (list linux-firmware
                  i915-firmware))
- 
- (initrd-modules 
+
+ (initrd-modules
   (cons* "i915" %base-initrd-modules))
- 
- (kernel-arguments 
+
+ (kernel-arguments
   (cons* "snd_hda_intel.dmic_detect=0"
    %default-kernel-arguments))
-  
- (bootloader 
+
+ (bootloader
   (bootloader-configuration
    (bootloader grub-efi-bootloader)
    (targets '("/boot/efi"))))
- 
+
  (mapped-devices
   (list (mapped-device
          (source (uuid "bf66bcde-3847-452b-a5e2-1906e5b9766d"))
          (target "cryptroot")
          (type luks-device-mapping))))
- 
+
  (file-systems
   (append
    (list (file-system

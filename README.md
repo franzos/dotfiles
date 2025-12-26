@@ -62,6 +62,23 @@ To add a new theme, create `home/themes/<name>/` with:
 - lxqt-policykit agent
 - block-facebook-hosts
 - Yubikey challenge-response for sudo
+- Fingerprint login (greetd, swaylock)
+
+#### Fingerprint Setup (Login)
+
+Enroll:
+
+```bash
+fprintd-enroll
+```
+
+Verify:
+
+```bash
+fprintd-verify
+```
+
+**Swaylock**: Press Enter, then scan fingerprint. Password login doesn't work due to [swaywm/swaylock#61](https://github.com/swaywm/swaylock/issues/61).
 
 #### Yubikey Setup (Challenge-Response for sudo)
 

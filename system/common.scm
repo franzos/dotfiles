@@ -31,7 +31,9 @@
   #:use-module (gnu packages containers)
   #:use-module (gnu packages security-token)  ;; ccid
   #:use-module (gnu packages authentication)  ;; yubico-pam
+  #:use-module (gnu packages freedesktop)      ;; fprintd
 
+  #:use-module (gnu services authentication)   ;; fprintd-service-type
   #:use-module (nongnu packages firmware)       ;; fwupd-nonfree
 
   #:use-module (px system panther)
@@ -239,6 +241,24 @@ COMMIT
                                  (control "sufficient")
                                  (module (file-append yubico-pam "/lib/security/pam_yubico.so"))
                                  (arguments '("mode=challenge-response")))
+                                (pam-service-auth pam))))
+                   pam))))))
+
+   ;; Fingerprint authentication service
+   (service fprintd-service-type)
+
+   ;; Fingerprint login for greetd and swaylock (fallback to password if supported)
+   (simple-service 'fprintd-pam-login
+     pam-root-service-type
+     (list (pam-extension
+            (transformer
+             (lambda (pam)
+               (if (member (pam-service-name pam) '("greetd" "swaylock"))
+                   (pam-service
+                    (inherit pam)
+                    (auth (cons (pam-entry
+                                 (control "sufficient")
+                                 (module (file-append fprintd "/lib/security/pam_fprintd.so")))
                                 (pam-service-auth pam))))
                    pam)))))))
 
