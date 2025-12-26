@@ -315,6 +315,8 @@ COMMIT
     xsettingsd      ;; xwayland, java
     gvfs            ;; for thunar to show trash, removable media and so on
     udiskie         ;; auto-mounts
+    yubico-pam      ;; yubikey challenge-response for sudo
+    fprintd         ;; fingerprint reader
     %panther-base-packages))
   
   (services
