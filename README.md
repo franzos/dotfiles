@@ -104,3 +104,5 @@ guix shell yubico-pam -- ykpamcfg -2 -v
 ### Hardware-specific
 - **Framework**: AMD GPU, fw-fanctrl
 - **Thinkpad**: Intel i915, SSH server, backlight udev rules
+
+Audio: I'm using Nothing Ear (Bluetooth) for crystal clear music and video calls - works perfectly.
