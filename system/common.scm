@@ -193,6 +193,8 @@ COMMIT
              (mail-location "maildir:~/.mail")))
    
    ;; https://www.reddit.com/r/GUIX/comments/xjjmtr/comment/iqs6cwe/
+   (simple-service 'fwupd-dbus dbus-root-service-type
+                   (list fwupd-nonfree))
    (simple-service 'fwupd-polkit polkit-service-type
                    (list fwupd-nonfree))
    
