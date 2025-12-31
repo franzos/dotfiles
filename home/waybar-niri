@@ -1,0 +1,129 @@
+{
+    "position": "top",
+    "height": 16,
+    "spacing": 4,
+    "modules-left": ["niri/workspaces"],
+    "modules-center": ["niri/window"],
+    "modules-right": ["cpu", "idle_inhibitor", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "clock", "clock#gmt1", "custom/gpg", "tray"],
+    "niri/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "active": "",
+            "default": ""
+        }
+    },
+    "niri/window": {
+        "format": "{}",
+        "max-length": 50
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        }
+    },
+    "tray": {
+        "spacing": 10
+    },
+    "clock": {
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "format-alt": "{:%Y-%m-%d}"
+    },
+    "clock#gmt1": {
+        "timezone": "Europe/Paris",
+        "format": "{:%H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>\nGMT+1 Time",
+        "format-alt": "{:%Y-%m-%d %H:%M %Z}"
+    },
+    "cpu": {
+        "format": "{usage}% ",
+        "tooltip": false,
+        "interval": 5,
+        "states": {
+            "warning": 70,
+            "critical": 90
+        },
+        "on-click": "footclient -e htop"
+    },
+    "memory": {
+        "format": "{}% "
+    },
+    "temperature": {
+        "critical-threshold": 80,
+        "format": "{temperatureC}°C {icon}",
+        "format-icons": ["", "", ""]
+    },
+    "backlight": {
+        "format": "{percent}% {icon}",
+        "format-icons": ["", "", "", "", "", "", "", "", ""]
+    },
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon}",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-alt": "{time} {icon}",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "network": {
+        "format-wifi": "{essid} ({signalStrength}%) ",
+        "format-ethernet": "{ipaddr}/{cidr} ",
+        "tooltip-format": "{ifname} via {gwaddr} ",
+        "format-linked": "{ifname} (No IP) ",
+        "format-disconnected": "Disconnected ⚠",
+        "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    },
+    "pulseaudio": {
+        "format": "{volume}% {icon} {format_source}",
+        "format-bluetooth": "{volume}% {icon} {format_source}",
+        "format-bluetooth-muted": " {icon} {format_source}",
+        "format-muted": " {format_source}",
+        "format-source": "{volume}% ",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+    "bluetooth": {
+        "format": "{icon}",
+        "format-disabled": "",
+        "format-off": "",
+        "format-on": "",
+        "format-connected": "{icon} {num_connections}",
+        "format-connected-battery": "{icon} {device_alias} {device_battery_percentage}%",
+        "format-icons": {
+            "enabled": "",
+            "disabled": ""
+        },
+        "tooltip-format": "{controller_alias}\t{status}\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}\t{status}\n{num_connections} connected\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_battery_percentage}%",
+        "on-click": "footclient -e bluetuith"
+    },
+    "custom/bt-profile": {
+        "format": "{}",
+        "return-type": "json",
+        "interval": 5,
+        "exec": "$HOME/.local/bin/bt-profile-status",
+        "on-click": "$HOME/.local/bin/bt-toggle-profile",
+        "tooltip": true
+    },
+    "custom/gpg": {
+        "format": "",
+        "tooltip": true,
+        "tooltip-format": "Click to reload Yubikey",
+        "on-click": "gpg-connect-agent 'scd serialno' 'learn --force' /bye && notify-send 'GPG' 'Yubikey reloaded'"
+    },
+}

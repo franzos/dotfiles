@@ -30,142 +30,142 @@
 (home-environment
  (packages
   (specifications->packages
-   (list "neovim"                   ;; editor
-         "qalculate-gtk"            ;; calculator
-         "mousepad"                 ;; text editor
-         "kitty"
-         "logseq"
-         "transmission"
-         "vscode"
-         ;; "signal-desktop"
-         "discord"
-         "slack-desktop"
-         "syncthing"
-         "trash-cli"
-         "gsettings-desktop-schemas"
-         "gnome-themes-extra"
-         "file"	                    ;; file type guesser
-         "google-chrome-stable"
-         "librewolf"
-         "glib:bin"
-         "calibre"                  ;; E-Books
-         "gpgme"
-        ;  "icedove-wayland"
-        ;  "obs-pipewire-audio-capture"
-         "xdg-desktop-portal-gtk"
-         "xdg-desktop-portal-wlr"
-        ;  "obs-wlrobs"
-        ;  "obs"
-         "wl-clipboard"
-         "clipman"
-         "grim"                      ;; screenshot editing
-         ;; should be replaced by rofi
-	       "dmenu"
-	       "j4-dmenu-desktop"          ;; flatpak integration
-         ;; dmenu replacement
-        ;  "rofi"
-        ;  "pinentry-rofi"
-	       "recoll"
-         "qemu"
-         "wireshark"
-         "kleopatra"                 ;; pgp
-         "flatpak"
-         "tomb"                      ;; secrets manager
-         "steghide"
+   (list
+         ;; GUI Apps
+         "gimp"
          "keepassxc"                 ;; password manager
          "vlc"
-         "gimp"
-         "yt-dlp"
-        ;  "seahorse"
          "inkscape"
-         "emacs"
-         "git"
-         "jj-vcs"
-         "recutils"
-         "curl"
-         "wget"
-         "bind:utils"
-         "rsync"
-         "ripgrep"                   ;; better grep
-         "broot"                     ;; file explorer
-         "glances"                   ;; system monitor
-         "python"
-        ;  "scribus"                   ;; inDesign alternative
-        ;  "python:tk"                 ;; for Scribus
-         "nmap"
-         "shellcheck"
-         "emacs-geiser-guile"
-         "bmon"
-         "htop"
-         "unzip"
-         "aspell"
+         "wireshark"
+         "recoll"
+         "calibre"                  ;; E-Books
+         "qalculate-gtk"            ;; calculator
+         "mousepad"                 ;; text editor
+         "logseq"
+         "google-chrome-stable"
+         "librewolf"
+         "libreoffice"
+         "evince"                    ;; PDF Reader
+         "kleopatra"                 ;; pgp
+         "mpv"
+         "tidal-hifi"
+         "mullvad-vpn-desktop"
+         "slack-desktop"
+         "qimgv"                     ;; image viewer
+
+         ;; Sound
          "pipewire"
          "wireplumber"
          "noise-suppression-for-voice"
-         "wireguard-tools"
-         "zip"
-         "lsof"
-         "font-linuxlibertine"
-         "net-tools"
-         "unrar"
-         "libusb"
-         "emacs-geiser"
+
+         ;; Fonts
          "font-openmoji"
          "font-google-noto"
          "font-google-noto-emoji"
-         "restic"                    ;; backup
-         "font-ibm-plex"
-         "hunspell-dict-en"
-         "hunspell-dict-en-us"
-         "aspell-dict-en"
-         "aspell-dict-de"
          "unicode-emoji"
-         "aspell-dict-uk"
-         "qpwgraph"
-         "sed"
-        ;  "mit-scheme"
-         "qtwayland"
-         "swappy"
-        ;  "wf-recorder"             ;; Screen Recording
-         "playerctl"                 ;; media control
-         "tidal-hifi"
-         "keychain"
-         "dconf"
-         "libgsf"
-         "libreoffice"
-         "evince"                    ;; PDF Reader
-         "mpv"
-         "openssh-sans-x"
-         "newsboat"
-         "mullvad-vpn-desktop"
-         "sway"
+         "font-ibm-plex"
+         "font-awesome"
+         "font-linuxlibertine"
+
+         ;; Desktop
+         "niri"
+         "xdg-desktop-portal-gnome"
+         "xdg-desktop-portal-gtk"
          "swayidle"
          "swaylock"
          "swaybg"
+         "keychain"
          "wlsunset"                  ;; Night light
          "bemenu"
          "slurp"                     ;; screen area selection
          "blueman"
-         ;; "j4-dmenu-desktop"          ;; flatpak in bemenu
          "waybar"                    ;; status bar
          "dunst"                     ;; notifications
-         "pinentry"                  ;; prompt for pgp, ssh, ...
+         "pinentry-qt"               ;; prompt for pgp, ssh, ...
          "pavucontrol"               ;; audio control
          "pamixer"                   ;; keyboard audio volumne
          "brightnessctl"             ;; keyboard display brightness
+         "lxqt-policykit"
+         "wl-clipboard"
+         "clipman"
+         "grim"                      ;; screenshot editing
+	     "dmenu"
+	     "j4-dmenu-desktop"          ;; flatpak integration
+		 "swappy"                    ;; Screenshot editing
+         "playerctl"                 ;; media control
+         "kanshi" 			         ;; auto display handling
+         "xdg-utils"                 ;; xdg-open
+
+         ;; Themes
          "yaru-theme"
          "hicolor-icon-theme"
          "papirus-icon-theme"
          "adwaita-icon-theme"
-         "font-awesome"
+         "gnome-themes-extra"
 
+         ;; Dictionary
+         "aspell"
+         "hunspell-dict-en"
+         "hunspell-dict-en-us"
+         "aspell-dict-en"
+         "aspell-dict-de"
+         "aspell-dict-uk"
+         "shellcheck"
+
+         ;; Supporting
+         "libusb"
+         "emacs"
+         "emacs-geiser"
+         "emacs-geiser-guile"
+         "bind:utils"
+         "python"
+         "glib:bin"
+         "gpgme"
+         "gsettings-desktop-schemas"
+         "qtwayland"
+         "dconf"
+         "libgsf"
+
+		 ;; CLI
          "curlie"                    ;; like curl
-         ;; "just"
-         ;; "himalaya"               ;; not packaged
          "tealdeer"                  ;; tdlr
          "jq"                        ;; json processor (darkman vscode)
+         "bmon"
+         "htop"
+         "unzip"
+         "git"
+         "jj-vcs"
+         "rsync"
+         "ripgrep"                   ;; better grep
+         "broot"                     ;; file explorer
+         "glances"                   ;; system monitor
+         "restic"                    ;; backup
+         "nmap"
+         "yt-dlp"
+         "wireguard-tools"
+         "zip"
+         "lsof"
+         "net-tools"
+         "unrar"
+         "recutils"
+         "curl"
+         "wget"
+         "qemu"
+         "flatpak"
+         "tomb"                      ;; secrets manager
+         "syncthing"
+         "trash-cli"
+         "qpwgraph"
+         "sed"
+         "openssh-sans-x"
+         "newsboat"                  ;; RSS reader
+         "file"	                    ;; file type guesser
+         "neovim"                   ;; editor
+         "transmission"
+         "sniffnet"
+         "witr"
 
-         ;; thunar
+         ;; Thunar
          "thunar"                    ;; file manager
          "thunar-vcs-plugin"         ;; git integration
          "thunar-archive-plugin"     ;; archive integration
@@ -177,10 +177,8 @@
          "ffmpegthumbnailer"
          "webp-pixbuf-loader"        ;; thunar thumbnails
          "tumbler"                   ;; thunar thumbnails dbus
-         "qimgv"                     ;; image viewer
-         "kanshi" 			             ;; auto display handling
-         "xdg-utils"                 ;; xdg-open
-         ;; Emailing
+
+         ;; Email and Calendar
          "aerc"
          "w3m"
          "isync"
@@ -188,11 +186,11 @@
          "libsecret"
          "pimsync"
          "khal"
+         ;; "himalaya"               ;; Email
+
          ;; Fan Control
-         "fw-fanctrl"
-         ;; Polkit
-         "lxqt-policykit"
-         ;; Darkman
+         ;; "fw-fanctrl"             ;; Framework fan control
+
          "darkman"
          "bluetuith"                 ;; Bluetooth TUI
          "direnv"
@@ -252,20 +250,20 @@
                    (".local/share/dark-mode.d/dunst" ,(local-file (string-append "themes/" current-theme "/dunst-dark") #:recursive? #t))
                    (".local/share/dark-mode.d/vscode" ,(local-file (string-append "themes/" current-theme "/vscode-dark") #:recursive? #t))
                    (".local/share/dark-mode.d/waybar" ,(local-file (string-append "themes/" current-theme "/waybar-dark") #:recursive? #t))
-                   (".local/share/dark-mode.d/sway" ,(local-file (string-append "themes/" current-theme "/sway-dark") #:recursive? #t))
+                   (".local/share/dark-mode.d/niri" ,(local-file (string-append "themes/" current-theme "/niri-dark") #:recursive? #t))
                    (".local/share/light-mode.d/gtk" ,(local-file (string-append "themes/" current-theme "/gtk-light") #:recursive? #t))
                    (".local/share/light-mode.d/foot" ,(local-file (string-append "themes/" current-theme "/foot-light") #:recursive? #t))
                    (".local/share/light-mode.d/dunst" ,(local-file (string-append "themes/" current-theme "/dunst-light") #:recursive? #t))
                    (".local/share/light-mode.d/vscode" ,(local-file (string-append "themes/" current-theme "/vscode-light") #:recursive? #t))
                    (".local/share/light-mode.d/waybar" ,(local-file (string-append "themes/" current-theme "/waybar-light") #:recursive? #t))
-                   (".local/share/light-mode.d/sway" ,(local-file (string-append "themes/" current-theme "/sway-light") #:recursive? #t))
+                   (".local/share/light-mode.d/niri" ,(local-file (string-append "themes/" current-theme "/niri-light") #:recursive? #t))
                    ;; Waybar theme files for darkman switching
                    (".local/share/waybar-themes/style-light.css" ,(local-file (string-append "themes/" current-theme "/waybar-light.css")))
                    (".local/share/waybar-themes/style-dark.css" ,(local-file (string-append "themes/" current-theme "/waybar-dark.css")))))
         (service home-xdg-configuration-files-service-type
-                 `(("sway/config" ,(local-file "sway"))
-                   ("sway/colors" ,(local-file (string-append "themes/" current-theme "/sway-colors")))
+                 `(("niri/config.kdl" ,(local-file "niri.kdl"))
                    ("waybar/config" ,(local-file "waybar"))
+                   ("waybar/config-niri" ,(local-file "waybar-niri"))
                    ;; waybar/style.css managed by darkman scripts, not guix home
                    ("kanshi/config" ,(local-file "kanshi"))
                    ("xfce4/xfconf/xfce-perchannel-xml/thunar.xml" ,(local-file "thunar.xml"))
@@ -295,8 +293,8 @@
                         `(("QT_QPA_PLATFORM" . "wayland;xcb")
                           ("SDL_VIDEODRIVER" . "wayland")
                           ("XDG_DATA_DIRS" . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")
-                          ("XDG_CURRENT_DESKTOP" . "sway")
-                          ("XDG_SESSION_DESKTOP" . "sway")
+                          ("XDG_CURRENT_DESKTOP" . "niri")
+                          ("XDG_SESSION_DESKTOP" . "niri")
                           ("XDG_SESSION_TYPE" . "wayland")
                           ;; Performance environment variables for Wayland
                           ("ELECTRON_OZONE_PLATFORM_HINT" . "wayland")
@@ -304,6 +302,8 @@
                           ("NIXOS_OZONE_WL" . "1")
                           ("GDK_BACKEND" . "wayland")
                           ("CLUTTER_BACKEND" . "wayland")
+                          ;; Qt theme integration (reads color-scheme from gsettings)
+                          ("QT_QPA_PLATFORMTHEME" . "gtk3")
                           ;; Hardware acceleration
                           ("LIBVA_DRIVER_NAME" . "radeonsi")
                           ("ANGLE_DEFAULT_PLATFORM" . "vulkan")
@@ -318,7 +318,9 @@
                           ("COREPACK_ENABLE_STRICT" . "0")
                           ;; Do Not Track: ex. Turborepo
                           ("DO_NOT_TRACK" . "1")
-                          ("NEXT_TELEMETRY_DISABLED" . "1")))
+                          ("NEXT_TELEMETRY_DISABLED" . "1")
+                          ;; GPG TTY for pinentry
+                          ("GPG_TTY" . "$(tty)")))
         (simple-service 'variant-packages-service
          home-channels-service-type
           (cons*
@@ -373,7 +375,7 @@
                  (home-gpg-agent-configuration
                   (pinentry-program
                     (file-append
-                     pinentry "/bin/pinentry"))))
+                     pinentry-qt "/bin/pinentry-qt"))))
         (service home-darkman-service-type
                  (home-darkman-configuration
                   (latitude 38.7)       ;; Lisbon coordinates from wlsunset

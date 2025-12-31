@@ -1,0 +1,264 @@
+// Niri config - mirrors sway setup
+// See: https://yalter.github.io/niri/
+
+// Input configuration
+input {
+    keyboard {
+        xkb {
+            // Empty = use system defaults from localectl
+        }
+    }
+
+    touchpad {
+        tap
+        dwt
+        accel-profile "flat"
+        accel-speed 0.7
+    }
+
+    mouse {
+        accel-profile "flat"
+    }
+}
+
+// Display configuration
+output "eDP-1" {
+    mode "2880x1920@60"
+    scale 1.5
+    // Note: adaptive_sync not directly supported in niri yet
+}
+
+// Layout settings
+layout {
+    gaps 8
+
+    // Focus ring matches IBM 5151 green theme
+    focus-ring {
+        width 2
+        active-color "#09CC50"
+        inactive-color "#006400"
+    }
+
+    border {
+        off
+    }
+
+    // Default column width
+    default-column-width { proportion 0.5; }
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+}
+
+// Cursor theme
+cursor {
+    xcursor-theme "Adwaita"
+    xcursor-size 24
+}
+
+// Prefer server-side decorations
+prefer-no-csd
+
+// Screenshot path
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+// Startup applications
+spawn-at-startup "swaybg" "-o" "*" "-i" "/home/franz/dotfiles/home/wallpaper/horsehead-nebula.jpg" "-m" "fill"
+spawn-at-startup "wl-paste" "--watch" "clipman" "store" "--no-persist"
+spawn-at-startup "dunst"
+spawn-at-startup "udiskie"
+spawn-at-startup "lxqt-policykit-agent"
+spawn-at-startup "xsettingsd"
+spawn-at-startup "mullvad-vpn"
+spawn-at-startup "playerctld" "daemon"
+spawn-at-startup "wlsunset" "-l" "13.7" "-L" "100.3"
+spawn-at-startup "waybar" "-c" "/home/franz/.config/waybar/config-niri"
+
+// Foot terminal server & darkman theme
+spawn-at-startup "sh" "-c" "foot --server & sleep 1 && ~/.local/share/$(darkman get)-mode.d/foot"
+
+// Screen sharing portal activation
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP=niri"
+
+// Idle and lock configuration
+spawn-at-startup "swayidle" "-w" "timeout" "2400" "swaylock -f -c 000000" "timeout" "3600" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors" "before-sleep" "swaylock -f -c 000000"
+
+// GTK settings (managed by darkman, these are static)
+spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "icon-theme" "Yaru"
+spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "cursor-theme" "Adwaita"
+spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "font-name" "Noto Sans 9"
+
+// Disable hotkey overlay on startup
+hotkey-overlay {
+    skip-at-startup
+}
+
+// Animations enabled (defaults)
+
+// Window rules
+// Firefox Picture-in-Picture as floating
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+// Firefox sharing indicator - block/minimize
+window-rule {
+    match app-id=r#"firefox$"# title="Sharing Indicator"
+    open-floating true
+}
+
+// Note: niri handles dialogs automatically via is-popup
+
+// Steam windows that should float
+window-rule {
+    match app-id=r#"^[Ss]team$"# title="^Friends$"
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^[Ss]team$"# title="Steam - News"
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^[Ss]team$"# title="^Settings$"
+    open-floating true
+}
+
+// Pinentry should float
+window-rule {
+    match app-id=r#"pinentry"#
+    open-floating true
+}
+
+// Firefox inhibit idle when fullscreen (niri handles this automatically)
+
+// Keybindings
+binds {
+    // Show hotkey overlay
+    Mod+Shift+Slash { show-hotkey-overlay; }
+
+    // Terminal
+    Mod+Return { spawn "footclient"; }
+
+    // App launcher (bemenu)
+    Mod+D { spawn-sh "j4-dmenu-desktop --dmenu='bemenu --ignorecase' --term='footclient'"; }
+
+    // Kill focused window
+    Mod+Shift+Q { close-window; }
+
+    // Reload config
+    Mod+Shift+C { spawn "niri" "msg" "action" "reload-config"; }
+
+    // Exit niri
+    Mod+Shift+E { quit; }
+
+    // Focus movement (vim keys)
+    Mod+H { focus-column-left; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+    Mod+L { focus-column-right; }
+
+    // Focus movement (arrow keys)
+    Mod+Left { focus-column-left; }
+    Mod+Down { focus-window-down; }
+    Mod+Up { focus-window-up; }
+    Mod+Right { focus-column-right; }
+
+    // Move windows (vim keys) - using Ctrl instead of Shift since niri uses Shift for monitors
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
+    Mod+Shift+L { move-column-right; }
+
+    // Move windows (arrow keys)
+    Mod+Shift+Left { move-column-left; }
+    Mod+Shift+Down { move-window-down; }
+    Mod+Shift+Up { move-window-up; }
+    Mod+Shift+Right { move-column-right; }
+
+    // Workspaces (niri has dynamic workspaces but supports numbered access)
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+0 { focus-workspace 10; }
+
+    // Move window to workspace
+    Mod+Ctrl+1 { move-column-to-workspace 1; }
+    Mod+Ctrl+2 { move-column-to-workspace 2; }
+    Mod+Ctrl+3 { move-column-to-workspace 3; }
+    Mod+Ctrl+4 { move-column-to-workspace 4; }
+    Mod+Ctrl+5 { move-column-to-workspace 5; }
+    Mod+Ctrl+6 { move-column-to-workspace 6; }
+    Mod+Ctrl+7 { move-column-to-workspace 7; }
+    Mod+Ctrl+8 { move-column-to-workspace 8; }
+    Mod+Ctrl+9 { move-column-to-workspace 9; }
+    Mod+Ctrl+0 { move-column-to-workspace 10; }
+
+    // Layout: tabbed mode (similar to sway's tabbed layout)
+    Mod+W { toggle-column-tabbed-display; }
+
+    // Fullscreen
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+
+    // Toggle floating
+    Mod+Shift+Space { toggle-window-floating; }
+
+    // Switch focus between floating and tiling
+    Mod+Space { switch-focus-between-floating-and-tiling; }
+
+    // Consume/expel windows (similar to sway splits)
+    Mod+B { consume-or-expel-window-left; }
+    Mod+V { consume-or-expel-window-right; }
+
+    // Resize mode equivalent - use +/- for width adjustments
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+
+    // Preset width cycling (like resize mode presets)
+    Mod+R { switch-preset-column-width; }
+
+    // Scratchpad equivalent - niri doesn't have scratchpad, but we can use workspaces
+    // Mod+Shift+Minus and Mod+Minus are used for resizing instead
+
+    // Center column
+    Mod+C { center-column; }
+
+    // Parent focus (move to column operations)
+    Mod+A { focus-column-first; }
+
+    // Functional keys
+    XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "set" "+5%"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "5%-"; }
+
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "pamixer" "-u" "-i" "2"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "pamixer" "-d" "2"; }
+    XF86AudioMute allow-when-locked=true { spawn "pamixer" "-t"; }
+    XF86AudioMicMute allow-when-locked=true { spawn "pamixer" "--default-source" "-t"; }
+
+    XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
+    XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
+
+    // Screenshot
+    Print { spawn-sh "grim - | swappy -f -"; }
+
+    // Theme toggle (darkman)
+    Mod+T { spawn "darkman" "toggle"; }
+
+    // Power off monitors
+    Mod+Shift+P { power-off-monitors; }
+}

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Switch niri to light (macOS Classic) theme
+# Note: Niri doesn't support runtime color changes like sway
+# Colors are defined in config.kdl - this just reloads the config
+
+niri msg action reload-config 2>/dev/null || true

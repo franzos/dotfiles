@@ -2,5 +2,5 @@
 if [ -f ~/.bashrc ]; then . ~/.bashrc; fi
 
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
-   exec sway
+   exec niri --session
 fi
