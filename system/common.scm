@@ -114,6 +114,8 @@ table ip nat {
 :OUTPUT ACCEPT
 -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 -A INPUT -i lo -j ACCEPT
+-A INPUT -i tailscale0 -j ACCEPT
+-A INPUT -p udp --dport 41641 -j ACCEPT
 -A INPUT -p tcp --dport 22000 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp-port-unreachable
 COMMIT
