@@ -316,6 +316,7 @@
                           ("TERM" . "xterm")
                           ;; Disable version enforcement
                           ("COREPACK_ENABLE_STRICT" . "0")
+                          ("COREPACK_ENABLE_PROJECT_SPEC" . "0")
                           ;; Do Not Track: ex. Turborepo
                           ("DO_NOT_TRACK" . "1")
                           ("NEXT_TELEMETRY_DISABLED" . "1")

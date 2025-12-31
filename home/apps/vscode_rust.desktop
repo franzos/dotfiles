@@ -2,7 +2,7 @@
 Name=Visual Studio Code [Rust]
 Comment=Code Editing. Redefined.
 GenericName=Text Editor
-Exec=guix shell node gcc-toolchain rust rust:cargo rust:tools openssl pkg-config -- sh -c "CC=gcc OPENSSL_DIR=$(dirname $(dirname $(realpath $(which openssl)))) code --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland"
+Exec=guix shell vscode node gcc-toolchain rust rust:cargo rust:tools openssl pkg-config -- sh -c "CC=gcc OPENSSL_DIR=$(dirname $(dirname $(realpath $(which openssl)))) code --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland"
 Icon=vscode
 Type=Application
 StartupNotify=true
@@ -10,4 +10,3 @@ StartupWMClass=Code
 Categories=TextEditor;Development;IDE;
 Actions=new-empty-window;
 Keywords=vscode;
-
