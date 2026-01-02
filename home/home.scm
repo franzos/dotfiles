@@ -20,6 +20,7 @@
              (px packages audio))
 
 ;; Theme configuration
+;; available: ibm-5151, macos-classic
 (define current-theme "ibm-5151")
 
 (define mcron-job-pimsync
@@ -69,6 +70,7 @@
 
          ;; Desktop
          "niri"
+         "xwayland-satellite"          ;; X11 support for niri
          "xdg-desktop-portal-gnome"
          "xdg-desktop-portal-gtk"
          "swayidle"
