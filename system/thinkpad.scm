@@ -4,9 +4,10 @@
   #:use-module (guix)
   #:use-module (gnu services xorg)
   #:use-module (gnu services ssh)
-  #:use-module (gnu services pm)             ;; tlp-service-type
-  #:use-module (gnu services linux)          ;; zram-device-service-type
-  #:use-module (gnu services networking)     ;; iptables-service-type
+  #:use-module (gnu services pm)              ;; tlp-service-type
+  #:use-module (gnu services linux)           ;; zram-device-service-type
+  #:use-module (gnu services networking)      ;; iptables-service-type
+  #:use-module (gnu packages linux)           ;; wireless-regdb
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd)
@@ -55,13 +56,15 @@ COMMIT
 
  (initrd microcode-initrd)
  (firmware (list linux-firmware
-                 i915-firmware))
+                 i915-firmware
+                 wireless-regdb))
 
  (initrd-modules
   (cons* "i915" %base-initrd-modules))
 
  (kernel-arguments
-  (cons* "snd_hda_intel.dmic_detect=0"
+  (cons* "cfg80211.ieee80211_regdom=PT"          ;; WiFi regulatory domain for Portugal
+         "snd_hda_intel.dmic_detect=0"
    %default-kernel-arguments))
 
  (bootloader

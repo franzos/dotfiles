@@ -7,6 +7,7 @@
   #:use-module (gnu services linux)           ;; zram-device-service-type
   #:use-module (gnu services base)            ;; udev-service-type
   #:use-module (gnu system file-systems)      ;; swap-space
+  #:use-module (px packages linux)            ;; wireless-regdb-signed
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd)
@@ -19,8 +20,9 @@
  (initrd microcode-initrd)
  (firmware (list linux-firmware
                  amdgpu-firmware
-                 amd-microcode))
- 
+                 amd-microcode
+                 wireless-regdb-signed))
+
  (kernel-arguments
   (cons* "resume=/dev/mapper/cryptroot"           ;; Resume from hibernation
          "resume_offset=317310976"                ;; Swap file offset for hibernation
@@ -30,6 +32,7 @@
          "amdgpu.abmlevel=3"                      ;; Adaptive backlight management
          "nmi_watchdog=0"                         ;; Disable NMI watchdog for power saving
          "modprobe.blacklist=hid_sensor_hub"
+         "cfg80211.ieee80211_regdom=PT"           ;; WiFi regulatory domain for Portugal
    %default-kernel-arguments))
   
  (bootloader 
