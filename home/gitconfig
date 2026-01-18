@@ -11,9 +11,7 @@
 [credential]
 	helper = store
 [sendemail]
-	smtpserver = smtp.fastmail.com
-	smtpserverport = 465
-	smtpencryption = ssl
-	smtpuser = mail@gofranz.com
+	sendmailcmd = msmtp -a gofranz.com
+	annotate = yes
 [http]
 	postBuffer = 157286400
