@@ -27,7 +27,8 @@
   (cons* "resume=/dev/mapper/cryptroot"           ;; Resume from hibernation
          "resume_offset=317310976"                ;; Swap file offset for hibernation
          "amd_pstate=active"                      ;; AMD Ryzen EPP power management
-         "pcie_aspm.policy=powersupersave"        ;; Aggressive PCIe power saving
+         "pcie_aspm.policy=powersave"             ;; PCIe power saving (no L1 substates)
+         "mt7921e.disable_aspm=Y"                 ;; Disable ASPM for WiFi (MT7922 wake bug)
          "amdgpu.ppfeaturemask=0xffffffff"        ;; Enable all GPU power features
          "amdgpu.abmlevel=3"                      ;; Adaptive backlight management
          "nmi_watchdog=0"                         ;; Disable NMI watchdog for power saving
@@ -38,9 +39,6 @@
          "randomize_kstack_offset=on"             ;; Randomize kernel stack offset
          "kptr_restrict=2"                        ;; Hide kernel pointers
          "page_alloc.shuffle=1"                   ;; Memory layout randomization
-         ;; Network performance
-         "net.core.default_qdisc=fq_codel"        ;; Fair queuing for better latency
-         "tcp_congestion_control=bbr"             ;; Google BBR for throughput
    %default-kernel-arguments))
   
  (bootloader 
@@ -113,6 +111,11 @@
                                      "ATTR{vendor}==\"0x144d\", "  ;; Samsung
                                      "ATTR{class}==\"0x010802\", "  ;; NVMe controller
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
+
+   ;; Android USB debugging (Google/Pixel devices)
+   (simple-service 'android-udev udev-service-type
+                   (list (udev-rule "51-android.rules"
+                                    "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", MODE=\"0660\", GROUP=\"plugdev\"\n")))
 
    (service mullvad-daemon-service-type)
    %common-services)))

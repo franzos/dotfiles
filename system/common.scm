@@ -136,9 +136,22 @@ COMMIT
 COMMIT
 "))
 
+(define %networkmanager-wifi-config
+  (plain-file "99-wifi-config.conf"
+              "[device]
+wifi.scan-rand-mac-address=yes
+
+[connection]
+wifi.powersave=2
+wifi.cloned-mac-address=stable
+"))
+
 (define %common-services
  (append
   (list
+   ;; NetworkManager WiFi configuration
+   (extra-special-file "/etc/NetworkManager/conf.d/99-wifi-config.conf"
+                       %networkmanager-wifi-config)
    (service screen-locker-service-type
             (screen-locker-configuration
              (name "swaylock")
@@ -309,7 +322,8 @@ COMMIT
                              "audio"
                              "video"
                              "plugdev"
-                             "input"))
+                             "input"
+                             "lp"))
      (home-directory "/home/franz"))
     %base-user-accounts))
   

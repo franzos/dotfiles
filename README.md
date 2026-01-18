@@ -64,6 +64,9 @@ To add a new theme, create `home/themes/<name>/` with:
 - Yubikey challenge-response for sudo
 - Fingerprint login (greetd, swaylock)
 
+### Regulatory
+- Set WiFi country code to `PT` (Portugal). Check with `iw reg get`.
+
 #### Fingerprint Setup (Login)
 
 Enroll:
