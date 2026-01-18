@@ -33,6 +33,14 @@
          "nmi_watchdog=0"                         ;; Disable NMI watchdog for power saving
          "modprobe.blacklist=hid_sensor_hub"
          "cfg80211.ieee80211_regdom=PT"           ;; WiFi regulatory domain for Portugal
+         ;; Security hardening
+         "slab_nomerge"                           ;; Prevent slab merging attacks
+         "randomize_kstack_offset=on"             ;; Randomize kernel stack offset
+         "kptr_restrict=2"                        ;; Hide kernel pointers
+         "page_alloc.shuffle=1"                   ;; Memory layout randomization
+         ;; Network performance
+         "net.core.default_qdisc=fq_codel"        ;; Fair queuing for better latency
+         "tcp_congestion_control=bbr"             ;; Google BBR for throughput
    %default-kernel-arguments))
   
  (bootloader 

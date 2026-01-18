@@ -58,6 +58,10 @@
          "pipewire"
          "wireplumber"
          "noise-suppression-for-voice"
+         ;; Framework: https://github.com/FrameworkComputer/linux-docs/blob/main/easy-effects/fw13-easy-effects.json OR https://github.com/cab404/framework-dsp
+         ;; Thinkpad: https://github.com/JackHack96/EasyEffects-Presets "Laptop"
+         "easyeffects"
+         "easyeffects-presets-framework"
 
          ;; Fonts
          "font-openmoji"
@@ -93,10 +97,12 @@
          "grim"                      ;; screenshot editing
 	     "dmenu"
 	     "j4-dmenu-desktop"          ;; flatpak integration
+		 "networkmanager-dmenu"
 		 "swappy"                    ;; Screenshot editing
          "playerctl"                 ;; media control
          "kanshi" 			         ;; auto display handling
          "xdg-utils"                 ;; xdg-open
+         ;; rquickshare
 
          ;; Themes
          "yaru-theme"
@@ -136,6 +142,7 @@
          "htop"
          "unzip"
          "git"
+         "git:send-email"
          "jj-vcs"
          "rsync"
          "ripgrep"                   ;; better grep
@@ -166,6 +173,7 @@
          "transmission"
          "sniffnet"
          "witr"
+         "keifu"
 
          ;; Thunar
          "thunar"                    ;; file manager
@@ -214,6 +222,7 @@
                              ("ls" . "ls -p --color=auto")
                              ("ccs" . "guix shell node pnpm gh -- pnpm dlx @anthropic-ai/claude-code")
                              ("ccss" . "guix shell node pnpm gh -- pnpm dlx @anthropic-ai/claude-code --dangerously-skip-permissions")
+                             ("ccssj" . "guix shell --container --expose=$HOME/.gitconfig=$HOME/.gitconfig --share=$HOME/.claude=$HOME/.claude --share=$HOME/.claude.json=$HOME/.claude.json --share=$HOME/.config/claude=$HOME/.config/claude --share=$HOME/.cache/pnpm=$HOME/.cache/pnpm --share=$HOME/.local/share/pnpm=$HOME/.local/share/pnpm --expose=$XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --preserve='^DBUS_SESSION_BUS_ADDRESS$' --preserve='^COLORTERM$' --share=$PWD=$PWD --network coreutils bash grep sed gawk git node pnpm gh dunst -- pnpm dlx @anthropic-ai/claude-code --dangerously-skip-permissions")
                              ("pms" . "podman system service --time=0 unix:///tmp/podman.sock")))
                   (bashrc (list (local-file
                                  ".bashrc"
@@ -329,7 +338,7 @@
           (cons*
            (channel
             (name 'pantherx)
-            (url "https://channels.pantherx.org/git/panther.git")
+            (url "https://codeberg.org/gofranz/panther.git")
             (branch "master")
             (introduction
              (make-channel-introduction
@@ -339,11 +348,20 @@
            (channel
             (name 'small-guix)
             (url "https://codeberg.org/fishinthecalculator/small-guix.git")
+            (branch "main")
             (introduction
              (make-channel-introduction
               "f260da13666cd41ae3202270784e61e062a3999c"
               (openpgp-fingerprint
                "8D10 60B9 6BB8 292E 829B  7249 AED4 1CC1 93B7 01E2"))))
+           (channel
+            (name 'guix-android)
+            (url "https://framagit.org/tyreunom/guix-android.git")
+            (introduction
+             (make-channel-introduction
+              "d031d039b1e5473b030fa0f272f693b469d0ac0e"
+              (openpgp-fingerprint
+               "1EFB 0909 1F17 D28C CBF9  B13A 53D4 57B2 D636 EE82"))))
            %default-channels))
         (service home-msmtp-service-type
          (home-msmtp-configuration

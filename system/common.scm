@@ -63,6 +63,10 @@ table inet filter {
     iif != lo ip daddr 127.0.0.1/8 drop
     iif != lo ip6 daddr ::1/128 drop
 
+    # drop spoofed loopback source (anti-spoofing)
+    ip saddr 127.0.0.0/8 iif != lo drop
+    ip6 saddr ::1/128 iif != lo drop
+
     # allow icmp
     ip protocol icmp accept
     ip6 nexthdr icmpv6 accept
@@ -280,7 +284,10 @@ COMMIT
     (sysctl-service-type config => (sysctl-configuration
                                     (inherit config)
                                     (settings '(("vm.overcommit_memory" . "1")
-                                               ("net.ipv4.ip_forward" . "1"))))))))
+                                               ("net.ipv4.ip_forward" . "1")
+                                               ;; TCP BBR congestion control + fair queuing
+                                               ("net.core.default_qdisc" . "fq_codel")
+                                               ("net.ipv4.tcp_congestion_control" . "bbr"))))))))
 
 (define %common-os
  (operating-system
