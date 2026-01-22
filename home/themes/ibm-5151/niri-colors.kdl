@@ -1,0 +1,8 @@
+// IBM 5151 green phosphor CRT theme - niri focus ring colors
+layout {
+    focus-ring {
+        width 2
+        active-color "#09CC50"
+        inactive-color "#006400"
+    }
+}

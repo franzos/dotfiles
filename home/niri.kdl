@@ -1,6 +1,9 @@
 // Niri config - mirrors sway setup
 // See: https://yalter.github.io/niri/
 
+// Theme colors (managed by guix home based on current-theme)
+include "colors.kdl"
+
 // Input configuration
 input {
     keyboard {
@@ -32,12 +35,7 @@ output "eDP-1" {
 layout {
     gaps 8
 
-    // Focus ring matches IBM 5151 green theme
-    focus-ring {
-        width 2
-        active-color "#09CC50"
-        inactive-color "#006400"
-    }
+    // Focus ring colors defined in colors.kdl (theme-specific)
 
     border {
         off

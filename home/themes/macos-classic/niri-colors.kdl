@@ -1,0 +1,8 @@
+// macOS Classic theme - niri focus ring colors
+layout {
+    focus-ring {
+        width 2
+        active-color "#D2D2D2"
+        inactive-color "#E0E0E0"
+    }
+}
