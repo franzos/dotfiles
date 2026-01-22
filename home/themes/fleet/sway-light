@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Switch sway window colors to light (Fleet) theme
+
+export SWAYSOCK="/run/user/1000/sway-ipc.1000.$(pgrep -x sway).sock"
+
+swaymsg client.focused '#2A7DEB' '#FFFFFF' '#090909' '#2A7DEB' '#2A7DEB'
+swaymsg client.focused_inactive '#EEEFF0' '#FFFFFF' '#6E747B' '#EEEFF0' '#EEEFF0'
+swaymsg client.unfocused '#EEEFF0' '#FFFFFF' '#6E747B' '#EEEFF0' '#EEEFF0'
+swaymsg client.urgent '#C72C49' '#C72C49' '#FFFFFF' '#C72C49' '#C72C49'
+swaymsg client.background '#FFFFFF'

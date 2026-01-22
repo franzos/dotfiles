@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Switch dunst notification daemon to dark (Fleet) theme
+
+set -euo pipefail
+
+CONFIG="$HOME/.config/dunst/dunstrc"
+
+# Update colors for dark theme (Fleet Dark)
+sed -i 's/^    background = .*/    background = "#18191B"/' "$CONFIG"
+sed -i 's/^    foreground = .*/    foreground = "#E0E1E4"/' "$CONFIG"
+sed -i 's/^    frame_color = .*/    frame_color = "#3E4147"/' "$CONFIG"
+sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/background = .*/background = "#18191B"/' "$CONFIG"
+sed -i '/\[urgency_low\]/,/\[urgency_normal\]/ s/foreground = .*/foreground = "#898E94"/' "$CONFIG"
+sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/background = .*/background = "#18191B"/' "$CONFIG"
+sed -i '/\[urgency_normal\]/,/\[urgency_critical\]/ s/foreground = .*/foreground = "#E0E1E4"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/background = .*/background = "#EB4056"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/foreground = .*/foreground = "#FFFFFF"/' "$CONFIG"
+sed -i '/\[urgency_critical\]/,$ s/frame_color = .*/frame_color = "#EB4056"/' "$CONFIG"
+
+# Restart dunst to apply changes
+killall dunst 2>/dev/null || true

@@ -1,0 +1,370 @@
+/* Fleet Theme - Light */
+* {
+    font-family: "Noto Sans", "FontAwesome", sans-serif;
+    font-size: 13px;
+}
+
+window#waybar {
+    background-color: rgba(238, 239, 240, 0.95);
+    border-bottom: 1px solid rgba(24, 25, 27, 0.2);
+    color: #090909;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+button {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+}
+
+button:hover {
+    background: rgba(42, 125, 235, 0.15);
+}
+
+/* Workspaces */
+#workspaces button {
+    padding: 0 8px;
+    background-color: transparent;
+    color: #090909;
+    border-right: 1px solid rgba(24, 25, 27, 0.2);
+}
+
+#workspaces button:first-child {
+    border-left: 1px solid rgba(24, 25, 27, 0.2);
+}
+
+#workspaces button:hover {
+    background: rgba(42, 125, 235, 0.15);
+}
+
+#workspaces button.focused,
+#workspaces button.active {
+    background-color: rgba(42, 125, 235, 0.2);
+    color: #090909;
+}
+
+#workspaces button.urgent {
+    background-color: #C72C49;
+    color: #FFFFFF;
+}
+
+#mode {
+    background-color: rgba(42, 125, 235, 0.2);
+    color: #090909;
+    padding: 0 10px;
+}
+
+/* Common module styling */
+#clock,
+#battery,
+#cpu,
+#memory,
+#disk,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#wireplumber,
+#custom-media,
+#tray,
+#idle_inhibitor,
+#scratchpad,
+#power-profiles-daemon,
+#bluetooth,
+#custom-bt-profile,
+#custom-gpg,
+#mpd {
+    padding: 0 10px;
+    color: #090909;
+    background-color: transparent;
+}
+
+#window {
+    color: #6E747B;
+    font-weight: 500;
+}
+
+#window,
+#workspaces {
+    margin: 0 4px;
+}
+
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+/* Clock */
+#clock {
+    background-color: #FFFFFF;
+    border-left: 1px solid rgba(24, 25, 27, 0.2);
+}
+
+/* Battery states */
+#battery {
+    background-color: transparent;
+}
+
+#battery.charging,
+#battery.plugged {
+    background-color: rgba(42, 125, 235, 0.15);
+    color: #1D61BA;
+}
+
+#battery.warning {
+    background-color: rgba(176, 153, 60, 0.2);
+    color: #B0993C;
+}
+
+#battery.critical:not(.charging) {
+    background-color: #C72C49;
+    color: #FFFFFF;
+    animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink {
+    50% {
+        background-color: #FFFFFF;
+        color: #C72C49;
+    }
+}
+
+/* CPU states */
+#cpu {
+    background-color: transparent;
+}
+
+#cpu.warning {
+    background-color: rgba(176, 153, 60, 0.2);
+    color: #B0993C;
+}
+
+#cpu.critical {
+    background-color: #C72C49;
+    color: #FFFFFF;
+}
+
+/* Network */
+#network {
+    background-color: transparent;
+}
+
+#network.disconnected {
+    background-color: #C72C49;
+    color: #FFFFFF;
+}
+
+/* Audio */
+#pulseaudio {
+    background-color: transparent;
+}
+
+#pulseaudio:hover {
+    background-color: rgba(42, 125, 235, 0.15);
+}
+
+#pulseaudio.muted {
+    background-color: #EEEFF0;
+    color: #6E747B;
+}
+
+#wireplumber {
+    background-color: transparent;
+}
+
+#wireplumber.muted {
+    background-color: #EEEFF0;
+    color: #6E747B;
+}
+
+/* Bluetooth */
+#bluetooth {
+    background-color: transparent;
+}
+
+#custom-bt-profile {
+    background-color: transparent;
+}
+
+#custom-bt-profile.a2dp {
+    background-color: rgba(29, 97, 186, 0.15);
+    color: #1D61BA;
+}
+
+#custom-bt-profile.headset {
+    background-color: rgba(204, 55, 250, 0.15);
+    color: #CC37FA;
+}
+
+#custom-bt-profile.disconnected,
+#custom-bt-profile.off {
+    background-color: transparent;
+    color: #6E747B;
+}
+
+#custom-bt-profile.unknown {
+    background-color: transparent;
+    color: #6E747B;
+}
+
+/* Backlight */
+#backlight {
+    background-color: transparent;
+}
+
+/* Temperature */
+#temperature {
+    background-color: transparent;
+}
+
+#temperature.critical {
+    background-color: #C72C49;
+    color: #FFFFFF;
+}
+
+/* Media */
+#custom-media {
+    background-color: transparent;
+    color: #6E747B;
+    min-width: 100px;
+}
+
+/* Tray */
+#tray {
+    background-color: transparent;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: rgba(42, 125, 235, 0.15);
+}
+
+/* Idle inhibitor */
+#idle_inhibitor {
+    background-color: transparent;
+    color: #6E747B;
+}
+
+#idle_inhibitor.activated {
+    background-color: rgba(42, 125, 235, 0.15);
+    color: #1D61BA;
+}
+
+/* Scratchpad */
+#scratchpad {
+    background-color: rgba(42, 125, 235, 0.15);
+}
+
+#scratchpad.empty {
+    background-color: transparent;
+}
+
+/* Power profiles */
+#power-profiles-daemon {
+    padding-right: 15px;
+}
+
+#power-profiles-daemon.performance {
+    background-color: #C72C49;
+    color: #FFFFFF;
+}
+
+#power-profiles-daemon.balanced {
+    background-color: transparent;
+}
+
+#power-profiles-daemon.power-saver {
+    background-color: rgba(10, 130, 130, 0.15);
+    color: #0A8282;
+}
+
+/* Memory/Disk */
+#memory {
+    background-color: transparent;
+}
+
+#disk {
+    background-color: transparent;
+}
+
+/* MPD */
+#mpd {
+    background-color: transparent;
+}
+
+#mpd.disconnected {
+    color: #6E747B;
+}
+
+#mpd.stopped {
+    color: #6E747B;
+}
+
+#mpd.paused {
+    color: #6E747B;
+}
+
+/* Language */
+#language {
+    background-color: transparent;
+    padding: 0 5px;
+    margin: 0 5px;
+    min-width: 16px;
+}
+
+/* Keyboard state */
+#keyboard-state {
+    background-color: transparent;
+    padding: 0;
+    margin: 0 5px;
+    min-width: 16px;
+}
+
+#keyboard-state > label {
+    padding: 0 5px;
+}
+
+#keyboard-state > label.locked {
+    background-color: rgba(42, 125, 235, 0.15);
+}
+
+/* Privacy */
+#privacy {
+    padding: 0;
+}
+
+#privacy-item {
+    padding: 0 5px;
+    background-color: #C72C49;
+    color: #FFFFFF;
+}
+
+#privacy-item.screenshare {
+    background-color: rgba(204, 55, 250, 0.3);
+    color: #CC37FA;
+}
+
+#privacy-item.audio-in {
+    background-color: rgba(29, 97, 186, 0.15);
+    color: #1D61BA;
+}
+
+#privacy-item.audio-out {
+    background-color: rgba(29, 97, 186, 0.15);
+    color: #1D61BA;
+}
+
+/* GPG/Yubikey */
+#custom-gpg {
+    background-color: transparent;
+}

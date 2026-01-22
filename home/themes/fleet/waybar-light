@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Switch waybar to light (Fleet) theme
+
+set -euo pipefail
+
+TARGET="$HOME/.config/waybar/style.css"
+
+# Remove symlink if it exists (from guix home)
+[ -L "$TARGET" ] && rm "$TARGET"
+
+# Copy light theme CSS
+cp ~/.local/share/waybar-themes/style-light.css "$TARGET"
+chmod 644 "$TARGET"
+
+# Reload waybar
+killall -SIGUSR2 waybar 2>/dev/null || killall waybar 2>/dev/null || true

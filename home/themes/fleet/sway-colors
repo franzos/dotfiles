@@ -1,0 +1,8 @@
+# Fleet theme - sway window colors
+# class                 border  backgr  text    indicator child_border
+client.focused          #4B8DEC #18191B #E0E1E4 #4B8DEC   #4B8DEC
+client.focused_inactive #3E4147 #18191B #898E94 #3E4147   #3E4147
+client.unfocused        #3E4147 #18191B #898E94 #3E4147   #3E4147
+client.urgent           #EB4056 #EB4056 #FFFFFF #EB4056   #EB4056
+client.placeholder      #3E4147 #18191B #E0E1E4 #3E4147   #3E4147
+client.background       #18191B
