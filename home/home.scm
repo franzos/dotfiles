@@ -20,8 +20,8 @@
              (px packages audio))
 
 ;; Theme configuration
-;; available: ibm-5151, macos-classic
-(define current-theme "ibm-5151")
+;; available: ibm-5151, macos-classic, fleet
+(define current-theme "macos-classic")
 
 (define mcron-job-pimsync
   #~(job '(next-hour '(0 3 6 9 12 15 18 21))
@@ -46,22 +46,24 @@
          "google-chrome-stable"
          "librewolf"
          "libreoffice"
-         "evince"                    ;; PDF Reader
+         "papers"                    ;; PDF Reader
          "kleopatra"                 ;; pgp
          "mpv"
          "tidal-hifi"
          "mullvad-vpn-desktop"
          "slack-desktop"
-         "qimgv"                     ;; image viewer
+         ;; "qimgv"                  ;; image viewer
+         "oculante"                  ;; image viewer
+         "dbeaver"
 
          ;; Sound
          "pipewire"
          "wireplumber"
-         "noise-suppression-for-voice"
          ;; Framework: https://github.com/FrameworkComputer/linux-docs/blob/main/easy-effects/fw13-easy-effects.json OR https://github.com/cab404/framework-dsp
          ;; Thinkpad: https://github.com/JackHack96/EasyEffects-Presets "Laptop"
          "easyeffects"
          "easyeffects-presets-framework"
+         "deepfilternet-ladspa"
 
          ;; Fonts
          "font-openmoji"
@@ -128,6 +130,7 @@
          "bind:utils"
          "python"
          "glib:bin"
+         "gnupg"
          "gpgme"
          "gsettings-desktop-schemas"
          "qtwayland"
@@ -160,7 +163,7 @@
          "curl"
          "wget"
          "qemu"
-         "flatpak"
+         ;; "flatpak"
          "tomb"                      ;; secrets manager
          "syncthing"
          "trash-cli"
@@ -252,6 +255,8 @@
                                                                       "apps/mullvad-vpn.desktop"))
                    (".local/share/applications/zed.desktop" ,(local-file
                                                                   "apps/zed.desktop"))
+                   (".local/share/applications/oculante.desktop" ,(local-file
+                                                                   "apps/oculante.desktop"))
                    ;; GTK-3 theme templates for darkman
                    (".local/share/gtk-themes/settings-dark.ini" ,(local-file (string-append "themes/" current-theme "/gtk-settings-dark.ini")))
                    (".local/share/gtk-themes/settings-light.ini" ,(local-file (string-append "themes/" current-theme "/gtk-settings-light.ini")))
@@ -273,6 +278,7 @@
                    (".local/share/waybar-themes/style-dark.css" ,(local-file (string-append "themes/" current-theme "/waybar-dark.css")))))
         (service home-xdg-configuration-files-service-type
                  `(("niri/config.kdl" ,(local-file "niri.kdl"))
+                   ("niri/colors.kdl" ,(local-file (string-append "themes/" current-theme "/niri-colors.kdl")))
                    ("waybar/config" ,(local-file "waybar"))
                    ("waybar/config-niri" ,(local-file "waybar-niri"))
                    ;; waybar/style.css managed by darkman scripts, not guix home
@@ -303,7 +309,7 @@
         (simple-service 'env-vars home-environment-variables-service-type
                         `(("QT_QPA_PLATFORM" . "wayland;xcb")
                           ("SDL_VIDEODRIVER" . "wayland")
-                          ("XDG_DATA_DIRS" . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")
+                          ;; ("XDG_DATA_DIRS" . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")
                           ("XDG_CURRENT_DESKTOP" . "niri")
                           ("XDG_SESSION_DESKTOP" . "niri")
                           ("XDG_SESSION_TYPE" . "wayland")
@@ -332,7 +338,9 @@
                           ("DO_NOT_TRACK" . "1")
                           ("NEXT_TELEMETRY_DISABLED" . "1")
                           ;; GPG TTY for pinentry
-                          ("GPG_TTY" . "$(tty)")))
+                          ("GPG_TTY" . "$(tty)")
+                          ;; Claude Code thinking budget
+                          ("MAX_THINKING_TOKENS" . "63999")))
         (simple-service 'variant-packages-service
          home-channels-service-type
           (cons*

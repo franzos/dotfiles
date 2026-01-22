@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Oculante
+Comment=Fast GPU-accelerated image viewer
+Exec=oculante %f
+Icon=image-x-generic
+Categories=Graphics;ImageViewer;
+MimeType=image/jpeg;image/png;image/gif;image/webp;image/bmp;image/tiff;image/avif;image/heic;image/x-icon;image/vnd.adobe.photoshop;
+StartupNotify=true
