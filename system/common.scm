@@ -85,11 +85,11 @@ table inet filter {
 
     # Allow established/related connections
     ct state {established, related} accept
-    
+
     # Allow all traffic from Docker networks
     iifname \"docker*\" accept
     iifname \"br-*\" accept
-    
+
     # Allow all return traffic to Docker networks
     oifname \"docker*\" accept
     oifname \"br-*\" accept
@@ -103,7 +103,7 @@ table inet filter {
 table ip nat {
   chain postrouting {
     type nat hook postrouting priority 100; policy accept;
-    
+
     # Masquerade Docker subnets
     ip saddr 172.17.0.0/16 oifname != \"docker0\" counter masquerade
     ip saddr 172.18.0.0/16 oifname != \"br-*\" counter masquerade
@@ -158,13 +158,13 @@ wifi.cloned-mac-address=stable
              (program (file-append swaylock-effects "/bin/swaylock"))
              (using-pam? #t)
              (using-setuid? #f)))
-   
+
    (service greetd-service-type
             (greetd-configuration
              (greeter-supplementary-groups
               (list "video" "input"))
              (terminals
-              (list 
+              (list
                (greetd-terminal-configuration
                 (terminal-vt "1")
                 (terminal-switch #t)
@@ -182,19 +182,19 @@ wifi.cloned-mac-address=stable
                 (terminal-vt "5"))
                (greetd-terminal-configuration
                 (terminal-vt "6"))))))
-   
+
    (service unattended-upgrade-service-type
             (unattended-upgrade-configuration
              (schedule "0 12 * * *")
              (channels #~
-                       (cons* 
+                       (cons*
                         (channel
                          (name 'pantherx)
                          (branch "master")
                          (url "https://codeberg.org/gofranz/panther.git")
                          (introduction
                           (make-channel-introduction
-                           "54b4056ac571611892c743b65f4c47dc298c49da"   
+                           "54b4056ac571611892c743b65f4c47dc298c49da"
                            (openpgp-fingerprint
                             "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
                         (channel
@@ -206,23 +206,25 @@ wifi.cloned-mac-address=stable
                            (openpgp-fingerprint
                             "8D10 60B9 6BB8 292E 829B  7249 AED4 1CC1 93B7 01E2"))))
                         %default-channels))))
-   
+
    (service dovecot-service-type
             (dovecot-configuration
              (mail-location "maildir:~/.mail")))
-   
-   ;; https://www.reddit.com/r/GUIX/comments/xjjmtr/comment/iqs6cwe/
+
    (simple-service 'fwupd-dbus dbus-root-service-type
                    (list fwupd-nonfree))
    (simple-service 'fwupd-polkit polkit-service-type
                    (list fwupd-nonfree))
-   
+
    (service pcscd-service-type
             (pcscd-configuration
              (usb-drivers (list acsccid ccid))))
-   
+
+   (simple-service 'pcscd-polkit polkit-service-type
+                   (list pcsc-lite))
+
    (service block-facebook-hosts-service-type)
-   
+
    ;; Support for trash, ftp, sftp ... in Thunar
    ;; Includes udisks-service-type
    (service gvfs-service-type)
@@ -231,7 +233,7 @@ wifi.cloned-mac-address=stable
             (bluetooth-configuration
              (bluez bluez)
              (auto-enable? #t)
-             (experimental #t)          ;; Enable experimental features for modern devices
+             (experimental #t)           ;; Enable experimental features for modern devices
              (multi-profile 'multiple))) ;; Enable multiple profiles (A2DP + HFP/HSP)
 
    (service thermald-service-type)
@@ -306,9 +308,9 @@ wifi.cloned-mac-address=stable
  (operating-system
   (inherit %panther-os)
   (host-name "panther")
-  (timezone "Europe/Lisbon")
+  (timezone "Asia/Bangkok")
   (locale "en_US.utf8")
-  
+
   (users
    (cons
     (user-account
@@ -326,8 +328,8 @@ wifi.cloned-mac-address=stable
                              "lp"))
      (home-directory "/home/franz"))
     %base-user-accounts))
-  
-  (packages 
+
+  (packages
    (cons* emacs
     sway
     podman
@@ -344,6 +346,6 @@ wifi.cloned-mac-address=stable
     yubico-pam      ;; yubikey challenge-response for sudo
     fprintd         ;; fingerprint reader
     %panther-base-packages))
-  
+
   (services
    %common-services)))
