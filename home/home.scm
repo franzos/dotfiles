@@ -1,10 +1,17 @@
 (use-modules (gnu home)
              (gnu packages)
+             (gnu packages bash)
+             (gnu packages gnome)
              (gnu packages gnupg)
+             (gnu packages linux)
              (gnu services)
+             (gnu services shepherd)
              (guix gexp)
              (guix profiles)
              (guix channels)
+             (guix packages)
+             (guix build-system copy)
+             ((guix licenses) #:prefix license:)
              (gnu home services)
              (gnu home services guix)
              (gnu home services ssh)
@@ -15,9 +22,11 @@
              (gnu home services sound)
              (gnu home services desktop)
              (gnu home services syncthing)
-             (px home services darkman)
+             (gnu home services shepherd)
              (px home services foot)
-             (px packages audio))
+             (px packages audio)
+             (px packages wm)
+             (px packages desktop-tools))
 
 ;; Theme configuration
 ;; available: ibm-5151, macos-classic, fleet
@@ -28,8 +37,36 @@
          "pimsync sync"
          #:user "franz"))
 
+;; Darkman theme switching scripts - installed to profile/share/ for darkman 2.3+
+(define darkman-scripts
+  (package
+    (name "darkman-scripts")
+    (version "1.0")
+    (source (local-file (string-append "themes/" current-theme) #:recursive? #t))
+    (build-system copy-build-system)
+    (arguments
+     '(#:install-plan
+       '(("foot-dark" "share/dark-mode.d/foot")
+         ("foot-light" "share/light-mode.d/foot")
+         ("gtk-dark" "share/dark-mode.d/gtk")
+         ("gtk-light" "share/light-mode.d/gtk")
+         ("dunst-dark" "share/dark-mode.d/dunst")
+         ("dunst-light" "share/light-mode.d/dunst")
+         ("vscode-dark" "share/dark-mode.d/vscode")
+         ("vscode-light" "share/light-mode.d/vscode")
+         ("waybar-dark" "share/dark-mode.d/waybar")
+         ("waybar-light" "share/light-mode.d/waybar")
+         ("niri-dark" "share/dark-mode.d/niri")
+         ("niri-light" "share/light-mode.d/niri"))))
+    (home-page "")
+    (synopsis "Darkman theme switching scripts")
+    (description "Scripts for automatic dark/light theme switching with darkman.")
+    (license license:gpl3+)))
+
 (home-environment
  (packages
+  (cons* niri-shm                    ;; Patched niri with SHM screencast support (PR #1791)
+         darkman-scripts             ;; Theme switching scripts for darkman
   (specifications->packages
    (list
          ;; GUI Apps
@@ -75,10 +112,10 @@
          "font-linuxlibertine"
 
          ;; Desktop
-         "niri"
-         "xwayland-satellite"          ;; X11 support for niri
+         "xwayland-satellite"        ;; X11 support for niri
          "xdg-desktop-portal-gnome"
          "xdg-desktop-portal-gtk"
+         "wayland-protocols"         ;; screen sharing (Google Meet)
          "swayidle"
          "swaylock"
          "swaybg"
@@ -99,7 +136,6 @@
          "grim"                      ;; screenshot editing
 	     "dmenu"
 	     "j4-dmenu-desktop"          ;; flatpak integration
-		 "networkmanager-dmenu"
 		 "swappy"                    ;; Screenshot editing
          "playerctl"                 ;; media control
          "kanshi" 			         ;; auto display handling
@@ -146,7 +182,6 @@
          "unzip"
          "git"
          "git:send-email"
-         "jj-vcs"
          "rsync"
          "ripgrep"                   ;; better grep
          "broot"                     ;; file explorer
@@ -177,6 +212,7 @@
          "sniffnet"
          "witr"
          "keifu"
+         "inotify-tools"             ;; file access monitoring
 
          ;; Thunar
          "thunar"                    ;; file manager
@@ -213,7 +249,8 @@
          "wakatime-cli"
          "wakatime-ls"
          "package-version-server"
-   )))
+         "claude-code"
+   ))))
 
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
@@ -223,9 +260,9 @@
                   (aliases '(("grep" . "grep --color=auto")
                              ("ll" . "ls -l")
                              ("ls" . "ls -p --color=auto")
-                             ("ccs" . "guix shell node pnpm gh -- pnpm dlx @anthropic-ai/claude-code")
-                             ("ccss" . "guix shell node pnpm gh -- pnpm dlx @anthropic-ai/claude-code --dangerously-skip-permissions")
-                             ("ccssj" . "guix shell --container --expose=$HOME/.gitconfig=$HOME/.gitconfig --share=$HOME/.claude=$HOME/.claude --share=$HOME/.claude.json=$HOME/.claude.json --share=$HOME/.config/claude=$HOME/.config/claude --share=$HOME/.cache/pnpm=$HOME/.cache/pnpm --share=$HOME/.local/share/pnpm=$HOME/.local/share/pnpm --expose=$XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --preserve='^DBUS_SESSION_BUS_ADDRESS$' --preserve='^COLORTERM$' --share=$PWD=$PWD --network coreutils bash grep sed gawk git node pnpm gh dunst -- pnpm dlx @anthropic-ai/claude-code --dangerously-skip-permissions")
+                             ("ccs" . "guix shell node pnpm gh claude-code -- claude")
+                             ("ccss" . "guix shell node pnpm claude-code -- claude --dangerously-skip-permissions")
+                             ("ccssj" . "guix shell --container --expose=$HOME/.gitconfig=$HOME/.gitconfig --expose=$HOME/.config/gh=$HOME/.config/gh --share=$HOME/.claude=$HOME/.claude --share=$HOME/.claude.json=$HOME/.claude.json --share=$HOME/.config/claude=$HOME/.config/claude --share=$HOME/.cache/pnpm=$HOME/.cache/pnpm --share=$HOME/.local/share/pnpm=$HOME/.local/share/pnpm --expose=$XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --preserve='^DBUS_SESSION_BUS_ADDRESS$' --preserve='^COLORTERM$' --share=$PWD=$PWD --network coreutils bash grep sed gawk git node pnpm gh dunst claude-code nss-certs -- claude --dangerously-skip-permissions")
                              ("pms" . "podman system service --time=0 unix:///tmp/podman.sock")))
                   (bashrc (list (local-file
                                  ".bashrc"
@@ -260,20 +297,7 @@
                    ;; GTK-3 theme templates for darkman
                    (".local/share/gtk-themes/settings-dark.ini" ,(local-file (string-append "themes/" current-theme "/gtk-settings-dark.ini")))
                    (".local/share/gtk-themes/settings-light.ini" ,(local-file (string-append "themes/" current-theme "/gtk-settings-light.ini")))
-                   ;; Darkman theme switching scripts
-                   (".local/share/dark-mode.d/gtk" ,(local-file (string-append "themes/" current-theme "/gtk-dark") #:recursive? #t))
-                   (".local/share/dark-mode.d/foot" ,(local-file (string-append "themes/" current-theme "/foot-dark") #:recursive? #t))
-                   (".local/share/dark-mode.d/dunst" ,(local-file (string-append "themes/" current-theme "/dunst-dark") #:recursive? #t))
-                   (".local/share/dark-mode.d/vscode" ,(local-file (string-append "themes/" current-theme "/vscode-dark") #:recursive? #t))
-                   (".local/share/dark-mode.d/waybar" ,(local-file (string-append "themes/" current-theme "/waybar-dark") #:recursive? #t))
-                   (".local/share/dark-mode.d/niri" ,(local-file (string-append "themes/" current-theme "/niri-dark") #:recursive? #t))
-                   (".local/share/light-mode.d/gtk" ,(local-file (string-append "themes/" current-theme "/gtk-light") #:recursive? #t))
-                   (".local/share/light-mode.d/foot" ,(local-file (string-append "themes/" current-theme "/foot-light") #:recursive? #t))
-                   (".local/share/light-mode.d/dunst" ,(local-file (string-append "themes/" current-theme "/dunst-light") #:recursive? #t))
-                   (".local/share/light-mode.d/vscode" ,(local-file (string-append "themes/" current-theme "/vscode-light") #:recursive? #t))
-                   (".local/share/light-mode.d/waybar" ,(local-file (string-append "themes/" current-theme "/waybar-light") #:recursive? #t))
-                   (".local/share/light-mode.d/niri" ,(local-file (string-append "themes/" current-theme "/niri-light") #:recursive? #t))
-                   ;; Waybar theme files for darkman switching
+                   ;; Waybar theme files for darkman switching (used by scripts)
                    (".local/share/waybar-themes/style-light.css" ,(local-file (string-append "themes/" current-theme "/waybar-light.css")))
                    (".local/share/waybar-themes/style-dark.css" ,(local-file (string-append "themes/" current-theme "/waybar-dark.css")))))
         (service home-xdg-configuration-files-service-type
@@ -407,8 +431,25 @@
                      pinentry-qt "/bin/pinentry-qt"))))
         (service home-darkman-service-type
                  (home-darkman-configuration
-                  (latitude 38.7)       ;; Lisbon coordinates from wlsunset
-                  (longitude -9.2)
-                  (use-geoclue? #f))))  ;; Manual coords for privacy
-
+                  (darkman darkman-2.3.1)
+                  (latitude 13.7)
+                  (longitude 100.3)
+                  (use-geoclue #f)))
+        ;; Monitor access to sensitive directories (SSH, AWS, GPG keys)
+        (simple-service 'sensitive-file-watch
+                        home-shepherd-service-type
+                        (list (shepherd-service
+                               (provision '(sensitive-file-watch))
+                               (documentation "Alert on access to sensitive credential directories")
+                               (start #~(make-forkexec-constructor
+                                         (list #$(file-append bash "/bin/bash")
+                                               #$(local-file "sensitive-file-watch.sh"))
+                                         #:environment-variables
+                                         (list (string-append "HOME=" (getenv "HOME"))
+                                               (string-append "PATH=" (getenv "PATH"))
+                                               (string-append "DBUS_SESSION_BUS_ADDRESS="
+                                                              (or (getenv "DBUS_SESSION_BUS_ADDRESS") ""))
+                                               (string-append "NOTIFY_SEND_PATH="
+                                                              #$(file-append libnotify "/bin/notify-send")))))
+                               (stop #~(make-kill-destructor))))))
         %base-home-services)))
