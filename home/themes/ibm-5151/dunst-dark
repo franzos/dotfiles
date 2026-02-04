@@ -17,5 +17,6 @@ sed -i '/\[urgency_critical\]/,$ s/background = .*/background = "#09CC50"/' "$CO
 sed -i '/\[urgency_critical\]/,$ s/foreground = .*/foreground = "#001000"/' "$CONFIG"
 sed -i '/\[urgency_critical\]/,$ s/frame_color = .*/frame_color = "#09CC50"/' "$CONFIG"
 
-# Restart dunst to apply changes
-killall dunst 2>/dev/null || true
+# Restart dunst to apply changes (backgrounded to avoid signal propagation issues with darkman)
+(killall dunst 2>/dev/null || true) &
+exit 0

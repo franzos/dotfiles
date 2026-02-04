@@ -2,8 +2,7 @@
 # Switch foot terminal to light theme using SIGUSR2 signal
 # Targets foot server process to update all clients instantly
 
-set -euo pipefail
-
 # Send SIGUSR2 to foot server to switch to [colors2] section (light theme)
-# This switches all current terminals AND sets the theme for new terminals
-kill -SIGUSR2 $(pgrep -x foot) 2>/dev/null || true
+# Run in background subshell to avoid signal propagation issues with darkman
+(pgrep -x foot | xargs -r kill -SIGUSR2) &
+exit 0

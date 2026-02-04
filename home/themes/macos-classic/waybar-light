@@ -12,5 +12,6 @@ TARGET="$HOME/.config/waybar/style.css"
 cp ~/.local/share/waybar-themes/style-light.css "$TARGET"
 chmod 644 "$TARGET"
 
-# Reload waybar
-killall -SIGUSR2 waybar 2>/dev/null || killall waybar 2>/dev/null || true
+# Reload waybar (backgrounded to avoid signal propagation issues with darkman)
+(killall -SIGUSR2 waybar 2>/dev/null || killall waybar 2>/dev/null || true) &
+exit 0
