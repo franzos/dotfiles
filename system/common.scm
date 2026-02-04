@@ -308,7 +308,7 @@ wifi.cloned-mac-address=stable
  (operating-system
   (inherit %panther-os)
   (host-name "panther")
-  (timezone "Asia/Bangkok")
+  (timezone "Europe/Lisbon")
   (locale "en_US.utf8")
 
   (users

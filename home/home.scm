@@ -431,9 +431,9 @@
                      pinentry-qt "/bin/pinentry-qt"))))
         (service home-darkman-service-type
                  (home-darkman-configuration
-                  (darkman darkman-2.3.1)
-                  (latitude 13.7)
-                  (longitude 100.3)
+                  (darkman darkman)
+                  (latitude 38.7)
+                  (longitude -9.14)
                   (use-geoclue #f)))
         ;; Monitor access to sensitive directories (SSH, AWS, GPG keys)
         (simple-service 'sensitive-file-watch
