@@ -132,6 +132,7 @@
          "brightnessctl"             ;; keyboard display brightness
          "lxqt-policykit"
          "wl-clipboard"
+         "wtype"                     ;; typing backend for voxtype
          "clipman"
          "grim"                      ;; screenshot editing
 	     "dmenu"
@@ -241,6 +242,7 @@
          ;; "fw-fanctrl"             ;; Framework fan control
 
          "darkman"
+         "voxtype-vulkan"            ;; push-to-talk voice-to-text
          "bluetuith"                 ;; Bluetooth TUI
          "direnv"
 
@@ -313,6 +315,7 @@
                    ("nvim/lua/core/options.lua" ,(local-file "nvim/lua/core/options.lua"))
                    ("nvim/lua/core/keymaps.lua" ,(local-file "nvim/lua/core/keymaps.lua"))
                    ("xdg-desktop-portal/portals.conf" ,(local-file "portals.conf"))
+                   ("voxtype/config.toml" ,(local-file "voxtype.toml"))
                    ("dunst/dunstrc" ,(local-file "dunstrc"))
                    ("foot/foot.ini" ,(local-file (string-append "themes/" current-theme "/foot.ini")))
                    ("swaylock/config" ,(local-file "swaylock"))

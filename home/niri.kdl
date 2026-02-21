@@ -84,6 +84,9 @@ spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPL
 // Restart portal-gnome after niri's ScreenCast D-Bus interface is ready
 spawn-at-startup "sh" "-c" "while ! busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; do sleep 0.2; done; pkill -f xdg-desktop-portal-gnome"
 
+// Voice-to-text (push-to-talk via Right Alt)
+spawn-at-startup "voxtype"
+
 // XWayland support for X11 applications
 spawn-at-startup "xwayland-satellite"
 

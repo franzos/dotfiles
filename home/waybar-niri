@@ -4,7 +4,7 @@
     "spacing": 4,
     "modules-left": ["niri/workspaces"],
     "modules-center": ["niri/window"],
-    "modules-right": ["cpu", "idle_inhibitor", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "clock", "clock#gmt1", "custom/gpg", "tray"],
+    "modules-right": ["custom/voxtype", "cpu", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "clock", "clock#gmt1", "custom/gpg", "tray"],
     "niri/workspaces": {
         "format": "{icon}",
         "format-icons": {
@@ -111,6 +111,11 @@
         "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
         "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_battery_percentage}%",
         "on-click": "footclient -e bluetuith"
+    },
+    "custom/voxtype": {
+        "exec": "voxtype status --follow --format json --icon-theme nerd-font",
+        "return-type": "json",
+        "tooltip": true
     },
     "custom/bt-profile": {
         "format": "{}",

@@ -56,6 +56,16 @@ To add a new theme, create `home/themes/<name>/` with:
 - **ZRAM** - Compressed swap (8G thinkpad, 24G framework)
 - **Chrome** with Hardware Acceleration
 - **Hibernation** Hibernate to disk after 60m standby
+- **Voxtype** - Push-to-talk voice-to-text (Right Alt, `base.en` model, waybar status)
+
+#### Voxtype Setup (Voice-to-Text)
+
+Download model and verify:
+
+```bash
+voxtype setup --download
+voxtype setup --check
+```
 
 ### Security
 - Smart card support (pcscd)
