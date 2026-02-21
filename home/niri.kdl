@@ -72,6 +72,7 @@ spawn-at-startup "lxqt-policykit-agent"
 spawn-at-startup "xsettingsd"
 spawn-at-startup "mullvad-vpn"
 spawn-at-startup "playerctld" "daemon"
+spawn-at-startup "easyeffects" "--gapplication-service"
 // spawn-at-startup "wlsunset" "-l" "13.7" "-L" "100.3"
 spawn-at-startup "waybar" "-c" "/home/franz/.config/waybar/config-niri"
 

@@ -319,6 +319,8 @@
                    ("dunst/dunstrc" ,(local-file "dunstrc"))
                    ("foot/foot.ini" ,(local-file (string-append "themes/" current-theme "/foot.ini")))
                    ("swaylock/config" ,(local-file "swaylock"))
+                   ;; EasyEffects autoload: apply fw13 preset on Framework speakers
+                   ("easyeffects/autoload/output/fw13-easy-effects.json" ,(local-file "easyeffects-autoload-output.json"))
                    ;; WirePlumber Bluetooth configuration for A2DP preference (WirePlumber 0.5+)
                    ("wireplumber/bluetooth.lua.d/51-bluez-config.lua" ,(local-file "wireplumber-bluetooth.lua"))
                    ;; broot
