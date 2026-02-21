@@ -1,0 +1,26 @@
+[hotkey]
+key = "RIGHTALT"
+mode = "push_to_talk"
+
+[audio]
+device = "default"
+sample_rate = 16000
+max_duration_secs = 60
+
+[audio.feedback]
+enabled = true
+volume = 0.5
+
+[whisper]
+model = "base.en"
+language = "en"
+on_demand_loading = true
+
+[output]
+mode = "type"
+fallback_to_clipboard = true
+
+[output.notification]
+on_transcription = true
+
+state_file = "auto"
