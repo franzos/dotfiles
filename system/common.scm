@@ -240,6 +240,8 @@ wifi.cloned-mac-address=stable
 
    (service earlyoom-service-type)
 
+   (service rtkit-daemon-service-type)
+
    (service iptables-service-type
          (iptables-configuration
           (ipv4-rules %iptables-ipv4-rules)
