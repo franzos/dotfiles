@@ -24,6 +24,7 @@
              (gnu home services syncthing)
              (gnu home services shepherd)
              (px home services foot)
+             (px services containers)
              (px packages audio)
              (px packages wm)
              (px packages desktop-tools))
@@ -441,6 +442,7 @@
                   (latitude 38.7)
                   (longitude -9.14)
                   (use-geoclue #f)))
+        (service home-podman-healthcheckd-service-type)
         ;; Monitor access to sensitive directories (SSH, AWS, GPG keys)
         (simple-service 'sensitive-file-watch
                         home-shepherd-service-type
