@@ -58,6 +58,9 @@ function br {
     fi
 }
 
+# envstash tab completion
+source <(COMPLETE=bash envstash)
+
 # direnv (.envrc)
 _direnv_hook() {
   local previous_exit_status=$?;

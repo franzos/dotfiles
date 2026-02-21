@@ -199,7 +199,8 @@
          "curl"
          "wget"
          "qemu"
-         ;; "flatpak"
+         "tku"                       ;; Token Usage
+         "envstash"                  ;; .env version management
          "tomb"                      ;; secrets manager
          "syncthing"
          "trash-cli"
