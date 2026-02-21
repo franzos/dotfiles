@@ -263,7 +263,7 @@
                              ("ll" . "ls -l")
                              ("ls" . "ls -p --color=auto")
                              ("ccs" . "guix shell node pnpm gh claude-code -- claude")
-                             ("ccss" . "guix shell node pnpm claude-code -- claude --dangerously-skip-permissions")
+                             ("ccss" . "guix shell node pnpm gh claude-code -- claude --dangerously-skip-permissions")
                              ("ccssj" . "guix shell --container --expose=$HOME/.gitconfig=$HOME/.gitconfig --expose=$HOME/.config/gh=$HOME/.config/gh --share=$HOME/.claude=$HOME/.claude --share=$HOME/.claude.json=$HOME/.claude.json --share=$HOME/.config/claude=$HOME/.config/claude --share=$HOME/.cache/pnpm=$HOME/.cache/pnpm --share=$HOME/.local/share/pnpm=$HOME/.local/share/pnpm --expose=$XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --preserve='^DBUS_SESSION_BUS_ADDRESS$' --preserve='^COLORTERM$' --share=$PWD=$PWD --network coreutils bash grep sed gawk git node pnpm gh dunst claude-code nss-certs -- claude --dangerously-skip-permissions")
                              ("pms" . "podman system service --time=0 unix:///tmp/podman.sock")))
                   (bashrc (list (local-file
