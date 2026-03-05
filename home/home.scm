@@ -38,6 +38,7 @@
          "pimsync sync"
          #:user "franz"))
 
+
 ;; Darkman theme switching scripts - installed to profile/share/ for darkman 2.3+
 (define darkman-scripts
   (package
@@ -85,6 +86,7 @@
          "librewolf"
          "libreoffice"
          "papers"                    ;; PDF Reader
+         "xournalpp"
          "kleopatra"                 ;; pgp
          "mpv"
          "tidal-hifi"
@@ -324,7 +326,7 @@
                    ;; EasyEffects autoload: apply fw13 preset on Framework speakers
                    ("easyeffects/autoload/output/fw13-easy-effects.json" ,(local-file "easyeffects-autoload-output.json"))
                    ;; WirePlumber Bluetooth configuration for A2DP preference (WirePlumber 0.5+)
-                   ("wireplumber/bluetooth.lua.d/51-bluez-config.lua" ,(local-file "wireplumber-bluetooth.lua"))
+                   ("wireplumber/wireplumber.conf.d/51-bluetooth.conf" ,(local-file "wireplumber-bluetooth.conf"))
                    ;; broot
                    ("broot/conf.hjson" ,(local-file "broot/conf.hjson"))
                    ("broot/verbs.hjson" ,(local-file "broot/verbs.hjson"))
