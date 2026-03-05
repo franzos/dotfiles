@@ -112,6 +112,11 @@
                                      "ATTR{class}==\"0x010802\", "  ;; NVMe controller
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
 
+   ;; AMD NPU accelerator (amdxdna) — allow render group access
+   (simple-service 'amdxdna-accel udev-service-type
+                   (list (udev-rule "90-amdxdna.rules"
+                                    "SUBSYSTEM==\"accel\", KERNEL==\"accel*\", GROUP=\"render\", MODE=\"0660\"\n")))
+
    ;; Android USB debugging (Google/Pixel devices)
    (simple-service 'android-udev udev-service-type
                    (list (udev-rule "51-android.rules"

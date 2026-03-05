@@ -38,6 +38,7 @@
   #:use-module (nongnu packages firmware)       ;; fwupd-nonfree
 
   #:use-module (px system panther)
+  #:use-module (px services audio)              ;; rtkit-daemon-service-type
   #:use-module (px packages security-token)     ;; acsccid
   #:use-module (px packages linux)              ;; bluez 5.83
 
@@ -313,6 +314,10 @@ wifi.cloned-mac-address=stable
   (timezone "Europe/Lisbon")
   (locale "en_US.utf8")
 
+  (groups
+   (cons (user-group (name "render"))
+         %base-groups))
+
   (users
    (cons
     (user-account
@@ -325,6 +330,7 @@ wifi.cloned-mac-address=stable
                              "kvm"
                              "audio"
                              "video"
+                             "render"
                              "plugdev"
                              "input"
                              "lp"))
