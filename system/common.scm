@@ -44,96 +44,31 @@
 
   #:export (%common-os %common-services))
 
-;; https://stackoverflow.com/a/77312416
-(define %nftables-ruleset
-  (plain-file "nftables.conf"
-              "# Firewall
-table inet filter {
-  chain input {
-    type filter hook input priority 0; policy drop;
-
-    # early drop of invalid connections
-    ct state invalid drop
-
-    # allow established/related connections
-    ct state { established, related } accept
-
-    # allow from loopback
-    iif lo accept
-    # drop connections to lo not coming from lo
-    iif != lo ip daddr 127.0.0.1/8 drop
-    iif != lo ip6 daddr ::1/128 drop
-
-    # drop spoofed loopback source (anti-spoofing)
-    ip saddr 127.0.0.0/8 iif != lo drop
-    ip6 saddr ::1/128 iif != lo drop
-
-    # allow icmp
-    ip protocol icmp accept
-    ip6 nexthdr icmpv6 accept
-
-    # allow ssh
-    # tcp dport ssh accept
-
-    # syncthing
-    tcp dport 22000 accept
-
-    # reject everything else
-    reject with icmpx type port-unreachable
-  }
-  chain forward {
-    type filter hook forward priority 0; policy drop;
-
-    # Allow established/related connections
-    ct state {established, related} accept
-
-    # Allow all traffic from Docker networks
-    iifname \"docker*\" accept
-    iifname \"br-*\" accept
-
-    # Allow all return traffic to Docker networks
-    oifname \"docker*\" accept
-    oifname \"br-*\" accept
-  }
-  chain output {
-    type filter hook output priority 0; policy accept;
-  }
-}
-
-# NAT for Docker
-table ip nat {
-  chain postrouting {
-    type nat hook postrouting priority 100; policy accept;
-
-    # Masquerade Docker subnets
-    ip saddr 172.17.0.0/16 oifname != \"docker0\" counter masquerade
-    ip saddr 172.18.0.0/16 oifname != \"br-*\" counter masquerade
-  }
-}
-"))
-
 (define %iptables-ipv4-rules
   (plain-file "iptables.rules" "*filter
-:INPUT ACCEPT
-:FORWARD ACCEPT
-:OUTPUT ACCEPT
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m conntrack --ctstate INVALID -j DROP
 -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 -A INPUT -i lo -j ACCEPT
 -A INPUT -i tailscale0 -j ACCEPT
 -A INPUT -p udp --dport 41641 -j ACCEPT
 -A INPUT -p tcp --dport 22000 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp-port-unreachable
+-A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 COMMIT
 "))
 
 (define %iptables-ipv6-rules
   (plain-file "ip6tables.rules" "*filter
-:INPUT ACCEPT
-:FORWARD ACCEPT
-:OUTPUT ACCEPT
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m conntrack --ctstate INVALID -j DROP
 -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
 -A INPUT -p tcp --dport 22000 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp6-port-unreachable
+-A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 COMMIT
 "))
 
@@ -200,7 +135,7 @@ wifi.cloned-mac-address=stable
                             "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
                         (channel
                          (name 'small-guix)
-                         (url "https://gitlab.com/orang3/small-guix")
+                         (url "https://codeberg.org/fishinthecalculator/small-guix.git")
                          (introduction
                           (make-channel-introduction
                            "f260da13666cd41ae3202270784e61e062a3999c"
@@ -210,6 +145,7 @@ wifi.cloned-mac-address=stable
 
    (service dovecot-service-type
             (dovecot-configuration
+             (listen '("127.0.0.1" "::1"))
              (mail-location "maildir:~/.mail")))
 
    (simple-service 'fwupd-dbus dbus-root-service-type
@@ -296,16 +232,28 @@ wifi.cloned-mac-address=stable
         (inherit config)
         (handle-power-key 'ignore)
         (handle-lid-switch 'suspend-then-hibernate)
-        (hibernate-delay-seconds 3600)))
+        (hibernate-delay-seconds 900)))
 
     ;; https://stackoverflow.com/questions/76830848/redis-warning-memory-overcommit-must-be-enabled
     (sysctl-service-type config => (sysctl-configuration
                                     (inherit config)
-                                    (settings '(("vm.overcommit_memory" . "1")
+                                    (settings (append
+                                              (sysctl-configuration-settings config)
+                                              '(("vm.overcommit_memory" . "1")
                                                ("net.ipv4.ip_forward" . "1")
                                                ;; TCP BBR congestion control + fair queuing
                                                ("net.core.default_qdisc" . "fq_codel")
-                                               ("net.ipv4.tcp_congestion_control" . "bbr"))))))))
+                                               ("net.ipv4.tcp_congestion_control" . "bbr")
+                                               ;; Kernel hardening
+                                               ("kernel.dmesg_restrict" . "1")
+                                               ("kernel.unprivileged_bpf_disabled" . "1")
+                                               ("kernel.yama.ptrace_scope" . "1")
+                                               ("kernel.kexec_load_disabled" . "1")
+                                               ("kernel.perf_event_paranoid" . "3")
+                                               ;; Network hardening
+                                               ("net.ipv4.conf.all.rp_filter" . "1")
+                                               ("net.ipv4.conf.all.accept_redirects" . "0")
+                                               ("net.ipv6.conf.all.accept_redirects" . "0")))))))))
 
 (define %common-os
  (operating-system
@@ -332,8 +280,7 @@ wifi.cloned-mac-address=stable
                              "video"
                              "render"
                              "plugdev"
-                             "input"
-                             "lp"))
+                             "input"))
      (home-directory "/home/franz"))
     %base-user-accounts))
 
