@@ -29,7 +29,7 @@
          "amd_pstate=active"                      ;; AMD Ryzen EPP power management
          "pcie_aspm.policy=powersave"             ;; PCIe power saving (no L1 substates)
          "mt7921e.disable_aspm=Y"                 ;; Disable ASPM for WiFi (MT7922 wake bug)
-         "amdgpu.ppfeaturemask=0xffffffff"        ;; Enable all GPU power features
+         "amdgpu.ppfeaturemask=0xfffd7fff"        ;; GPU power features (overdrive disabled)
          "amdgpu.abmlevel=3"                      ;; Adaptive backlight management
          "nmi_watchdog=0"                         ;; Disable NMI watchdog for power saving
          "modprobe.blacklist=hid_sensor_hub"
@@ -97,10 +97,6 @@
                                      "ACTION==\"add\", SUBSYSTEM==\"usb\", "
                                      "ATTR{product}==\"HDMI Expansion Card\", "
                                      "ATTR{manufacturer}==\"Framework\", "
-                                     "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"
-                                     ;; YubiKey FIDO+CCID
-                                     "ACTION==\"add\", SUBSYSTEM==\"usb\", "
-                                     "ATTR{idVendor}==\"1050\", "  ;; Yubico
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
 
    ;; Enable PCI Runtime PM for NVMe SSD
@@ -117,10 +113,13 @@
                    (list (udev-rule "90-amdxdna.rules"
                                     "SUBSYSTEM==\"accel\", KERNEL==\"accel*\", GROUP=\"render\", MODE=\"0660\"\n")))
 
-   ;; Android USB debugging (Google/Pixel devices)
+   ;; Android USB debugging (Pixel: ADB, fastboot, MTP)
    (simple-service 'android-udev udev-service-type
                    (list (udev-rule "51-android.rules"
-                                    "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", MODE=\"0660\", GROUP=\"plugdev\"\n")))
+                                    (string-append
+                                     "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4ee2\", MODE=\"0660\", GROUP=\"plugdev\"\n"
+                                     "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4ee1\", MODE=\"0660\", GROUP=\"plugdev\"\n"
+                                     "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4ee7\", MODE=\"0660\", GROUP=\"plugdev\"\n"))))
 
    (service mullvad-daemon-service-type)
    %common-services)))
