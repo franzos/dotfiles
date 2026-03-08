@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# power-profile-status - Display current power profile for Waybar
+# Supports power-profiles-daemon (powerprofilesctl) and TLP (tlp-stat)
+
+if command -v powerprofilesctl >/dev/null 2>&1; then
+    PROFILE=$(powerprofilesctl get 2>/dev/null)
+    BACKEND="ppd"
+elif command -v tlp-stat >/dev/null 2>&1; then
+    PROFILE=$(tlp-stat -p 2>/dev/null | grep -oP 'active\s*=\s*\K\S+')
+    BACKEND="tlp"
+else
+    echo '{"text":"","tooltip":"No power management tool found","class":"unavailable"}'
+    exit 0
+fi
+
+if [ -z "$PROFILE" ]; then
+    echo '{"text":"","tooltip":"Could not read power profile","class":"unavailable"}'
+    exit 0
+fi
+
+case "$BACKEND" in
+    ppd)
+        case "$PROFILE" in
+            power-saver)  TEXT=" saver"; CLASS="power-saver" ;;
+            balanced)     TEXT=" bal";   CLASS="balanced" ;;
+            performance)  TEXT=" perf";  CLASS="performance" ;;
+            *)            TEXT=" $PROFILE"; CLASS="unknown" ;;
+        esac
+        TOOLTIP="$PROFILE (power-profiles-daemon)\nClick to switch"
+        ;;
+    tlp)
+        case "$PROFILE" in
+            AC)  TEXT=" AC";  CLASS="performance" ;;
+            BAT) TEXT=" BAT"; CLASS="power-saver" ;;
+            *)   TEXT=" $PROFILE"; CLASS="unknown" ;;
+        esac
+        TOOLTIP="TLP: $PROFILE mode"
+        ;;
+esac
+
+echo "{\"text\":\"$TEXT\",\"tooltip\":\"$TOOLTIP\",\"class\":\"$CLASS\"}"

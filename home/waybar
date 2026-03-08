@@ -4,7 +4,7 @@
     "spacing": 4,
     "modules-left": ["sway/workspaces", "sway/mode", "sway/scratchpad", "custom/media"],
     "modules-center": ["sway/window"],
-    "modules-right": ["cpu", "idle_inhibitor", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "clock", "clock#gmt1", "custom/gpg", "tray"],
+    "modules-right": ["cpu", "idle_inhibitor", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "custom/power-profile", "clock", "clock#gmt1", "custom/gpg", "tray"],
     "sway/mode": {
         "format": "<span style=\"italic\">{}</span>"
     },
@@ -117,6 +117,14 @@
         "interval": 3,
         "exec": "$HOME/.local/bin/bt-profile-status",
         "on-click": "$HOME/.local/bin/bt-toggle-profile",
+        "tooltip": true
+    },
+    "custom/power-profile": {
+        "format": "{}",
+        "return-type": "json",
+        "interval": 5,
+        "exec": "$HOME/.local/bin/power-profile-status",
+        "on-click": "$HOME/.local/bin/power-profile-toggle",
         "tooltip": true
     },
     "custom/gpg": {

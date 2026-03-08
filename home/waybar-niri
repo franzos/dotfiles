@@ -4,7 +4,7 @@
     "spacing": 4,
     "modules-left": ["niri/workspaces"],
     "modules-center": ["niri/window"],
-    "modules-right": ["custom/voxtype", "cpu", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "clock", "clock#gmt1", "custom/gpg", "tray"],
+    "modules-right": ["custom/voxtype", "cpu", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "custom/power-profile", "clock", "clock#gmt1", "custom/gpg", "tray"],
     "niri/workspaces": {
         "format": "{icon}",
         "format-icons": {
@@ -15,13 +15,6 @@
     "niri/window": {
         "format": "{}",
         "max-length": 50
-    },
-    "idle_inhibitor": {
-        "format": "{icon}",
-        "format-icons": {
-            "activated": "",
-            "deactivated": ""
-        }
     },
     "tray": {
         "spacing": 10
@@ -123,6 +116,14 @@
         "interval": 5,
         "exec": "$HOME/.local/bin/bt-profile-status",
         "on-click": "$HOME/.local/bin/bt-toggle-profile",
+        "tooltip": true
+    },
+    "custom/power-profile": {
+        "format": "{}",
+        "return-type": "json",
+        "interval": 5,
+        "exec": "$HOME/.local/bin/power-profile-status",
+        "on-click": "$HOME/.local/bin/power-profile-toggle",
         "tooltip": true
     },
     "custom/gpg": {

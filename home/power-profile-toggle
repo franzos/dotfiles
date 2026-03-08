@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# power-profile-toggle - Cycle through power profiles
+# Only works with power-profiles-daemon; TLP profiles are hardware-driven
+
+if ! command -v powerprofilesctl >/dev/null 2>&1; then
+    notify-send "Power Profile" "Toggling not supported with TLP" 2>/dev/null
+    exit 0
+fi
+
+CURRENT=$(powerprofilesctl get 2>/dev/null)
+
+case "$CURRENT" in
+    power-saver) NEXT="balanced" ;;
+    balanced)    NEXT="performance" ;;
+    *)           NEXT="power-saver" ;;
+esac
+
+powerprofilesctl set "$NEXT"
+
+if command -v notify-send >/dev/null 2>&1; then
+    notify-send "Power Profile" "Switched to: $NEXT"
+fi
