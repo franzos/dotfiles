@@ -27,26 +27,31 @@
 
 (define %thinkpad-iptables-ipv4-rules
   (plain-file "iptables.rules" "*filter
-:INPUT ACCEPT
-:FORWARD ACCEPT
-:OUTPUT ACCEPT
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m conntrack --ctstate INVALID -j DROP
 -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 -A INPUT -i lo -j ACCEPT
+-A INPUT -i tailscale0 -j ACCEPT
+-A INPUT -p udp --dport 41641 -j ACCEPT
 -A INPUT -p tcp --dport 22 -j ACCEPT
 -A INPUT -p tcp --dport 22000 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp-port-unreachable
+-A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 COMMIT
 "))
 
 (define %thinkpad-iptables-ipv6-rules
   (plain-file "ip6tables.rules" "*filter
-:INPUT ACCEPT
-:FORWARD ACCEPT
-:OUTPUT ACCEPT
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m conntrack --ctstate INVALID -j DROP
 -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
 -A INPUT -p tcp --dport 22 -j ACCEPT
 -A INPUT -p tcp --dport 22000 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp6-port-unreachable
+-A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 COMMIT
 "))
 
@@ -111,6 +116,7 @@ COMMIT
              (password-authentication? #f)
              (authorized-keys
               `(("franz" ,(plain-file "franz.pub" %franz-ssh-key))))))
+     (service thermald-service-type)
      (udev-rules-service 'backlight %backlight-udev-rule)
      (service tlp-service-type
               (tlp-configuration
