@@ -12,7 +12,6 @@
   #:use-module (gnu services virtualization)
   #:use-module (gnu services desktop)           ;; gvfs-service-type
   #:use-module (gnu services containers)
-  #:use-module (gnu services pm)
   #:use-module (gnu services web)
   #:use-module (gnu services security-token)
   #:use-module (gnu services networking)
@@ -31,8 +30,7 @@
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages containers)
   #:use-module (gnu packages security-token)  ;; ccid
-  #:use-module (gnu packages authentication)  ;; yubico-pam
-  #:use-module (gnu packages freedesktop)      ;; fprintd
+  #:use-module (gnu packages authentication)  ;; yubico-pam, fprintd
 
   #:use-module (gnu services authentication)   ;; fprintd-service-type
   #:use-module (nongnu packages firmware)       ;; fwupd-nonfree
@@ -173,8 +171,6 @@ wifi.cloned-mac-address=stable
              (experimental #t)           ;; Enable experimental features for modern devices
              (multi-profile 'multiple))) ;; Enable multiple profiles (A2DP + HFP/HSP)
 
-   (service thermald-service-type)
-
    (service earlyoom-service-type)
 
    (service rtkit-daemon-service-type)
@@ -252,8 +248,19 @@ wifi.cloned-mac-address=stable
                                                ("kernel.perf_event_paranoid" . "3")
                                                ;; Network hardening
                                                ("net.ipv4.conf.all.rp_filter" . "1")
+                                               ("net.ipv4.conf.default.rp_filter" . "1")
                                                ("net.ipv4.conf.all.accept_redirects" . "0")
-                                               ("net.ipv6.conf.all.accept_redirects" . "0")))))))))
+                                               ("net.ipv4.conf.default.accept_redirects" . "0")
+                                               ("net.ipv6.conf.all.accept_redirects" . "0")
+                                               ("net.ipv6.conf.default.accept_redirects" . "0")
+                                               ("net.ipv4.conf.all.send_redirects" . "0")
+                                               ("net.ipv4.conf.all.accept_source_route" . "0")
+                                               ("net.ipv6.conf.all.accept_source_route" . "0")
+                                               ("net.ipv4.tcp_syncookies" . "1")
+                                               ("net.ipv4.icmp_echo_ignore_broadcasts" . "1")
+                                               ;; Filesystem hardening
+                                               ("fs.protected_fifos" . "2")
+                                               ("fs.protected_regular" . "2")))))))))
 
 (define %common-os
  (operating-system
