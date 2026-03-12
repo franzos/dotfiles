@@ -76,9 +76,9 @@
          "keepassxc"                 ;; password manager
          "vlc"
          "inkscape"
-         "wireshark"
-         "recoll"
-         "calibre"                  ;; E-Books
+         ; "wireshark"
+         ; "recoll"
+         ; "calibre"                  ;; E-Books
          "qalculate-gtk"            ;; calculator
          "mousepad"                 ;; text editor
          "logseq"
@@ -103,7 +103,7 @@
          ;; Thinkpad: https://github.com/JackHack96/EasyEffects-Presets "Laptop"
          "easyeffects"
          "easyeffects-presets-framework"
-         "deepfilternet-ladspa"
+         ; "deepfilternet-ladspa"
 
          ;; Fonts
          "font-openmoji"
@@ -135,7 +135,8 @@
          "brightnessctl"             ;; keyboard display brightness
          "lxqt-policykit"
          "wl-clipboard"
-         "wtype"                     ;; typing backend for voxtype
+         ; "wtype"                     ;; typing backend for voxtype
+         ; "voxtype-vulkan"            ;; push-to-talk voice-to-text
          "clipman"
          "grim"                      ;; screenshot editing
 	     "dmenu"
@@ -164,9 +165,9 @@
 
          ;; Supporting
          "libusb"
-         "emacs"
-         "emacs-geiser"
-         "emacs-geiser-guile"
+         ; "emacs"
+         ; "emacs-geiser"
+         ; "emacs-geiser-guile"
          "bind:utils"
          "python"
          "glib:bin"
@@ -187,7 +188,7 @@
          "git"
          "git:send-email"
          "rsync"
-         "ripgrep"                   ;; better grep
+         ; "ripgrep"                   ;; better grep
          "broot"                     ;; file explorer
          "glances"                   ;; system monitor
          "restic"                    ;; backup
@@ -207,8 +208,8 @@
          "tomb"                      ;; secrets manager
          "syncthing"
          "trash-cli"
-         "qpwgraph"
-         "sed"
+         ; "qpwgraph"
+         ; "sed"
          "openssh-sans-x"
          "newsboat"                  ;; RSS reader
          "file"	                    ;; file type guesser
@@ -246,7 +247,6 @@
          ;; "fw-fanctrl"             ;; Framework fan control
 
          "darkman"
-         "voxtype-vulkan"            ;; push-to-talk voice-to-text
          "bluetuith"                 ;; Bluetooth TUI
          "direnv"
 
@@ -266,9 +266,9 @@
                   (aliases '(("grep" . "grep --color=auto")
                              ("ll" . "ls -l")
                              ("ls" . "ls -p --color=auto")
-                             ("ccs" . "guix shell node pnpm gh claude-code -- claude")
-                             ("ccss" . "guix shell node pnpm gh claude-code -- claude --dangerously-skip-permissions")
-                             ("ccssj" . "guix shell --container --expose=$HOME/.gitconfig=$HOME/.gitconfig --expose=$HOME/.config/gh=$HOME/.config/gh --share=$HOME/.claude=$HOME/.claude --share=$HOME/.claude.json=$HOME/.claude.json --share=$HOME/.config/claude=$HOME/.config/claude --share=$HOME/.cache/pnpm=$HOME/.cache/pnpm --share=$HOME/.local/share/pnpm=$HOME/.local/share/pnpm --expose=$XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --preserve='^DBUS_SESSION_BUS_ADDRESS$' --preserve='^COLORTERM$' --share=$PWD=$PWD --network coreutils bash grep sed gawk git node pnpm gh dunst claude-code nss-certs -- claude --dangerously-skip-permissions")
+                             ("ccs" . "guix shell node pnpm gh sed ripgrep claude-code -- claude")
+                             ("ccss" . "guix shell node pnpm gh sed ripgrep claude-code -- claude --dangerously-skip-permissions")
+                             ("ccssj" . "guix shell --container --expose=$HOME/.gitconfig=$HOME/.gitconfig --expose=$HOME/.config/gh=$HOME/.config/gh --share=$HOME/.claude=$HOME/.claude --share=$HOME/.claude.json=$HOME/.claude.json --share=$HOME/.config/claude=$HOME/.config/claude --share=$HOME/.cache/pnpm=$HOME/.cache/pnpm --share=$HOME/.local/share/pnpm=$HOME/.local/share/pnpm --preserve='^COLORTERM$' --share=$PWD=$PWD --network coreutils bash grep sed gawk git node pnpm gh dunst ripgrep claude-code nss-certs -- claude --dangerously-skip-permissions")
                              ("pms" . "podman system service --time=0 unix:///tmp/podman.sock")))
                   (bashrc (list (local-file
                                  ".bashrc"
@@ -282,6 +282,8 @@
                    ;; Bluetooth profile management scripts
                    (".local/bin/bt-toggle-profile" ,(local-file "bt-toggle-profile" #:recursive? #t))
                    (".local/bin/bt-profile-status" ,(local-file "bt-profile-status" #:recursive? #t))
+                   (".local/bin/power-profile-status" ,(local-file "power-profile-status" #:recursive? #t))
+                   (".local/bin/power-profile-toggle" ,(local-file "power-profile-toggle" #:recursive? #t))
                    (".local/share/applications/lock.desktop" ,(local-file
                                                                "apps/lock.desktop"))
                    (".local/share/applications/vscode.desktop" ,(local-file
@@ -354,8 +356,7 @@
                           ("CLUTTER_BACKEND" . "wayland")
                           ;; Qt theme integration (reads color-scheme from gsettings)
                           ("QT_QPA_PLATFORMTHEME" . "gtk3")
-                          ;; Hardware acceleration
-                          ("LIBVA_DRIVER_NAME" . "radeonsi")
+                          ;; Hardware acceleration (auto-detect via Mesa)
                           ("ANGLE_DEFAULT_PLATFORM" . "vulkan")
                           ;; Cursor theme
                           ("XCURSOR_THEME" . "Adwaita")
@@ -363,7 +364,7 @@
                           ;; podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock
                           ("DOCKER_HOST" . "unix:///run/user/$(id -u)/podman/podman.sock")
                           ;; Unknown terminal: foot
-                          ("TERM" . "xterm")
+                          ("TERM" . "xterm-256color")
                           ;; Disable version enforcement
                           ("COREPACK_ENABLE_STRICT" . "0")
                           ("COREPACK_ENABLE_PROJECT_SPEC" . "0")
