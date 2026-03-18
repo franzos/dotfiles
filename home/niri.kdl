@@ -270,4 +270,12 @@ binds {
 
     // Power off monitors
     Mod+Shift+P { power-off-monitors; }
+
+    // Mouse: side buttons for column switching
+    MouseBack    { focus-column-left; }
+    MouseForward { focus-column-right; }
+
+    // Mouse: Mod + scroll wheel for workspace switching
+    Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+    Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
 }
