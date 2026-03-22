@@ -24,6 +24,7 @@
              (gnu home services syncthing)
              (gnu home services shepherd)
              (px home services foot)
+             (px home services unattended-upgrade)
              (px services containers)
              (px packages audio)
              (px packages wm)
@@ -32,6 +33,8 @@
 ;; Theme configuration
 ;; available: ibm-5151, macos-classic, fleet
 (define current-theme "macos-classic")
+(define current-theme-dir
+  (string-append (dirname (current-filename)) "/themes/" current-theme))
 
 (define mcron-job-pimsync
   #~(job '(next-hour '(0 3 6 9 12 15 18 21))
@@ -44,7 +47,7 @@
   (package
     (name "darkman-scripts")
     (version "1.0")
-    (source (local-file (string-append "themes/" current-theme) #:recursive? #t))
+    (source (local-file current-theme-dir #:recursive? #t))
     (build-system copy-build-system)
     (arguments
      '(#:install-plan
@@ -64,6 +67,7 @@
     (synopsis "Darkman theme switching scripts")
     (description "Scripts for automatic dark/light theme switching with darkman.")
     (license license:gpl3+)))
+
 
 (home-environment
  (packages
@@ -303,14 +307,14 @@
                    (".local/share/applications/oculante.desktop" ,(local-file
                                                                    "apps/oculante.desktop"))
                    ;; GTK-3 theme templates for darkman
-                   (".local/share/gtk-themes/settings-dark.ini" ,(local-file (string-append "themes/" current-theme "/gtk-settings-dark.ini")))
-                   (".local/share/gtk-themes/settings-light.ini" ,(local-file (string-append "themes/" current-theme "/gtk-settings-light.ini")))
+                   (".local/share/gtk-themes/settings-dark.ini" ,(local-file (string-append current-theme-dir "/gtk-settings-dark.ini")))
+                   (".local/share/gtk-themes/settings-light.ini" ,(local-file (string-append current-theme-dir "/gtk-settings-light.ini")))
                    ;; Waybar theme files for darkman switching (used by scripts)
-                   (".local/share/waybar-themes/style-light.css" ,(local-file (string-append "themes/" current-theme "/waybar-light.css")))
-                   (".local/share/waybar-themes/style-dark.css" ,(local-file (string-append "themes/" current-theme "/waybar-dark.css")))))
+                   (".local/share/waybar-themes/style-light.css" ,(local-file (string-append current-theme-dir "/waybar-light.css")))
+                   (".local/share/waybar-themes/style-dark.css" ,(local-file (string-append current-theme-dir "/waybar-dark.css")))))
         (service home-xdg-configuration-files-service-type
                  `(("niri/config.kdl" ,(local-file "niri.kdl"))
-                   ("niri/colors.kdl" ,(local-file (string-append "themes/" current-theme "/niri-colors.kdl")))
+                   ("niri/colors.kdl" ,(local-file (string-append current-theme-dir "/niri-colors.kdl")))
                    ("waybar/config" ,(local-file "waybar"))
                    ("waybar/config-niri" ,(local-file "waybar-niri"))
                    ;; waybar/style.css managed by darkman scripts, not guix home
@@ -323,7 +327,7 @@
                    ("xdg-desktop-portal/portals.conf" ,(local-file "portals.conf"))
                    ("voxtype/config.toml" ,(local-file "voxtype.toml"))
                    ("dunst/dunstrc" ,(local-file "dunstrc"))
-                   ("foot/foot.ini" ,(local-file (string-append "themes/" current-theme "/foot.ini")))
+                   ("foot/foot.ini" ,(local-file (string-append current-theme-dir "/foot.ini")))
                    ("swaylock/config" ,(local-file "swaylock"))
                    ;; EasyEffects autoload: apply fw13 preset on Framework speakers
                    ("easyeffects/autoload/output/fw13-easy-effects.json" ,(local-file "easyeffects-autoload-output.json"))
@@ -462,5 +466,42 @@
                                                               (or (getenv "DBUS_SESSION_BUS_ADDRESS") ""))
                                                (string-append "NOTIFY_SEND_PATH="
                                                               #$(file-append libnotify "/bin/notify-send")))))
-                               (stop #~(make-kill-destructor))))))
+                               (stop #~(make-kill-destructor)))))
+        ;; Unattended home upgrade (daily at 19:00, after system upgrade at 17:00)
+        (service home-unattended-upgrade-service-type
+                 (home-unattended-upgrade-configuration
+                  (config-file "/home/franz/dotfiles/home/home.scm")
+                  (skip-on-battery? #t)
+                  (warm-packages '("node" "pnpm" "gh" "sed" "ripgrep"
+                                   "claude-code" "rust" "gcc-toolchain"
+                                   "openssl"))
+                  (channels #~
+                            (cons*
+                             (channel
+                              (name 'pantherx)
+                              (branch "master")
+                              (url "https://codeberg.org/gofranz/panther.git")
+                              (introduction
+                               (make-channel-introduction
+                                "54b4056ac571611892c743b65f4c47dc298c49da"
+                                (openpgp-fingerprint
+                                 "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
+                             (channel
+                              (name 'small-guix)
+                              (branch "main")
+                              (url "https://codeberg.org/fishinthecalculator/small-guix.git")
+                              (introduction
+                               (make-channel-introduction
+                                "f260da13666cd41ae3202270784e61e062a3999c"
+                                (openpgp-fingerprint
+                                 "8D10 60B9 6BB8 292E 829B  7249 AED4 1CC1 93B7 01E2"))))
+                             (channel
+                              (name 'guix-android)
+                              (url "https://framagit.org/tyreunom/guix-android.git")
+                              (introduction
+                               (make-channel-introduction
+                                "d031d039b1e5473b030fa0f272f693b469d0ac0e"
+                                (openpgp-fingerprint
+                                 "1EFB 0909 1F17 D28C CBF9  B13A 53D4 57B2 D636 EE82"))))
+                             %default-channels)))))
         %base-home-services)))
