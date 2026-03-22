@@ -2,7 +2,7 @@
   #:use-module (gnu)
   #:use-module (gnu system)
   #:use-module (gnu system setuid)
-  #:use-module (gnu system accounts)           ;; for 'subid-range'
+  #:use-module (gnu system accounts)                 ;; for 'subid-range'
   #:use-module (gnu services linux)
   #:use-module (gnu services base)
   #:use-module (gnu services mcron)
@@ -10,15 +10,13 @@
   #:use-module (gnu services dbus)
   #:use-module (gnu services xorg)
   #:use-module (gnu services virtualization)
-  #:use-module (gnu services desktop)           ;; gvfs-service-type
+  #:use-module (gnu services desktop)                ;; gvfs-service-type
   #:use-module (gnu services containers)
   #:use-module (gnu services web)
   #:use-module (gnu services security-token)
   #:use-module (gnu services networking)
   #:use-module (gnu services mail)
-  #:use-module (px services unattended-upgrade)
   #:use-module (gnu system pam)
-
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages terminals)
@@ -29,16 +27,18 @@
   #:use-module (gnu packages vim)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages containers)
-  #:use-module (gnu packages security-token)  ;; ccid
-  #:use-module (gnu packages authentication)  ;; yubico-pam, fprintd
+  #:use-module (gnu packages security-token)         ;; ccid
+  #:use-module (gnu packages authentication)         ;; yubico-pam, fprintd
 
-  #:use-module (gnu services authentication)   ;; fprintd-service-type
-  #:use-module (nongnu packages firmware)       ;; fwupd-nonfree
+  #:use-module (gnu services authentication)         ;; fprintd-service-type
+  #:use-module (nongnu packages firmware)            ;; fwupd-nonfree
 
-  #:use-module (px system panther)
-  #:use-module (px services audio)              ;; rtkit-daemon-service-type
-  #:use-module (px packages security-token)     ;; acsccid
-  #:use-module (px packages linux)              ;; bluez 5.83
+  #:use-module (px services unattended-upgrade)
+  #:use-module (px system os)
+  #:use-module (px services audio)                   ;; rtkit-daemon-service-type
+  #:use-module (px packages security-token)          ;; acsccid
+  #:use-module (px packages linux)                   ;; bluez 5.83
+  #:use-module (px services security-token)          ;; nitro, coinkite, ledger udev rules
 
   #:export (%common-os %common-services))
 
@@ -161,6 +161,14 @@ wifi.cloned-mac-address=stable
    (simple-service 'pcscd-polkit polkit-service-type
                    (list pcsc-lite))
 
+   ;; Security token udev rules
+   (simple-service 'custom-udev-rules udev-service-type
+                   (list libu2f-host))
+   (udev-rules-service 'nitro %nitro-key-udev-rule #:groups '("plugdev"))
+   (udev-rules-service 'fido2 libfido2)
+   (udev-rules-service 'yubikey yubikey-personalization)
+   (udev-rules-service 'ledger %ledger-udev-rule)
+
    (service block-facebook-hosts-service-type)
 
    ;; Support for trash, ftp, sftp ... in Thunar
@@ -224,7 +232,7 @@ wifi.cloned-mac-address=stable
                                 (pam-service-auth pam))))
                    pam)))))))
 
-  (modify-services %panther-desktop-services-minimal
+  (modify-services %os-desktop-services-minimal
     ;; Configure elogind for suspend-then-hibernate
     (elogind-service-type config =>
       (elogind-configuration
@@ -267,7 +275,7 @@ wifi.cloned-mac-address=stable
 
 (define %common-os
  (operating-system
-  (inherit %panther-os)
+  (inherit %os-base)
   (host-name "panther")
   (timezone "Europe/Lisbon")
   (locale "en_US.utf8")
@@ -308,9 +316,12 @@ wifi.cloned-mac-address=stable
     xsettingsd      ;; xwayland, java
     gvfs            ;; for thunar to show trash, removable media and so on
     udiskie         ;; auto-mounts
+    pam-u2f         ;; U2F/FIDO2 PAM module
+    libu2f-host     ;; U2F host library
+    libu2f-server   ;; U2F server library
     yubico-pam      ;; yubikey challenge-response for sudo
     fprintd         ;; fingerprint reader
-    %panther-base-packages))
+    %os-base-packages))
 
   (services
    %common-services)))
