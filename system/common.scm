@@ -16,7 +16,7 @@
   #:use-module (gnu services security-token)
   #:use-module (gnu services networking)
   #:use-module (gnu services mail)
-  #:use-module (gnu services admin)
+  #:use-module (px services unattended-upgrade)
   #:use-module (gnu system pam)
 
   #:use-module (gnu packages emacs)
@@ -119,7 +119,9 @@ wifi.cloned-mac-address=stable
 
    (service unattended-upgrade-service-type
             (unattended-upgrade-configuration
-             (schedule "0 12 * * *")
+             (schedule "0 17 * * *")
+             (system-load-paths '("/home/franz/dotfiles/system"))
+             (skip-on-battery? #t)
              (channels #~
                        (cons*
                         (channel
@@ -133,6 +135,7 @@ wifi.cloned-mac-address=stable
                             "A36A D41E ECC7 A871 1003  5D24 524F EB1A 9D33 C9CB"))))
                         (channel
                          (name 'small-guix)
+                         (branch "main")
                          (url "https://codeberg.org/fishinthecalculator/small-guix.git")
                          (introduction
                           (make-channel-introduction

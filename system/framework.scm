@@ -29,7 +29,10 @@
          "amd_pstate=active"                      ;; AMD Ryzen EPP power management
          "pcie_aspm.policy=powersave"             ;; PCIe power saving (no L1 substates)
          "mt7921e.disable_aspm=Y"                 ;; Disable ASPM for WiFi (MT7922 wake bug)
-         "amdgpu.ppfeaturemask=0xfffd7fff"        ;; GPU power features (overdrive disabled)
+         "amdgpu.ppfeaturemask=0xfff53fff"        ;; Default minus GFXOFF and stutter (stability)
+         "amdgpu.dcdebugmask=0x10"                ;; Disable PSR (Panel Self Refresh freeze fix)
+         "amdgpu.gpu_recovery=1"                  ;; Enable GPU reset after hang
+         "amdgpu.cwsr_enable=0"                   ;; Disable CWSR (MES hang fix for gfx11/6.18.x)
          "amdgpu.abmlevel=3"                      ;; Adaptive backlight management
          "nmi_watchdog=0"                         ;; Disable NMI watchdog for power saving
          "modprobe.blacklist=hid_sensor_hub"
