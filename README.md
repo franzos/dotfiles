@@ -114,6 +114,17 @@ Generate challenge file (once, with any key):
 guix shell yubico-pam -- ykpamcfg -2 -v
 ```
 
+### Firmware Update (Framework)
+
+Via LVFS using fwupd (capsule-on-disk):
+
+```bash
+guix shell fwupd -- fwupdmgr get-updates
+guix shell fwupd -- sudo fwupdmgr update
+```
+
+Requires AC power. Stages a UEFI capsule to `/boot/efi/EFI/UpdateCapsule/` and flashes on next reboot.
+
 ### Hardware-specific
 - **Framework**: AMD GPU, fw-fanctrl
 - **Thinkpad**: Intel i915, SSH server, backlight udev rules

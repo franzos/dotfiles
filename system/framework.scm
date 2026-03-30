@@ -17,6 +17,7 @@
  (inherit %common-os)
  (host-name "framework")
  
+ (kernel linux-6.19)
  (initrd microcode-initrd)
  (firmware (list linux-firmware
                  amdgpu-firmware
@@ -28,12 +29,11 @@
          "resume_offset=317310976"                ;; Swap file offset for hibernation
          "amd_pstate=active"                      ;; AMD Ryzen EPP power management
          "pcie_aspm.policy=powersave"             ;; PCIe power saving (no L1 substates)
-         "mt7921e.disable_aspm=Y"                 ;; Disable ASPM for WiFi (MT7922 wake bug)
-         "amdgpu.ppfeaturemask=0xfff53fff"        ;; Default minus GFXOFF and stutter (stability)
-         "amdgpu.dcdebugmask=0x10"                ;; Disable PSR (Panel Self Refresh freeze fix)
+         "amdgpu.ppfeaturemask=0xfff5bfff"        ;; Default minus stutter (GFXOFF re-enabled for s2idle)
+         "amdgpu.dcdebugmask=0x12"                ;; Disable PSR + memory stutter (MES hang fix)
          "amdgpu.gpu_recovery=1"                  ;; Enable GPU reset after hang
          "amdgpu.cwsr_enable=0"                   ;; Disable CWSR (MES hang fix for gfx11/6.18.x)
-         "amdgpu.abmlevel=3"                      ;; Adaptive backlight management
+         "amdgpu.noretry=0"                       ;; Allow GPU retry on fault (MES recovery)
          "nmi_watchdog=0"                         ;; Disable NMI watchdog for power saving
          "modprobe.blacklist=hid_sensor_hub"
          "cfg80211.ieee80211_regdom=PT"           ;; WiFi regulatory domain for Portugal
