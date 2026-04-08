@@ -2,7 +2,7 @@
 Name=Google Chrome HW
 Comment=Web Browser with Hardware Acceleration
 GenericName=Web Browser
-Exec=google-chrome --enable-features=VaapiIgnoreDriverChecks,Vulkan,DefaultANGLEVulkan,VulkanFromANGLE,AcceleratedVideoEncoder,UseMultiPlaneFormatForHardwareVideo
+Exec=google-chrome --enable-features=VaapiIgnoreDriverChecks,Vulkan,DefaultANGLEVulkan,VulkanFromANGLE,UseMultiPlaneFormatForHardwareVideo
 Icon=google-chrome
 Type=Application
 StartupNotify=true
