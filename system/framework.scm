@@ -11,7 +11,7 @@
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd)
-  #:use-module (small-guix services mullvad)) ;; mullvad-daemon-service-type
+  #:use-module (px services networking))      ;; mullvad-daemon-service-type
 
 (operating-system
  (inherit %common-os)
