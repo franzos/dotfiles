@@ -50,7 +50,8 @@ To add a new theme, create `home/themes/<name>/` with:
 - **Rootless Podman** - Container runtime
 - **Mullvad VPN** - VPN service
 - **broot** - File navigator with multi-scheme theming
-- **Unattended upgrades** - Daily at 12:00 (pantherx + small-guix channels)
+- **Unattended upgrades** - Daily at 12:00 (pantherx channel)
+- **Chrony (NTS)** - Authenticated time sync (RFC 8915), replaces default ntpd
 - **LUKS encryption** - Full disk encryption
 - **TLP** - Power management with custom AC/battery profiles
 - **ZRAM** - Compressed swap (8G thinkpad, 24G framework)

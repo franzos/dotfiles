@@ -39,6 +39,7 @@
   #:use-module (px services unattended-upgrade)
   #:use-module (px system os)
   #:use-module (px services audio)                   ;; rtkit-daemon-service-type
+  #:use-module (px services ntp)                     ;; chrony-service-type (NTS)
   #:use-module (px packages security-token)          ;; acsccid
   #:use-module (px packages linux)                   ;; bluez 5.83
   #:use-module (px services security-token)          ;; nitro, coinkite, ledger udev rules
@@ -227,6 +228,10 @@ disk_error_action = syslog
           (ipv4-rules %iptables-ipv4-rules)
           (ipv6-rules %iptables-ipv6-rules)))
 
+   ;; Chrony with NTS (RFC 8915) — authenticated time sync.
+   ;; Replaces the default ntpd from %desktop-services
+   (service chrony-service-type)
+
    (service rootless-podman-service-type
             (rootless-podman-configuration
              (subgids
@@ -269,6 +274,8 @@ disk_error_action = syslog
                    pam)))))))
 
   (modify-services %os-desktop-services-minimal
+    (delete ntp-service-type)
+
     ;; Configure elogind for suspend-then-hibernate
     (elogind-service-type config =>
       (elogind-configuration

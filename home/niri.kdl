@@ -66,7 +66,6 @@ screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 // Startup applications
 spawn-at-startup "swaybg" "-o" "*" "-i" "/home/franz/dotfiles/home/wallpaper/horsehead-nebula.jpg" "-m" "fill"
-spawn-at-startup "wl-paste" "--watch" "clipman" "store" "--no-persist"
 spawn-at-startup "dunst"
 spawn-at-startup "udiskie"
 spawn-at-startup "lxqt-policykit-agent"
