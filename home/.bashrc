@@ -26,6 +26,14 @@ then
 else
     PS1='\u@\h \w\$ '
 fi
+
+# History: in-memory only, never written to disk
+HISTFILE=/dev/null
+HISTSIZE=10000
+HISTFILESIZE=0
+HISTCONTROL=ignoreboth:erasedups
+HISTIGNORE=' *:ls:ll:cd:exit:clear'
+
 alias ls='ls -p --color=auto'
 alias ll='ls -l'
 alias grep='grep --color=auto'

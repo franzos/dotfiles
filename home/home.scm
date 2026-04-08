@@ -379,7 +379,13 @@
                           ;; GPG TTY for pinentry
                           ("GPG_TTY" . "$(tty)")
                           ;; Claude Code thinking budget
-                          ("MAX_THINKING_TOKENS" . "63999")))
+                          ("MAX_THINKING_TOKENS" . "63999")
+                          ;; Suppress history files for tools that honor these
+                          ("LESSHISTFILE" . "/dev/null")
+                          ("NODE_REPL_HISTORY" . "")
+                          ("SQLITE_HISTORY" . "/dev/null")
+                          ("PSQL_HISTORY" . "/dev/null")
+                          ("MYSQL_HISTFILE" . "/dev/null")))
         (simple-service 'variant-packages-service
          home-channels-service-type
           (cons*
