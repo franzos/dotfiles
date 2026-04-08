@@ -274,7 +274,7 @@
                              ("ccs" . "guix shell node pnpm gh sed ripgrep claude-code -- claude")
                              ("ccss" . "guix shell node pnpm gh sed ripgrep claude-code -- claude --dangerously-skip-permissions")
                              ("ccssj" . "guix shell --container --expose=$HOME/.gitconfig=$HOME/.gitconfig --expose=$HOME/.config/gh=$HOME/.config/gh --share=$HOME/.claude=$HOME/.claude --share=$HOME/.claude.json=$HOME/.claude.json --share=$HOME/.config/claude=$HOME/.config/claude --share=$HOME/.cache/pnpm=$HOME/.cache/pnpm --share=$HOME/.local/share/pnpm=$HOME/.local/share/pnpm --preserve='^COLORTERM$' --share=$PWD=$PWD --network coreutils bash grep sed gawk git node pnpm gh dunst ripgrep claude-code nss-certs -- claude --dangerously-skip-permissions")
-                             ("pms" . "podman system service --time=0 unix:///tmp/podman.sock")))
+                             ("pms" . "podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock")))
                   (bashrc (list (local-file
                                  ".bashrc"
                                  "bashrc")))
