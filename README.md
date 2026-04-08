@@ -127,7 +127,17 @@ guix shell fwupd -- sudo fwupdmgr update
 Requires AC power. Stages a UEFI capsule to `/boot/efi/EFI/UpdateCapsule/` and flashes on next reboot.
 
 ### Hardware-specific
-- **Framework**: AMD GPU, fw-fanctrl
+- **Framework**: AMD GPU, fw-fanctrl, USBGuard (device authorization)
 - **Thinkpad**: Intel i915, SSH server, backlight udev rules
+
+#### USBGuard (Framework)
+
+```bash
+usbguard list-devices          # see what's plugged in
+usbguard list-rules            # active policy
+sudo tail -f /var/log/usbguard/usbguard-audit.log
+```
+
+`wheel` group can run `usbguard` without sudo.
 
 Audio: I'm using Nothing Ear (Bluetooth) for crystal clear music and video calls - works perfectly.

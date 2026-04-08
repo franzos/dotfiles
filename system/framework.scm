@@ -11,7 +11,8 @@
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd)
-  #:use-module (px services networking))      ;; mullvad-daemon-service-type
+  #:use-module (px services networking)       ;; mullvad-daemon-service-type
+  #:use-module (px services usbguard))         ;; usbguard-service-type
 
 (operating-system
  (inherit %common-os)
@@ -125,4 +126,19 @@
                                      "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4ee7\", MODE=\"0660\", GROUP=\"plugdev\"\n"))))
 
    (service mullvad-daemon-service-type)
+
+   ;; USBGuard — USB device authorization.
+   ;;
+   ;; Trial mode: 'implicit-policy-target is 'allow, so any device that
+   ;; doesn't match a rule falls through to "allow" instead of being
+   ;; blocked.
+   (service usbguard-service-type
+            (usbguard-configuration
+             (implicit-policy-target 'allow)     ;; TRIAL: flip to 'block later
+             (present-device-policy 'apply-policy)
+             (inserted-device-policy 'apply-policy)
+             (authorized-default 'all)           ;; no unauthorized window during trial
+             (device-rules-with-port? #f)        ;; Yubikey works in any port
+             (ipc-allowed-groups '("wheel"))))   ;; run `usbguard` CLI without sudo
+
    %common-services)))
