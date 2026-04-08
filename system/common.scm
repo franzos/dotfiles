@@ -16,7 +16,10 @@
   #:use-module (gnu services security-token)
   #:use-module (gnu services networking)
   #:use-module (gnu services mail)
+  #:use-module (gnu services auditd)
+  #:use-module (gnu services shepherd)
   #:use-module (gnu system pam)
+  #:use-module (gnu packages admin)                  ;; audit
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages terminals)
@@ -78,6 +81,16 @@ wifi.scan-rand-mac-address=yes
 [connection]
 wifi.powersave=2
 wifi.cloned-mac-address=stable
+"))
+
+(define %auditd-rules-file
+  (plain-file "audit.rules"
+    "-w /home/franz/.ssh -p rwa -k sensitive-files
+-w /home/franz/.aws -p rwa -k sensitive-files
+-w /home/franz/.gnupg -p rwa -k sensitive-files
+-w /home/franz/.config/gh -p rwa -k sensitive-files
+-w /home/franz/.config/syncthing -p rwa -k sensitive-files
+-w /home/franz/.local/share/keyrings -p rwa -k sensitive-files
 "))
 
 (define %common-services
@@ -159,6 +172,38 @@ wifi.cloned-mac-address=stable
    (udev-rules-service 'fido2 libfido2)
    (udev-rules-service 'yubikey yubikey-personalization)
    (udev-rules-service 'ledger %ledger-udev-rule)
+
+   ;; Audit sensitive file access (query: ausearch -k sensitive-files)
+   (service auditd-service-type
+            (auditd-configuration
+             (configuration-directory
+              (computed-file "auditd"
+               #~(begin
+                   (mkdir #$output)
+                   (copy-file #$(plain-file "auditd.conf"
+                                 "log_file = /var/log/audit.log
+log_format = ENRICHED
+freq = 1
+max_log_file = 50
+max_log_file_action = ROTATE
+num_logs = 3
+space_left = 5%
+space_left_action = syslog
+admin_space_left_action = ignore
+disk_full_action = ignore
+disk_error_action = syslog
+")
+                              (string-append #$output "/auditd.conf")))))))
+   ;; auditd does not load rules itself; auditctl must be run after daemon starts
+   (simple-service 'audit-rules shepherd-root-service-type
+     (list (shepherd-service
+            (provision '(audit-rules))
+            (requirement '(auditd))
+            (one-shot? #t)
+            (start #~(lambda _
+                       (zero? (system* (string-append #$audit "/sbin/auditctl")
+                                       "-R" #$%auditd-rules-file))))
+            (documentation "Load audit rules into the kernel."))))
 
    (service block-facebook-hosts-service-type)
 
