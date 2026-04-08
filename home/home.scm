@@ -190,6 +190,7 @@
          "htop"
          "unzip"
          "git"
+         "git:credential-libsecret"
          "git:send-email"
          "rsync"
          ; "ripgrep"                   ;; better grep

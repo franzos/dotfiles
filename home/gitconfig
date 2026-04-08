@@ -9,7 +9,7 @@
 [init]
 	defaultBranch = master
 [credential]
-	helper = store
+	helper = libsecret
 [sendemail]
 	sendmailcmd = msmtp -a gofranz.com
 	annotate = yes
