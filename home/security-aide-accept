@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# security-aide-accept — accept the current filesystem state as the new
+
+set -euo pipefail
+
+CONF="${AIDE_CONF:-$HOME/.config/aide/aide.conf}"
+STATE="$HOME/.local/state/aide"
+DB="$STATE/aide.db"
+NEWDB="$STATE/aide.db.new"
+LOG="$HOME/.local/var/log/security-aide.log"
+
+mkdir -p "$STATE" "$(dirname "$LOG")"
+
+log() { printf '[%s] %s\n' "$(date -Iseconds)" "$*" >> "$LOG"; }
+
+if [[ ! -f "$CONF" ]]; then
+    echo "config not found: $CONF" >&2
+    exit 1
+fi
+
+echo "Building new AIDE baseline (this can take a minute)..."
+aide --update --config="$CONF" < /dev/null > /dev/null
+
+if [[ ! -f "$NEWDB" ]]; then
+    echo "ERROR: aide --update did not produce $NEWDB" >&2
+    exit 1
+fi
+
+mv "$NEWDB" "$DB"
+
+git -C "$STATE" add -A
+if git -C "$STATE" diff --cached --quiet; then
+    echo "No baseline changes to commit."
+    log "accept: nothing to commit"
+    exit 0
+fi
+
+msg="accept: baseline updated $(date -Iseconds) on $(hostname)"
+git -C "$STATE" commit -q -m "$msg"
+log "$msg"
+echo "New baseline committed."

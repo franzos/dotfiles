@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Hibernate
+Comment=Hibernate the system
+Exec=loginctl hibernate
+Icon=system-suspend-hibernate
+Terminal=false
+Type=Application
+Categories=System;

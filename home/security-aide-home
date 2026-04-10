@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# security-aide-home — daily AIDE check for user-scope paths
+#
+# Runs AIDE against ~/.config/aide/aide.conf, commits the DB to a local git
+# repo for tamper-evidence, mails a diff if anything changed.
+
+set -euo pipefail
+
+CONF="${AIDE_CONF:-$HOME/.config/aide/aide.conf}"
+STATE="$HOME/.local/state/aide"
+DB="$STATE/aide.db"
+NEWDB="$STATE/aide.db.new"
+LOG_DIR="$HOME/.local/var/log"
+LOG="$LOG_DIR/security-aide.log"
+
+MAIL_TO="mail@gofranz.com"
+MAIL_FROM="mail@gofranz.com"
+MAIL_ACCOUNT="gofranz.com"
+
+mkdir -p "$STATE" "$LOG_DIR"
+
+log() {
+    printf '[%s] %s\n' "$(date -Iseconds)" "$*" >> "$LOG"
+}
+
+host=$(hostname)
+
+if [[ ! -f "$CONF" ]]; then
+    log "ERROR: config $CONF not found"
+    exit 1
+fi
+
+# Ensure git repo exists in state dir
+if [[ ! -d "$STATE/.git" ]]; then
+    git -C "$STATE" init -q -b main
+    git -C "$STATE" config user.name  "security-aide-home"
+    git -C "$STATE" config user.email "mail@gofranz.com"
+    log "initialized git repo at $STATE"
+fi
+
+# -----------------------------------------------------------------------------
+# First run: build baseline
+# -----------------------------------------------------------------------------
+if [[ ! -f "$DB" ]]; then
+    log "no baseline found — initializing"
+    aide --init --config="$CONF" < /dev/null >> "$LOG" 2>&1
+    if [[ ! -f "$NEWDB" ]]; then
+        log "ERROR: aide --init did not produce $NEWDB"
+        exit 1
+    fi
+    mv "$NEWDB" "$DB"
+    git -C "$STATE" add -A
+    git -C "$STATE" commit -q -m "init: baseline $(date -Iseconds) on $host"
+    log "baseline committed"
+    exit 0
+fi
+
+# -----------------------------------------------------------------------------
+# Check run
+# -----------------------------------------------------------------------------
+log "starting aide check"
+TMPOUT=$(mktemp)
+trap 'rm -f "$TMPOUT"' EXIT
+
+set +e
+aide --check --config="$CONF" < /dev/null > "$TMPOUT" 2>&1
+rc=$?
+set -e
+
+# AIDE --check exit codes:
+#   0          = no differences
+#   1          = new files detected
+#   2          = removed files detected
+#   4          = changed files detected
+#   1..7       = bitwise combinations of the above
+#   >=8        = error conditions (14=write err, 15=invalid arg, 18=IO err, ...)
+if [[ $rc -eq 0 ]]; then
+    log "clean"
+    exit 0
+fi
+
+if [[ $rc -ge 8 ]]; then
+    log "ERROR: aide --check returned $rc"
+    if {
+        printf 'To: %s\n' "$MAIL_TO"
+        printf 'From: %s\n' "$MAIL_FROM"
+        printf 'Subject: [aide] %s: ERROR rc=%s\n' "$host" "$rc"
+        printf 'Content-Type: text/plain; charset=utf-8\n'
+        printf '\n'
+        cat "$TMPOUT"
+    } | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
+        :
+    else
+        log "FAILED to mail error report"
+    fi
+    exit 1
+fi
+
+# Derive what kinds of changes occurred from AIDE's exit-code bitmask:
+#   bit 0 (1) = new files
+#   bit 1 (2) = removed files
+#   bit 2 (4) = changed files
+parts=()
+if (( rc & 1 )); then parts+=("added"); fi
+if (( rc & 2 )); then parts+=("removed"); fi
+if (( rc & 4 )); then parts+=("changed"); fi
+desc=$(IFS='/'; echo "${parts[*]}")
+
+# Log full diff for audit trail
+{
+    printf '=== %s rc=%s kinds=%s ===\n' "$(date -Iseconds)" "$rc" "$desc"
+    cat "$TMPOUT"
+    printf '\n'
+} >> "$LOG"
+
+# Mail the diff. IMPORTANT: the baseline is NOT auto-updated. After reviewing
+# this email and confirming the changes are legitimate, run `security-aide-accept`
+# to bake the current state in as the new baseline. Until you do, every subsequent
+# run will re-report the same diff.
+if {
+    printf 'To: %s\n' "$MAIL_TO"
+    printf 'From: %s\n' "$MAIL_FROM"
+    printf 'Subject: [aide] %s: %s on %s\n' "$host" "$desc" "$(date -I)"
+    printf 'Content-Type: text/plain; charset=utf-8\n'
+    printf '\n'
+    printf 'AIDE detected filesystem changes on %s.\n\n' "$host"
+    printf '  !! The baseline has NOT been updated. !!\n\n'
+    printf 'Review the diff below. If every change is legitimate (you edited a\n'
+    printf 'shell rc, added an SSH key, installed a tool in ~/.local/bin, etc.),\n'
+    printf 'accept the new baseline with:\n\n'
+    printf '    security-aide-accept\n\n'
+    printf 'Until you run that, this same email will be resent daily.\n'
+    printf 'If anything in the diff looks unfamiliar, investigate before accepting.\n\n'
+    printf '%s\n' '--- diff ---'
+    cat "$TMPOUT"
+} | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
+    log "mailed diff ($desc)"
+else
+    log "FAILED to mail diff (see errors above — keyring locked? account wrong?)"
+fi
+
+# Do NOT auto-update the baseline. User must explicitly accept.
+exit 0

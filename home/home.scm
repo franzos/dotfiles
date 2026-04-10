@@ -41,6 +41,28 @@
          "pimsync sync"
          #:user "franz"))
 
+;; Security monitoring jobs — see ~/dotfiles/home/security-* scripts.
+;; All three run under the user; msmtp uses secret-tool, so they only
+;; deliver mail while the keyring is unlocked (i.e. when logged in).
+;; Schedule for times when Franz is typically logged in, not 03:00.
+(define mcron-job-security-aide
+  ;; Daily at 09:00
+  #~(job "0 9 * * *"
+         "/home/franz/.local/bin/security-aide-home"
+         #:user "franz"))
+
+(define mcron-job-security-yara
+  ;; Daily at 09:15
+  #~(job "15 9 * * *"
+         "/home/franz/.local/bin/security-yara-recent"
+         #:user "franz"))
+
+(define mcron-job-security-lynis
+  ;; Mondays at 09:30
+  #~(job "30 9 * * 1"
+         "/home/franz/.local/bin/security-lynis-weekly"
+         #:user "franz"))
+
 
 ;; Darkman theme switching scripts - installed to profile/share/ for darkman 2.3+
 (define darkman-scripts
@@ -85,7 +107,7 @@
          ; "calibre"                  ;; E-Books
          "qalculate-gtk"            ;; calculator
          "mousepad"                 ;; text editor
-         "logseq"
+         ;; "logseq"
          "google-chrome-stable"
          "librewolf"
          "libreoffice"
@@ -129,6 +151,7 @@
          "keychain"
          "wlsunset"                  ;; Night light
          "bemenu"
+         "networkmanager-dmenu"      ;; wifi/vpn picker (waybar network on-click)
          "slurp"                     ;; screen area selection
          "blueman"
          "waybar"                    ;; status bar
@@ -141,7 +164,6 @@
          "wl-clipboard"
          ; "wtype"                     ;; typing backend for voxtype
          ; "voxtype-vulkan"            ;; push-to-talk voice-to-text
-         "clipman"
          "grim"                      ;; screenshot editing
 	     "dmenu"
 	     "j4-dmenu-desktop"          ;; flatpak integration
@@ -255,6 +277,11 @@
          "bluetuith"                 ;; Bluetooth TUI
          "direnv"
 
+         ;; Security monitoring (see security-* scripts + aide.conf)
+         "aide"                      ;; file integrity baseline
+         "yara"                      ;; pattern matching on recent files
+         "lynis"                     ;; weekly user-context audit
+
          ;;Zed
          "zed"
          "wakatime-cli"
@@ -271,10 +298,11 @@
                   (aliases '(("grep" . "grep --color=auto")
                              ("ll" . "ls -l")
                              ("ls" . "ls -p --color=auto")
-                             ("ccs" . "guix shell node pnpm gh sed ripgrep claude-code -- claude")
-                             ("ccss" . "guix shell node pnpm gh sed ripgrep claude-code -- claude --dangerously-skip-permissions")
-                             ("ccssj" . "guix shell --container --expose=$HOME/.gitconfig=$HOME/.gitconfig --expose=$HOME/.config/gh=$HOME/.config/gh --share=$HOME/.claude=$HOME/.claude --share=$HOME/.claude.json=$HOME/.claude.json --share=$HOME/.config/claude=$HOME/.config/claude --share=$HOME/.cache/pnpm=$HOME/.cache/pnpm --share=$HOME/.local/share/pnpm=$HOME/.local/share/pnpm --preserve='^COLORTERM$' --share=$PWD=$PWD --network coreutils bash grep sed gawk git node pnpm gh dunst ripgrep claude-code nss-certs -- claude --dangerously-skip-permissions")
-                             ("pms" . "podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock")))
+                             ("ccs" . "guix shell -m $HOME/.config/claude-container/manifest.scm -- claude")
+                             ("ccss" . "guix shell -m $HOME/.config/claude-container/manifest.scm -- claude --dangerously-skip-permissions")
+                             ("pms" . "podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock")
+                             ("freshclam" . "mkdir -p $HOME/.local/share/clamav && guix shell clamav -- freshclam --datadir=$HOME/.local/share/clamav --config-file=$XDG_CONFIG_HOME/clamav/freshclam.conf")
+                             ("clamscan" . "guix shell clamav -- clamscan --database=$HOME/.local/share/clamav")))
                   (bashrc (list (local-file
                                  ".bashrc"
                                  "bashrc")))
@@ -284,13 +312,26 @@
         (service home-files-service-type
                  `((".gitconfig" ,(local-file "gitconfig"))
                    (".gtkrc-2.0" ,(local-file "gtkrc-2.0"))
-                   ;; Bluetooth profile management scripts
+                   ;; Claude container: manifest with SSL search paths, gitconfig
+                   (".config/claude-container/manifest.scm"
+                    ,(local-file "claude-container-manifest.scm"))
+                   (".config/claude-container/gitconfig"
+                    ,(plain-file "claude-container-gitconfig"
+                       "[include]\n\tpath = ~/.gitconfig\n[credential]\n\thelper =\n\thelper = !gh auth git-credential\n[url \"https://github.com/\"]\n\tinsteadOf = git@github.com:\n"))
+                   (".local/bin/docker" ,(local-file "docker" #:recursive? #t))
                    (".local/bin/bt-toggle-profile" ,(local-file "bt-toggle-profile" #:recursive? #t))
                    (".local/bin/bt-profile-status" ,(local-file "bt-profile-status" #:recursive? #t))
                    (".local/bin/power-profile-status" ,(local-file "power-profile-status" #:recursive? #t))
                    (".local/bin/power-profile-toggle" ,(local-file "power-profile-toggle" #:recursive? #t))
+                   ;; Security monitoring scripts (scheduled via mcron below)
+                   (".local/bin/security-aide-home" ,(local-file "security-aide-home" #:recursive? #t))
+                   (".local/bin/security-aide-accept" ,(local-file "security-aide-accept" #:recursive? #t))
+                   (".local/bin/security-yara-recent" ,(local-file "security-yara-recent" #:recursive? #t))
+                   (".local/bin/security-lynis-weekly" ,(local-file "security-lynis-weekly" #:recursive? #t))
                    (".local/share/applications/lock.desktop" ,(local-file
                                                                "apps/lock.desktop"))
+                   (".local/share/applications/hibernate.desktop" ,(local-file
+                                                                    "apps/hibernate.desktop"))
                    (".local/share/applications/vscode.desktop" ,(local-file
                                                                  "apps/vscode.desktop"))
                    (".local/share/applications/vscode_go.desktop" ,(local-file
@@ -318,6 +359,7 @@
                    ("niri/colors.kdl" ,(local-file (string-append current-theme-dir "/niri-colors.kdl")))
                    ("waybar/config" ,(local-file "waybar"))
                    ("waybar/config-niri" ,(local-file "waybar-niri"))
+                   ("networkmanager-dmenu/config.ini" ,(local-file "networkmanager-dmenu/config.ini"))
                    ;; waybar/style.css managed by darkman scripts, not guix home
                    ("kanshi/config" ,(local-file "kanshi"))
                    ("xfce4/xfconf/xfce-perchannel-xml/thunar.xml" ,(local-file "thunar.xml"))
@@ -345,7 +387,11 @@
                    ("broot/skins/native-16.hjson" ,(local-file "broot/skins/native-16.hjson"))
                    ("broot/skins/solarized-dark.hjson" ,(local-file "broot/skins/solarized-dark.hjson"))
                    ("broot/skins/solarized-light.hjson" ,(local-file "broot/skins/solarized-light.hjson"))
-                   ("broot/skins/white.hjson" ,(local-file "broot/skins/white.hjson"))))
+                   ("broot/skins/white.hjson" ,(local-file "broot/skins/white.hjson"))
+                   ;; AIDE config used by security-aide-home
+                   ("aide/aide.conf" ,(local-file "aide.conf"))
+                   ;; ClamAV freshclam config (DB stored in ~/.local/share/clamav)
+                   ("clamav/freshclam.conf" ,(local-file "freshclam.conf"))))
         (simple-service 'env-vars home-environment-variables-service-type
                         `(("QT_QPA_PLATFORM" . "wayland;xcb")
                           ("SDL_VIDEODRIVER" . "wayland")
@@ -418,7 +464,10 @@
         (service home-mcron-service-type
          (home-mcron-configuration
           (jobs (list
-                 mcron-job-pimsync))))
+                 mcron-job-pimsync
+                 mcron-job-security-aide
+                 mcron-job-security-yara
+                 mcron-job-security-lynis))))
         (service home-syncthing-service-type)
         (service home-dbus-service-type)
         (service home-pipewire-service-type
@@ -427,7 +476,8 @@
                   (wireplumber wireplumber)))
         ;; I want to manage SSH keys manually for now
         ;; (service home-openssh-service-type)
-        (service home-ssh-agent-service-type)
+        ;; SSH agent managed by keychain in .bashrc
+        ;; (service home-ssh-agent-service-type)
         (service home-gpg-agent-service-type
                  (home-gpg-agent-configuration
                   (pinentry-program
@@ -457,10 +507,11 @@
                                                (string-append "NOTIFY_SEND_PATH="
                                                               #$(file-append libnotify "/bin/notify-send")))))
                                (stop #~(make-kill-destructor)))))
-        ;; Unattended home upgrade (daily at 19:00, after system upgrade at 17:00)
+        ;; Unattended home upgrade (Saturday 21:00, after system upgrade at 17:00)
         (service home-unattended-upgrade-service-type
                  (home-unattended-upgrade-configuration
                   (config-file "/home/franz/dotfiles/home/home.scm")
+                  (schedule "0 21 * * 6")
                   (skip-on-battery? #t)
                   (warm-packages '("node" "pnpm" "gh" "sed" "ripgrep"
                                    "claude-code" "rust" "gcc-toolchain"

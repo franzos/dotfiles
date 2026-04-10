@@ -1,0 +1,4 @@
+#!/bin/sh
+# docker → podman shim
+# Lets tools that hard-code `docker` (e.g. Zed dev containers) talk to podman.
+exec podman "$@"

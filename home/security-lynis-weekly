@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# security-lynis-weekly — weekly user-context Lynis audit
+
+set -euo pipefail
+
+STATE="$HOME/.local/state/security-lynis"
+CUR="$STATE/report.dat"
+PREV="$STATE/report-prev.dat"
+LYNIS_LOGFILE="$STATE/lynis.log"
+LOG_DIR="$HOME/.local/var/log"
+LOG="$LOG_DIR/security-lynis.log"
+
+MAIL_TO="mail@gofranz.com"
+MAIL_FROM="mail@gofranz.com"
+MAIL_ACCOUNT="gofranz.com"
+
+mkdir -p "$STATE" "$LOG_DIR"
+
+log() { printf '[%s] %s\n' "$(date -Iseconds)" "$*" >> "$LOG"; }
+
+host=$(hostname)
+
+log "starting weekly lynis audit"
+
+# Rotate previous report
+if [[ -f "$CUR" ]]; then
+    mv "$CUR" "$PREV"
+fi
+
+# --cronjob      = non-interactive, no pauses, no colors
+# --quick        = skip slow checks we don't care about as non-root
+# --log-file     = avoid default /var/log/lynis.log (which we can't write)
+# --report-file  = machine-readable key=value dump we diff against
+set +e
+lynis audit system \
+    --cronjob \
+    --quick \
+    --log-file "$LYNIS_LOGFILE" \
+    --report-file "$CUR" \
+    < /dev/null > /dev/null 2>&1
+lynis_rc=$?
+set -e
+
+if [[ ! -f "$CUR" ]]; then
+    log "ERROR: lynis produced no report (rc=$lynis_rc)"
+    if {
+        printf 'To: %s\n' "$MAIL_TO"
+        printf 'From: %s\n' "$MAIL_FROM"
+        printf 'Subject: [lynis] %s: ERROR weekly audit failed\n' "$host"
+        printf 'Content-Type: text/plain; charset=utf-8\n'
+        printf '\n'
+        printf 'lynis exit code: %s\n' "$lynis_rc"
+        printf 'See: %s\n' "$LYNIS_LOGFILE"
+    } | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
+        :
+    else
+        log "FAILED to mail error report"
+    fi
+    exit 1
+fi
+
+# Extract interesting fields — warnings, suggestions, hardening index.
+# Lynis report is key[]=value lines; we want the bag of findings.
+extract() {
+    grep -E '^(warning|suggestion)\[\]=' "$1" 2>/dev/null | sort -u || true
+}
+
+index=$(grep -E '^hardening_index=' "$CUR" | cut -d= -f2 || true)
+prev_index=""
+if [[ -f "$PREV" ]]; then
+    prev_index=$(grep -E '^hardening_index=' "$PREV" | cut -d= -f2 || true)
+fi
+
+# grep -c always prints a number, so || true is enough; no :- fallback needed
+nwarn=$(grep -c -E '^warning\[\]=' "$CUR" 2>/dev/null || true)
+nsugg=$(grep -c -E '^suggestion\[\]=' "$CUR" 2>/dev/null || true)
+
+if [[ -f "$PREV" ]]; then
+    diff_body=$(diff -u <(extract "$PREV") <(extract "$CUR") || true)
+    if [[ -z "$diff_body" ]]; then
+        diff_body="(no delta vs last week)"
+    fi
+else
+    diff_body="(first run — no previous report to diff)"
+fi
+
+if {
+    printf 'To: %s\n' "$MAIL_TO"
+    printf 'From: %s\n' "$MAIL_FROM"
+    printf 'Subject: [lynis] %s: weekly audit — index=%s (was %s)\n' \
+        "$host" "${index:-?}" "${prev_index:-first}"
+    printf 'Content-Type: text/plain; charset=utf-8\n'
+    printf '\n'
+    printf 'Host:             %s\n' "$host"
+    printf 'Hardening index:  %s (previous: %s)\n' "${index:-?}" "${prev_index:-first}"
+    printf 'Warnings:         %s\n' "$nwarn"
+    printf 'Suggestions:      %s\n' "$nsugg"
+    printf '\nDelta vs last week (warnings + suggestions):\n'
+    printf '%s\n' "$diff_body"
+} | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
+    log "mailed weekly report (index=${index:-?})"
+else
+    log "FAILED to mail weekly report"
+fi
+
+exit 0

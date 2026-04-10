@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# security-yara-recent — daily YARA scan of recently-modified files in $HOME
+#
+# Only scans files with mtime < 24h, skipping obvious noise (caches, trash,
+# git objects, node_modules bodies, browser profiles). Mails matches if any.
+
+set -euo pipefail
+
+RULES_INDEX="${YARA_RULES:-$HOME/.local/share/yara/rules/index.yar}"
+SCAN_ROOT="$HOME"
+LOG_DIR="$HOME/.local/var/log"
+LOG="$LOG_DIR/security-yara.log"
+
+MAIL_TO="mail@gofranz.com"
+MAIL_FROM="mail@gofranz.com"
+MAIL_ACCOUNT="gofranz.com"
+
+mkdir -p "$LOG_DIR"
+
+log() { printf '[%s] %s\n' "$(date -Iseconds)" "$*" >> "$LOG"; }
+
+host=$(hostname)
+
+if [[ ! -f "$RULES_INDEX" ]]; then
+    log "no YARA rules at $RULES_INDEX — skipping (see README for setup)"
+    exit 0
+fi
+
+log "starting yara scan"
+TMPFILES=$(mktemp)
+TMPMATCHES=$(mktemp)
+trap 'rm -f "$TMPFILES" "$TMPMATCHES"' EXIT
+
+# Gather files modified in the last 24h, skipping chatty/irrelevant paths.
+# Directories listed below are *pruned* (find does not descend into them),
+# which is crucial: a plain `! -path` would still walk into e.g. every
+# node_modules to reject files one-by-one, taking minutes on a real $HOME.
+# -size -50M: skip huge files (YARA chokes, and big blobs are rarely useful)
+find "$SCAN_ROOT" \
+    \( -type d \( \
+            -path "$SCAN_ROOT/.cache" \
+        -o  -path "$SCAN_ROOT/.local/share/Trash" \
+        -o  -path "$SCAN_ROOT/.local/state/aide" \
+        -o  -path "$SCAN_ROOT/.local/var/log" \
+        -o  -name '.git' \
+        -o  -name 'node_modules' \
+        -o  -name 'target' \
+        -o  -path '*/.mozilla/*/Cache*' \
+        -o  -path '*/.mozilla/*/storage' \
+        -o  -path '*/.config/google-chrome/*/Cache' \
+        -o  -path '*/.config/google-chrome/*/Code Cache' \
+        -o  -path '*/.config/google-chrome/*/Service Worker' \
+       \) -prune \) \
+    -o \
+    \( -type f -mtime -1 -size -50M -print0 \) \
+    2>/dev/null > "$TMPFILES" || true
+
+nfiles=$(tr -cd '\0' < "$TMPFILES" | wc -c)
+if [[ $nfiles -eq 0 ]]; then
+    log "no recent files to scan"
+    exit 0
+fi
+
+# -N: do not follow symlinks
+# -w: disable warnings (rule compilation noise)
+xargs -0 -a "$TMPFILES" yara -N -w "$RULES_INDEX" > "$TMPMATCHES" 2>/dev/null || true
+
+if [[ ! -s "$TMPMATCHES" ]]; then
+    log "scanned $nfiles files — clean"
+    exit 0
+fi
+
+matches=$(wc -l < "$TMPMATCHES")
+
+{
+    printf '=== %s scanned=%s matches=%s ===\n' "$(date -Iseconds)" "$nfiles" "$matches"
+    cat "$TMPMATCHES"
+    printf '\n'
+} >> "$LOG"
+
+if {
+    printf 'To: %s\n' "$MAIL_TO"
+    printf 'From: %s\n' "$MAIL_FROM"
+    printf 'Subject: [yara] %s: %s matches on %s\n' "$host" "$matches" "$(date -I)"
+    printf 'Content-Type: text/plain; charset=utf-8\n'
+    printf '\n'
+    printf 'Scanned %s files modified in the last 24h.\n' "$nfiles"
+    printf 'Matches (rule file):\n\n'
+    cat "$TMPMATCHES"
+} | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
+    log "mailed $matches matches"
+else
+    log "FAILED to mail matches (keyring locked?)"
+fi
+
+exit 0

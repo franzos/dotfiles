@@ -66,6 +66,30 @@ function br {
     fi
 }
 
+# Claude Code in a guix container
+ccssj() {
+    local manifests=("-m" "$HOME/.config/claude-container/manifest.scm")
+    if [ -f "$PWD/manifest.scm" ]; then
+        manifests+=("-m" "$PWD/manifest.scm")
+        echo "ccssj: including $PWD/manifest.scm"
+    fi
+    guix shell "${manifests[@]}" --container \
+        --expose="$HOME/.gitconfig=$HOME/.gitconfig" \
+        --expose="$HOME/.config/gh=$HOME/.config/gh" \
+        --expose="$HOME/.config/claude-container/gitconfig=$HOME/.config/claude-container/gitconfig" \
+        --share="$HOME/.claude=$HOME/.claude" \
+        --share="$HOME/.claude.json=$HOME/.claude.json" \
+        --share="$HOME/.config/claude=$HOME/.config/claude" \
+        --share="$HOME/.cache/pnpm=$HOME/.cache/pnpm" \
+        --share="$HOME/.local/share/pnpm=$HOME/.local/share/pnpm" \
+        --preserve='^COLORTERM$' \
+        --share="$PWD=$PWD" \
+        --network \
+        -- env GUIX_CONTAINER=1 \
+        GIT_CONFIG_GLOBAL="$HOME/.config/claude-container/gitconfig" \
+        claude --dangerously-skip-permissions --settings '{"disableAllHooks":true}' "$@"
+}
+
 # envstash tab completion
 source <(COMPLETE=bash envstash)
 

@@ -36,4 +36,7 @@ done < <(inotifywait -m -r -q \
   -e access,modify,open \
   "$HOME/.ssh" \
   "$HOME/.aws" \
-  "$HOME/.gnupg" 2>/dev/null)
+  "$HOME/.gnupg" \
+  "$HOME/.config/gh" \
+  "$HOME/.config/syncthing" \
+  "$HOME/.local/share/keyrings" 2>/dev/null)
