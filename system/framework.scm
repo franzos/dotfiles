@@ -17,7 +17,7 @@
 (operating-system
  (inherit %common-os)
  (host-name "framework")
- 
+
  (kernel linux-6.19)
  (initrd microcode-initrd)
  (firmware (list linux-firmware
@@ -39,18 +39,24 @@
          "modprobe.blacklist=hid_sensor_hub"
          "cfg80211.ieee80211_regdom=PT"           ;; WiFi regulatory domain for Portugal
          ;; Security hardening
+         ;; NOTE: unprivileged user namespaces must stay enabled —
+         ;; guix-daemon runs unprivileged (system/common.scm) and needs
+         ;; them for per-build UID isolation. Don't set
+         ;; kernel.unprivileged_userns_clone=0 or user.max_user_namespaces=0.
          "slab_nomerge"                           ;; Prevent slab merging attacks
          "randomize_kstack_offset=on"             ;; Randomize kernel stack offset
-         "kptr_restrict=2"                        ;; Hide kernel pointers
          "page_alloc.shuffle=1"                   ;; Memory layout randomization
+         "init_on_free=1"                         ;; Zero freed memory (UAF mitigation)
+         "bdev_allow_write_mounted=0"             ;; No raw writes to mounted block devs
+         "proc_mem.force_override=never"          ;; Close /proc/PID/mem force-write
    %default-kernel-arguments))
-  
- (bootloader 
+
+ (bootloader
   (bootloader-configuration
    (bootloader grub-efi-bootloader)
    (targets '("/boot/efi"))))
 
-  (mapped-devices 
+  (mapped-devices
    (list (mapped-device
           (source (uuid
                    "33d48354-afc2-428f-aa2a-0234984a04d8"))

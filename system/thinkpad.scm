@@ -71,10 +71,16 @@ COMMIT
   (cons* "cfg80211.ieee80211_regdom=PT"          ;; WiFi regulatory domain for Portugal
          "snd_hda_intel.dmic_detect=0"
          ;; Security hardening
+         ;; NOTE: unprivileged user namespaces must stay enabled —
+         ;; guix-daemon runs unprivileged (system/common.scm) and needs
+         ;; them for per-build UID isolation. Don't set
+         ;; kernel.unprivileged_userns_clone=0 or user.max_user_namespaces=0.
          "slab_nomerge"                          ;; Prevent slab merging attacks
          "randomize_kstack_offset=on"            ;; Randomize kernel stack offset
-         "kptr_restrict=2"                       ;; Hide kernel pointers
          "page_alloc.shuffle=1"                  ;; Memory layout randomization
+         "init_on_free=1"                        ;; Zero freed memory (UAF mitigation)
+         "bdev_allow_write_mounted=0"            ;; No raw writes to mounted block devs
+         "proc_mem.force_override=never"         ;; Close /proc/PID/mem force-write
    %default-kernel-arguments))
 
  (bootloader

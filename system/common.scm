@@ -133,7 +133,7 @@ wifi.cloned-mac-address=stable
 
    (service unattended-upgrade-service-type
             (unattended-upgrade-configuration
-             (schedule "0 17 * * *")
+             (schedule "0 17 * * 6")
              (system-load-paths '("/home/franz/dotfiles/system"))
              (skip-on-battery? #t)
              (channels #~
@@ -276,13 +276,23 @@ disk_error_action = syslog
   (modify-services %os-desktop-services-minimal
     (delete ntp-service-type)
 
+    ;; Run guix-daemon unprivileged: it executes as the 'guix-daemon'
+    ;; user instead of root, and per-build UID isolation is done via
+    ;; Linux user namespaces (no more guixbuilder1..N pool). Reduces
+    ;; blast radius of a daemon compromise. Requires unprivileged user
+    ;; namespaces to stay enabled — see note in the sysctl block below.
+    (guix-service-type config =>
+                       (guix-configuration
+                        (inherit config)
+                        (privileged? #f)))
+
     ;; Configure elogind for suspend-then-hibernate
     (elogind-service-type config =>
       (elogind-configuration
         (inherit config)
         (handle-power-key 'ignore)
         (handle-lid-switch 'suspend-then-hibernate)
-        (hibernate-delay-seconds 900)))
+        (hibernate-delay-seconds 3600)))
 
     ;; https://stackoverflow.com/questions/76830848/redis-warning-memory-overcommit-must-be-enabled
     (sysctl-service-type config => (sysctl-configuration
@@ -295,11 +305,22 @@ disk_error_action = syslog
                                                ("net.core.default_qdisc" . "fq_codel")
                                                ("net.ipv4.tcp_congestion_control" . "bbr")
                                                ;; Kernel hardening
+                                               ;; Do NOT disable unprivileged user namespaces
+                                               ;; (no kernel.unprivileged_userns_clone=0,
+                                               ;; no user.max_user_namespaces=0): guix-daemon
+                                               ;; runs unprivileged and relies on them for
+                                               ;; per-build UID isolation.
                                                ("kernel.dmesg_restrict" . "1")
                                                ("kernel.unprivileged_bpf_disabled" . "1")
                                                ("kernel.yama.ptrace_scope" . "1")
                                                ("kernel.kexec_load_disabled" . "1")
                                                ("kernel.perf_event_paranoid" . "3")
+                                               ("kernel.kptr_restrict" . "2")
+                                               ("kernel.sysrq" . "0")
+                                               ("kernel.oops_limit" . "100")
+                                               ("kernel.warn_limit" . "100")
+                                               ("dev.tty.ldisc_autoload" . "0")
+                                               ("net.core.bpf_jit_harden" . "2")
                                                ;; Network hardening
                                                ("net.ipv4.conf.all.rp_filter" . "1")
                                                ("net.ipv4.conf.default.rp_filter" . "1")
@@ -309,6 +330,7 @@ disk_error_action = syslog
                                                ("net.ipv6.conf.default.accept_redirects" . "0")
                                                ("net.ipv4.conf.all.send_redirects" . "0")
                                                ("net.ipv4.conf.all.accept_source_route" . "0")
+                                               ("net.ipv4.conf.default.accept_source_route" . "0")
                                                ("net.ipv6.conf.all.accept_source_route" . "0")
                                                ("net.ipv4.tcp_syncookies" . "1")
                                                ("net.ipv4.icmp_echo_ignore_broadcasts" . "1")
