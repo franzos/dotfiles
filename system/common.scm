@@ -80,7 +80,7 @@ COMMIT
 wifi.scan-rand-mac-address=yes
 
 [connection]
-wifi.powersave=2
+wifi.powersave=3
 wifi.cloned-mac-address=stable
 "))
 
@@ -184,7 +184,7 @@ wifi.cloned-mac-address=stable
                    (copy-file #$(plain-file "auditd.conf"
                                  "log_file = /var/log/audit.log
 log_format = ENRICHED
-freq = 1
+freq = 10
 max_log_file = 50
 max_log_file_action = ROTATE
 num_logs = 3
@@ -292,7 +292,7 @@ disk_error_action = syslog
         (inherit config)
         (handle-power-key 'ignore)
         (handle-lid-switch 'suspend-then-hibernate)
-        (hibernate-delay-seconds 3600)))
+        (hibernate-delay-seconds 18000)))
 
     ;; https://stackoverflow.com/questions/76830848/redis-warning-memory-overcommit-must-be-enabled
     (sysctl-service-type config => (sysctl-configuration

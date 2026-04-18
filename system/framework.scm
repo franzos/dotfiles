@@ -28,13 +28,12 @@
  (kernel-arguments
   (cons* "resume=/dev/mapper/cryptroot"           ;; Resume from hibernation
          "resume_offset=317310976"                ;; Swap file offset for hibernation
+         "rtc_cmos.use_acpi_alarm=1"              ;; Fix RTC alarm for suspend-then-hibernate on AMD
          "amd_pstate=active"                      ;; AMD Ryzen EPP power management
          "pcie_aspm.policy=powersave"             ;; PCIe power saving (no L1 substates)
          "amdgpu.ppfeaturemask=0xfff5bfff"        ;; Default minus stutter (GFXOFF re-enabled for s2idle)
-         "amdgpu.dcdebugmask=0x12"                ;; Disable PSR + memory stutter (MES hang fix)
          "amdgpu.gpu_recovery=1"                  ;; Enable GPU reset after hang
-         "amdgpu.cwsr_enable=0"                   ;; Disable CWSR (MES hang fix for gfx11/6.18.x)
-         "amdgpu.noretry=0"                       ;; Allow GPU retry on fault (MES recovery)
+         "snd_hda_intel.power_save=1"             ;; Audio codec sleep after 1s silence
          "nmi_watchdog=0"                         ;; Disable NMI watchdog for power saving
          "modprobe.blacklist=hid_sensor_hub"
          "cfg80211.ieee80211_regdom=PT"           ;; WiFi regulatory domain for Portugal
@@ -46,7 +45,7 @@
          "slab_nomerge"                           ;; Prevent slab merging attacks
          "randomize_kstack_offset=on"             ;; Randomize kernel stack offset
          "page_alloc.shuffle=1"                   ;; Memory layout randomization
-         "init_on_free=1"                         ;; Zero freed memory (UAF mitigation)
+         "init_on_alloc=1"                        ;; Zero allocated memory (UAF mitigation, lower overhead)
          "bdev_allow_write_mounted=0"             ;; No raw writes to mounted block devs
          "proc_mem.force_override=never"          ;; Close /proc/PID/mem force-write
    %default-kernel-arguments))
@@ -116,6 +115,23 @@
                                      "ACTION==\"add\", SUBSYSTEM==\"pci\", "
                                      "ATTR{vendor}==\"0x144d\", "  ;; Samsung
                                      "ATTR{class}==\"0x010802\", "  ;; NVMe controller
+                                     "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
+
+   ;; PCI Runtime PM for WiFi, GPU, and AMD crypto coprocessor
+   (simple-service 'pci-runtime-pm udev-service-type
+                   (list (udev-rule "90-pci-runtime-pm.rules"
+                                    (string-append
+                                     ;; MediaTek MT7921 WiFi
+                                     "ACTION==\"add\", SUBSYSTEM==\"pci\", "
+                                     "ATTR{vendor}==\"0x14c3\", "
+                                     "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"
+                                     ;; AMD GPU (amdgpu)
+                                     "ACTION==\"add\", SUBSYSTEM==\"pci\", "
+                                     "ATTR{vendor}==\"0x1002\", "
+                                     "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"
+                                     ;; AMD CCP (crypto coprocessor)
+                                     "ACTION==\"add\", SUBSYSTEM==\"pci\", "
+                                     "ATTR{vendor}==\"0x1022\", ATTR{device}==\"0x15c7\", "
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
 
    ;; AMD NPU accelerator (amdxdna) — allow render group access
