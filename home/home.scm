@@ -368,7 +368,7 @@
                    ("nvim/lua/core/options.lua" ,(local-file "nvim/lua/core/options.lua"))
                    ("nvim/lua/core/keymaps.lua" ,(local-file "nvim/lua/core/keymaps.lua"))
                    ("xdg-desktop-portal/portals.conf" ,(local-file "portals.conf"))
-                   ("voxtype/config.toml" ,(local-file "voxtype.toml"))
+
                    ("dunst/dunstrc" ,(local-file "dunstrc"))
                    ("foot/foot.ini" ,(local-file (string-append current-theme-dir "/foot.ini")))
                    ("swaylock/config" ,(local-file "swaylock"))
@@ -490,23 +490,6 @@
                   (longitude -9.14)
                   (use-geoclue #f)))
         (service home-podman-healthcheckd-service-type)
-        ;; Monitor access to sensitive directories (SSH, AWS, GPG keys)
-        (simple-service 'sensitive-file-watch
-                        home-shepherd-service-type
-                        (list (shepherd-service
-                               (provision '(sensitive-file-watch))
-                               (documentation "Alert on access to sensitive credential directories")
-                               (start #~(make-forkexec-constructor
-                                         (list #$(file-append bash "/bin/bash")
-                                               #$(local-file "sensitive-file-watch.sh"))
-                                         #:environment-variables
-                                         (list (string-append "HOME=" (getenv "HOME"))
-                                               (string-append "PATH=" (getenv "PATH"))
-                                               (string-append "DBUS_SESSION_BUS_ADDRESS="
-                                                              (or (getenv "DBUS_SESSION_BUS_ADDRESS") ""))
-                                               (string-append "NOTIFY_SEND_PATH="
-                                                              #$(file-append libnotify "/bin/notify-send")))))
-                               (stop #~(make-kill-destructor)))))
         ;; Unattended home upgrade (Saturday 21:00, after system upgrade at 17:00)
         (service home-unattended-upgrade-service-type
                  (home-unattended-upgrade-configuration

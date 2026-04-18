@@ -85,14 +85,11 @@ spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPL
 // Restart portal-gnome after niri's ScreenCast D-Bus interface is ready
 spawn-at-startup "sh" "-c" "while ! busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; do sleep 0.2; done; pkill -f xdg-desktop-portal-gnome"
 
-// Voice-to-text (push-to-talk via Right Alt)
-spawn-at-startup "voxtype"
-
 // XWayland support for X11 applications
 spawn-at-startup "xwayland-satellite"
 
 // Idle and lock configuration
-spawn-at-startup "swayidle" "-w" "timeout" "2400" "swaylock -f -c 000000" "timeout" "3600" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors" "before-sleep" "swaylock -f -c 000000"
+spawn-at-startup "swayidle" "-w" "timeout" "180" "brightnessctl -s set 30%" "resume" "brightnessctl -r" "timeout" "2400" "swaylock -f -c 000000" "timeout" "3600" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors" "before-sleep" "swaylock -f -c 000000"
 
 // GTK settings (managed by darkman, these are static)
 spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "icon-theme" "Yaru"

@@ -4,7 +4,7 @@
     "spacing": 4,
     "modules-left": ["niri/workspaces"],
     "modules-center": ["niri/window"],
-    "modules-right": ["custom/voxtype", "cpu", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "custom/power-profile", "clock", "clock#gmt1", "custom/gpg", "tray"],
+    "modules-right": ["cpu", "pulseaudio", "custom/bt-profile", "bluetooth", "network",  "backlight", "battery", "custom/power-profile", "clock", "clock#gmt1", "custom/gpg", "tray"],
     "niri/workspaces": {
         "format": "{icon}",
         "format-icons": {
@@ -105,15 +105,10 @@
         "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_battery_percentage}%",
         "on-click": "footclient -e bluetuith"
     },
-    "custom/voxtype": {
-        "exec": "voxtype status --follow --format json --icon-theme nerd-font",
-        "return-type": "json",
-        "tooltip": true
-    },
     "custom/bt-profile": {
         "format": "{}",
         "return-type": "json",
-        "interval": 5,
+        "interval": 10,
         "exec": "$HOME/.local/bin/bt-profile-status",
         "on-click": "$HOME/.local/bin/bt-toggle-profile",
         "tooltip": true
@@ -121,7 +116,7 @@
     "custom/power-profile": {
         "format": "{}",
         "return-type": "json",
-        "interval": 5,
+        "interval": 10,
         "exec": "$HOME/.local/bin/power-profile-status",
         "on-click": "$HOME/.local/bin/power-profile-toggle",
         "tooltip": true
