@@ -1,4 +1,4 @@
-;; Read packages from home.scm and query substitutes availability
+;; Read packages from home-common.scm and query substitutes availability
 ;; Run: guile home-weather.scm
 
 (use-modules (ice-9 regex)
@@ -27,7 +27,7 @@
             (not (string-contains package ":")))
           packages))
 
-(define packages (extract-packages "home.scm"))
+(define packages (extract-packages "home-common.scm"))
 (define filtered-packages (filter-packages packages))
 
 (define guix-weather-command
