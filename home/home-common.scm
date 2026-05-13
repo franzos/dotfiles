@@ -32,7 +32,7 @@
 
 ;; Theme configuration
 ;; available: ibm-5151, macos-classic, fleet
-(define current-theme "macos-classic")
+(define current-theme "fleet")
 (define current-theme-dir
   (string-append (dirname (current-filename)) "/themes/" current-theme))
 
@@ -468,6 +468,21 @@
 (define podman-healthcheckd-service
   (service home-podman-healthcheckd-service-type))
 
+;; Extra profile for Zed's node — kept out of the main home profile
+;; (per preference) but refreshed on every `guix home reconfigure`.
+(define zed-node-profile-service
+  (simple-service 'zed-node-profile
+                  home-activation-service-type
+                  #~(let* ((home (getenv "HOME"))
+                           (profile-dir (string-append home "/.guix-extra-profiles/zed-node"))
+                           (profile (string-append profile-dir "/zed-node"))
+                           (manifest #$(plain-file "zed-node-manifest.scm"
+                                                   "(specifications->manifest '(\"node\"))")))
+                      (system* "mkdir" "-p" profile-dir)
+                      (format #t "Updating zed-node profile…~%")
+                      (system* "/run/current-system/profile/bin/guix"
+                               "package" "-p" profile "-m" manifest))))
+
 ;; Unattended home upgrade (Saturday 21:00, after system upgrade at 17:00).
 ;; Host variants call this with their own path so reconfigure picks the
 ;; right file.
@@ -515,6 +530,7 @@
          gpg-agent-service
          darkman-service
          podman-healthcheckd-service
+         zed-node-profile-service
          (unattended-upgrade-for unattended-upgrade-config-file))
    extra-services
    %base-home-services))

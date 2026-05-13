@@ -1,12 +1,12 @@
-/* Fleet Theme - Dark */
+/* Fleet Dark Purple Theme */
 * {
     font-family: "Noto Sans", "FontAwesome", sans-serif;
     font-size: 13px;
 }
 
 window#waybar {
-    background-color: rgba(9, 9, 9, 0.9);
-    border-bottom: 1px solid #3E4147;
+    background-color: rgba(19, 16, 27, 0.65);
+    border-bottom: 1px solid #3E3852;
     color: #E0E1E4;
 }
 
@@ -21,7 +21,7 @@ button {
 }
 
 button:hover {
-    background: rgba(75, 141, 236, 0.25);
+    background: rgba(166, 96, 212, 0.25);
 }
 
 /* Workspaces */
@@ -29,20 +29,20 @@ button:hover {
     padding: 0 8px;
     background-color: transparent;
     color: #E0E1E4;
-    border-right: 1px solid #3E4147;
+    border-right: 1px solid #3E3852;
 }
 
 #workspaces button:first-child {
-    border-left: 1px solid #3E4147;
+    border-left: 1px solid #3E3852;
 }
 
 #workspaces button:hover {
-    background: rgba(75, 141, 236, 0.25);
+    background: rgba(166, 96, 212, 0.25);
 }
 
 #workspaces button.focused,
 #workspaces button.active {
-    background-color: rgba(75, 141, 236, 0.25);
+    background-color: rgba(166, 96, 212, 0.25);
     color: #E0E1E4;
 }
 
@@ -52,7 +52,7 @@ button:hover {
 }
 
 #mode {
-    background-color: rgba(75, 141, 236, 0.25);
+    background-color: rgba(166, 96, 212, 0.25);
     color: #E0E1E4;
     padding: 0 10px;
 }
@@ -83,7 +83,7 @@ button:hover {
 }
 
 #window {
-    color: #898E94;
+    color: #8E8FA2;
     font-weight: 500;
 }
 
@@ -102,8 +102,8 @@ button:hover {
 
 /* Clock */
 #clock {
-    background-color: #18191B;
-    border-left: 1px solid #3E4147;
+    background-color: transparent;
+    border-left: 1px solid #3E3852;
 }
 
 /* Battery states */
@@ -130,7 +130,7 @@ button:hover {
 
 @keyframes blink {
     50% {
-        background-color: #18191B;
+        background-color: #1C1827;
         color: #EB4056;
     }
 }
@@ -166,12 +166,12 @@ button:hover {
 }
 
 #pulseaudio:hover {
-    background-color: rgba(75, 141, 236, 0.25);
+    background-color: rgba(166, 96, 212, 0.25);
 }
 
 #pulseaudio.muted {
-    background-color: #18191B;
-    color: #898E94;
+    background-color: #1C1827;
+    color: #8E8FA2;
 }
 
 #wireplumber {
@@ -179,8 +179,8 @@ button:hover {
 }
 
 #wireplumber.muted {
-    background-color: #18191B;
-    color: #898E94;
+    background-color: #1C1827;
+    color: #8E8FA2;
 }
 
 /* Bluetooth */
@@ -205,12 +205,12 @@ button:hover {
 #custom-bt-profile.disconnected,
 #custom-bt-profile.off {
     background-color: transparent;
-    color: #898E94;
+    color: #8E8FA2;
 }
 
 #custom-bt-profile.unknown {
     background-color: transparent;
-    color: #898E94;
+    color: #8E8FA2;
 }
 
 /* Backlight */
@@ -231,7 +231,7 @@ button:hover {
 /* Media */
 #custom-media {
     background-color: transparent;
-    color: #898E94;
+    color: #8E8FA2;
     min-width: 100px;
 }
 
@@ -252,7 +252,7 @@ button:hover {
 /* Idle inhibitor */
 #idle_inhibitor {
     background-color: transparent;
-    color: #898E94;
+    color: #8E8FA2;
 }
 
 #idle_inhibitor.activated {
@@ -262,7 +262,7 @@ button:hover {
 
 /* Scratchpad */
 #scratchpad {
-    background-color: rgba(75, 141, 236, 0.25);
+    background-color: rgba(166, 96, 212, 0.25);
 }
 
 #scratchpad.empty {
@@ -284,8 +284,8 @@ button:hover {
 }
 
 #power-profiles-daemon.power-saver {
-    background-color: rgba(130, 210, 206, 0.25);
-    color: #82D2CE;
+    background-color: rgba(136, 219, 215, 0.25);
+    color: #88DBD7;
 }
 
 /* Memory/Disk */
@@ -303,15 +303,15 @@ button:hover {
 }
 
 #mpd.disconnected {
-    color: #898E94;
+    color: #8E8FA2;
 }
 
 #mpd.stopped {
-    color: #898E94;
+    color: #8E8FA2;
 }
 
 #mpd.paused {
-    color: #898E94;
+    color: #8E8FA2;
 }
 
 /* Language */
@@ -335,7 +335,7 @@ button:hover {
 }
 
 #keyboard-state > label.locked {
-    background-color: rgba(75, 141, 236, 0.25);
+    background-color: rgba(166, 96, 212, 0.25);
 }
 
 /* Privacy */

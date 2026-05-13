@@ -140,6 +140,66 @@ window-rule {
     open-floating true
 }
 
+// =============================================================
+// Subtle rounded corners on every window. clip-to-geometry cuts
+// CSD shadows and forces the surface itself round; focus-ring
+// follows the radius automatically.
+// =============================================================
+window-rule {
+    geometry-corner-radius 8
+    clip-to-geometry true
+}
+
+// =============================================================
+// Blur experiment (niri 26.04)
+// Subtle blur on system layer-shell surfaces only; app windows
+// are left fully opaque. Comment out the block to disable.
+// xray blur reuses a static blurred wallpaper => essentially free.
+// geometry-corner-radius on layer-rules shapes the blur to match
+// each surface — must agree with the client's own corner radius.
+// =============================================================
+
+// Status bar (waybar) — square; waybar's own CSS draws no
+// border-radius, so leaving niri's blur shape square avoids
+// a mismatch between rounded blur and square surface.
+layer-rule {
+    match namespace="^waybar$"
+    background-effect {
+        blur true
+    }
+}
+
+// Notifications (dunst — default layer-shell namespace is "notifications")
+// Pair with `corner_radius = 8` in dunstrc.
+layer-rule {
+    match namespace="^notifications$"
+    geometry-corner-radius 8
+    background-effect {
+        blur true
+    }
+}
+
+// App launcher (bemenu)
+layer-rule {
+    match namespace="^bemenu$"
+    geometry-corner-radius 8
+    background-effect {
+        blur true
+    }
+}
+
+// Overlay layer (dunst, bemenu) actually sits over windows, so
+// blur what's really behind, not just the wallpaper. waybar is
+// `top` with an exclusive zone — nothing but wallpaper sits under
+// it, so the default xray blur is both cheaper and identical.
+layer-rule {
+    match layer="overlay"
+
+    background-effect {
+        xray false
+    }
+}
+
 // Firefox inhibit idle when fullscreen (niri handles this automatically)
 
 // Keybindings

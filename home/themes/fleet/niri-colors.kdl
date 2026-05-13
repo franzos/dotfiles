@@ -1,8 +1,8 @@
-// Fleet theme - niri focus ring colors
+// Fleet Dark Purple theme - niri focus ring colors
 layout {
     focus-ring {
         width 2
-        active-color "#4B8DEC"
-        inactive-color "#3E4147"
+        active-color "#A660D4"
+        inactive-color "#3E3852"
     }
 }

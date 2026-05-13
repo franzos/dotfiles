@@ -1,8 +1,8 @@
-# Fleet theme - sway window colors
+# Fleet Dark Purple theme - sway window colors
 # class                 border  backgr  text    indicator child_border
-client.focused          #4B8DEC #18191B #E0E1E4 #4B8DEC   #4B8DEC
-client.focused_inactive #3E4147 #18191B #898E94 #3E4147   #3E4147
-client.unfocused        #3E4147 #18191B #898E94 #3E4147   #3E4147
-client.urgent           #EB4056 #EB4056 #FFFFFF #EB4056   #EB4056
-client.placeholder      #3E4147 #18191B #E0E1E4 #3E4147   #3E4147
-client.background       #18191B
+client.focused          #A660D4 #1C1827 #E0E1E4 #A660D4   #A660D4
+client.focused_inactive #3E3852 #1C1827 #8E8FA2 #3E3852   #3E3852
+client.unfocused        #3E3852 #1C1827 #8E8FA2 #3E3852   #3E3852
+client.urgent           #E1465E #432132 #FFFFFF #E1465E   #E1465E
+client.placeholder      #3E3852 #1C1827 #E0E1E4 #3E3852   #3E3852
+client.background       #1C1827
