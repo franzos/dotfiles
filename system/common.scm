@@ -42,6 +42,7 @@
   #:use-module (px services ntp)                     ;; chrony-service-type (NTS)
   #:use-module (px packages security-token)          ;; acsccid
   #:use-module (px packages linux)                   ;; bluez 5.83
+  #:use-module (px packages networking)              ;; tailscale
   #:use-module (px services security-token)          ;; nitro, coinkite, ledger udev rules
 
   #:export (%common-os %common-services))
@@ -393,6 +394,7 @@ disk_error_action = syslog
     libu2f-server   ;; U2F server library
     yubico-pam      ;; yubikey challenge-response for sudo
     fprintd         ;; fingerprint reader
+    tailscale
     %os-base-packages))
 
   (services
