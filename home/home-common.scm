@@ -217,6 +217,7 @@
          "witr"
          "keifu"
          "inotify-tools"             ;; file access monitoring
+         "shelf"                     ;; organize files automatically
 
          ;; Thunar
          "thunar"                    ;; file manager
