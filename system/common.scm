@@ -219,7 +219,14 @@ disk_error_action = syslog
              (experimental #t)           ;; Enable experimental features for modern devices
              (multi-profile 'multiple))) ;; Enable multiple profiles (A2DP + HFP/HSP)
 
-   (service earlyoom-service-type)
+   ;; SIGTERM fires only when BOTH RAM and swap drop below their
+   ;; thresholds. With ~90G of swap, the default 10% swap threshold
+   ;; meant earlyoom basically never triggered. Drop swap to 2%
+   ;; (~1.8G) so it kicks in before the system thrashes.
+   (service earlyoom-service-type
+            (earlyoom-configuration
+             (minimum-available-memory 10)   ;; percent of RAM
+             (minimum-free-swap 2)))         ;; percent of swap
 
    (service rtkit-daemon-service-type)
 
