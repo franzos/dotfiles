@@ -8,10 +8,11 @@
   #:use-module (gnu services base)            ;; udev-service-type
   #:use-module (gnu system file-systems)      ;; swap-space
   #:use-module (px packages linux)            ;; wireless-regdb-signed
+  #:use-module (px packages networking)       ;; vpnmux
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
   #:use-module (nongnu system linux-initrd)
-  #:use-module (px services networking)       ;; mullvad-daemon-service-type
+  #:use-module (px services networking)       ;; mullvad-daemon-service-type, vpnmux-service-type
   #:use-module (px services usbguard))         ;; usbguard-service-type
 
 (operating-system
@@ -30,7 +31,7 @@
          "resume_offset=317310976"                ;; Swap file offset for hibernation
          "rtc_cmos.use_acpi_alarm=1"              ;; Fix RTC alarm for suspend-then-hibernate on AMD
          "amd_pstate=active"                      ;; AMD Ryzen EPP power management
-         "pcie_aspm.policy=powersave"             ;; PCIe power saving (no L1 substates)
+         "pcie_aspm.policy=powersupersave"        ;; PCIe power saving, includes L1.1/L1.2 substates
          "amdgpu.ppfeaturemask=0xfff5bfff"        ;; Default minus stutter (GFXOFF re-enabled for s2idle)
          "amdgpu.gpu_recovery=1"                  ;; Enable GPU reset after hang
          "snd_hda_intel.power_save=1"             ;; Audio codec sleep after 1s silence
@@ -48,6 +49,10 @@
          "init_on_alloc=1"                        ;; Zero allocated memory (UAF mitigation, lower overhead)
          "bdev_allow_write_mounted=0"             ;; No raw writes to mounted block devs
          "proc_mem.force_override=never"          ;; Close /proc/PID/mem force-write
+         ;; LSM stack — include landlock so unprivileged sandboxes
+         ;; (Chromium, Firefox renderer) can actually self-restrict.
+         ;; Without this dmesg logs "landlock: Disabled but requested by user space".
+         "lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
    %default-kernel-arguments))
 
  (bootloader
@@ -83,6 +88,11 @@
                           file-systems))
     (priority 10))))  ;; Low priority - only used for hibernation and overflow
 
+ ;; vpnmux CLI globally available (the service also adds it to the profile).
+ (packages
+  (cons vpnmux
+        (operating-system-packages %common-os)))
+
  (services
   (cons*
    (service zram-device-service-type
@@ -117,20 +127,23 @@
                                      "ATTR{class}==\"0x010802\", "  ;; NVMe controller
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
 
-   ;; PCI Runtime PM for WiFi, GPU, and AMD crypto coprocessor
+   ;; PCI Runtime PM for WiFi, GPU, and AMD crypto coprocessor.
+   ;; No ACTION== match: devices enumerated before udevd loads its
+   ;; rules don't get an "add" event, so a rule gated on "add" silently
+   ;; skips them. TEST==power/control guards against remove events.
    (simple-service 'pci-runtime-pm udev-service-type
                    (list (udev-rule "90-pci-runtime-pm.rules"
                                     (string-append
                                      ;; MediaTek MT7921 WiFi
-                                     "ACTION==\"add\", SUBSYSTEM==\"pci\", "
+                                     "SUBSYSTEM==\"pci\", "
                                      "ATTR{vendor}==\"0x14c3\", "
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"
                                      ;; AMD GPU (amdgpu)
-                                     "ACTION==\"add\", SUBSYSTEM==\"pci\", "
+                                     "SUBSYSTEM==\"pci\", "
                                      "ATTR{vendor}==\"0x1002\", "
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"
                                      ;; AMD CCP (crypto coprocessor)
-                                     "ACTION==\"add\", SUBSYSTEM==\"pci\", "
+                                     "SUBSYSTEM==\"pci\", "
                                      "ATTR{vendor}==\"0x1022\", ATTR{device}==\"0x15c7\", "
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
 
@@ -148,6 +161,16 @@
                                      "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4ee7\", MODE=\"0660\", GROUP=\"plugdev\"\n"))))
 
    (service mullvad-daemon-service-type)
+   (service tailscale-service-type)
+
+   ;; Keep Mullvad and Tailscale from clashing at the netfilter/DNS layer.
+   (service vpnmux-service-type)
+
+   ;; Resolve Podman's host-gateway name to localhost on the host itself,
+   ;; so tooling hardcoded to host.containers.internal also works outside
+   ;; containers. Appends to /etc/hosts alongside block-facebook-hosts.
+   (simple-service 'host-containers-internal hosts-service-type
+                   (list (host "127.0.0.1" "host.containers.internal")))
 
    ;; USBGuard — USB device authorization.
    ;;
