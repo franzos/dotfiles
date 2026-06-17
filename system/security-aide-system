@@ -1,29 +1,27 @@
 #!/usr/bin/env bash
-# security-aide-home — daily AIDE check for user-scope paths
+# security-aide-system — daily AIDE check for system-scope paths
 #
-# Runs AIDE against ~/.config/aide/aide.conf, commits the DB to a local git
-# repo for tamper-evidence, mails a diff if anything changed.
+# Runs AIDE as root against /etc/aide/aide.conf, commits the DB to a local
+# git repo for tamper-evidence, and appends any diff to the log. No email.
 
 set -euo pipefail
+umask 077
 
-CONF="${AIDE_CONF:-$HOME/.config/aide/aide.conf}"
-STATE="$HOME/.local/state/aide"
+CONF="$AIDE_CONF"
+STATE="/var/lib/aide"
 DB="$STATE/aide.db"
 NEWDB="$STATE/aide.db.new"
-LOG_DIR="$HOME/.local/var/log"
-LOG="$LOG_DIR/security-aide.log"
+LOG="/var/log/security-aide.log"
 
-MAIL_TO="mail@gofranz.com"
-MAIL_FROM="mail@gofranz.com"
-MAIL_ACCOUNT="gofranz.com"
-
-mkdir -p "$STATE" "$LOG_DIR"
+mkdir -p "$STATE"
+chmod 700 "$STATE"
+touch "$LOG"; chmod 600 "$LOG"
 
 log() {
     printf '[%s] %s\n' "$(date -Iseconds)" "$*" >> "$LOG"
 }
 
-host=$(hostname)
+host=$(uname -n)
 
 if [[ ! -f "$CONF" ]]; then
     log "ERROR: config $CONF not found"
@@ -33,8 +31,8 @@ fi
 # Ensure git repo exists in state dir
 if [[ ! -d "$STATE/.git" ]]; then
     git -C "$STATE" init -q -b main
-    git -C "$STATE" config user.name  "security-aide-home"
-    git -C "$STATE" config user.email "mail@gofranz.com"
+    git -C "$STATE" config user.name  "security-aide-system"
+    git -C "$STATE" config user.email "root@$host"
     log "initialized git repo at $STATE"
 fi
 
@@ -81,18 +79,11 @@ fi
 
 if [[ $rc -ge 8 ]]; then
     log "ERROR: aide --check returned $rc"
-    if {
-        printf 'To: %s\n' "$MAIL_TO"
-        printf 'From: %s\n' "$MAIL_FROM"
-        printf 'Subject: [aide] %s: ERROR rc=%s\n' "$host" "$rc"
-        printf 'Content-Type: text/plain; charset=utf-8\n'
-        printf '\n'
+    {
+        printf '=== %s ERROR rc=%s ===\n' "$(date -Iseconds)" "$rc"
         cat "$TMPOUT"
-    } | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
-        :
-    else
-        log "FAILED to mail error report"
-    fi
+        printf '\n'
+    } >> "$LOG"
     exit 1
 fi
 
@@ -106,38 +97,19 @@ if (( rc & 2 )); then parts+=("removed"); fi
 if (( rc & 4 )); then parts+=("changed"); fi
 desc=$(IFS='/'; echo "${parts[*]}")
 
-# Log full diff for audit trail
+# Log full diff for audit trail. IMPORTANT: the baseline is NOT auto-updated.
+# After reviewing this diff and confirming the changes are legitimate, run
+# `security-aide-accept` to bake the current state in as the new baseline.
+# Until you do, every subsequent run re-reports the same diff.
 {
     printf '=== %s rc=%s kinds=%s ===\n' "$(date -Iseconds)" "$rc" "$desc"
+    printf 'AIDE detected filesystem changes on %s.\n' "$host"
+    printf 'baseline NOT updated; run security-aide-accept once reviewed.\n\n'
     cat "$TMPOUT"
     printf '\n'
 } >> "$LOG"
 
-# Mail the diff. IMPORTANT: the baseline is NOT auto-updated. After reviewing
-# this email and confirming the changes are legitimate, run `security-aide-accept`
-# to bake the current state in as the new baseline. Until you do, every subsequent
-# run will re-report the same diff.
-if {
-    printf 'To: %s\n' "$MAIL_TO"
-    printf 'From: %s\n' "$MAIL_FROM"
-    printf 'Subject: [aide] %s: %s on %s\n' "$host" "$desc" "$(date -I)"
-    printf 'Content-Type: text/plain; charset=utf-8\n'
-    printf '\n'
-    printf 'AIDE detected filesystem changes on %s.\n\n' "$host"
-    printf '  !! The baseline has NOT been updated. !!\n\n'
-    printf 'Review the diff below. If every change is legitimate (you edited a\n'
-    printf 'shell rc, added an SSH key, installed a tool in ~/.local/bin, etc.),\n'
-    printf 'accept the new baseline with:\n\n'
-    printf '    security-aide-accept\n\n'
-    printf 'Until you run that, this same email will be resent daily.\n'
-    printf 'If anything in the diff looks unfamiliar, investigate before accepting.\n\n'
-    printf '%s\n' '--- diff ---'
-    cat "$TMPOUT"
-} | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
-    log "mailed diff ($desc)"
-else
-    log "FAILED to mail diff (see errors above — keyring locked? account wrong?)"
-fi
+log "logged diff ($desc)"
 
 # Do NOT auto-update the baseline. User must explicitly accept.
 exit 0

@@ -17,28 +17,6 @@
          "pimsync sync"
          #:user "franz"))
 
-;; Security monitoring jobs — see ~/dotfiles/home/security-* scripts.
-;; All three run under the user; msmtp uses secret-tool, so they only
-;; deliver mail while the keyring is unlocked (i.e. when logged in).
-;; Schedule for times when Franz is typically logged in, not 03:00.
-(define mcron-job-security-aide
-  ;; Daily at 09:00
-  #~(job "0 9 * * *"
-         "/home/franz/.local/bin/security-aide-home"
-         #:user "franz"))
-
-(define mcron-job-security-yara
-  ;; Daily at 09:15
-  #~(job "15 9 * * *"
-         "/home/franz/.local/bin/security-yara-recent"
-         #:user "franz"))
-
-(define mcron-job-security-lynis
-  ;; Mondays at 09:30
-  #~(job "30 9 * * 1"
-         "/home/franz/.local/bin/security-lynis-weekly"
-         #:user "franz"))
-
 (define msmtp-service
   (service home-msmtp-service-type
            (home-msmtp-configuration
@@ -61,16 +39,13 @@
   (service home-mcron-service-type
            (home-mcron-configuration
             (jobs (list
-                   mcron-job-pimsync
-                   mcron-job-security-aide
-                   mcron-job-security-yara
-                   mcron-job-security-lynis)))))
+                   mcron-job-pimsync)))))
 
 (home-environment
- (packages (append common-packages security-packages))
+ (packages common-packages)
  (services
   (common-services
-   #:home-files (append home-files-common home-files-security)
-   #:xdg-config-files (append xdg-config-files-common xdg-config-files-aide)
+   #:home-files home-files-common
+   #:xdg-config-files xdg-config-files-common
    #:unattended-upgrade-config-file "/home/franz/dotfiles/home/home-framework.scm"
    #:extra-services (list msmtp-service mcron-service))))

@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
-# security-lynis-weekly — weekly user-context Lynis audit
+# security-lynis-weekly — weekly system-context Lynis audit. Run as root.
+#
+# Appends the report summary and the delta vs last week to the log. No email.
 
 set -euo pipefail
+umask 077
 
-STATE="$HOME/.local/state/security-lynis"
+STATE="/var/lib/security-lynis"
 CUR="$STATE/report.dat"
 PREV="$STATE/report-prev.dat"
 LYNIS_LOGFILE="$STATE/lynis.log"
-LOG_DIR="$HOME/.local/var/log"
-LOG="$LOG_DIR/security-lynis.log"
+LOG="/var/log/security-lynis.log"
 
-MAIL_TO="mail@gofranz.com"
-MAIL_FROM="mail@gofranz.com"
-MAIL_ACCOUNT="gofranz.com"
-
-mkdir -p "$STATE" "$LOG_DIR"
+mkdir -p "$STATE"
+chmod 700 "$STATE"
+touch "$LOG"; chmod 600 "$LOG"
 
 log() { printf '[%s] %s\n' "$(date -Iseconds)" "$*" >> "$LOG"; }
 
-host=$(hostname)
+host=$(uname -n)
 
 log "starting weekly lynis audit"
 
@@ -28,8 +28,8 @@ if [[ -f "$CUR" ]]; then
 fi
 
 # --cronjob      = non-interactive, no pauses, no colors
-# --quick        = skip slow checks we don't care about as non-root
-# --log-file     = avoid default /var/log/lynis.log (which we can't write)
+# --quick        = skip slow checks
+# --log-file     = avoid default /var/log/lynis.log
 # --report-file  = machine-readable key=value dump we diff against
 set +e
 lynis audit system \
@@ -42,20 +42,7 @@ lynis_rc=$?
 set -e
 
 if [[ ! -f "$CUR" ]]; then
-    log "ERROR: lynis produced no report (rc=$lynis_rc)"
-    if {
-        printf 'To: %s\n' "$MAIL_TO"
-        printf 'From: %s\n' "$MAIL_FROM"
-        printf 'Subject: [lynis] %s: ERROR weekly audit failed\n' "$host"
-        printf 'Content-Type: text/plain; charset=utf-8\n'
-        printf '\n'
-        printf 'lynis exit code: %s\n' "$lynis_rc"
-        printf 'See: %s\n' "$LYNIS_LOGFILE"
-    } | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
-        :
-    else
-        log "FAILED to mail error report"
-    fi
+    log "ERROR: lynis produced no report (rc=$lynis_rc); see $LYNIS_LOGFILE"
     exit 1
 fi
 
@@ -84,23 +71,16 @@ else
     diff_body="(first run — no previous report to diff)"
 fi
 
-if {
-    printf 'To: %s\n' "$MAIL_TO"
-    printf 'From: %s\n' "$MAIL_FROM"
-    printf 'Subject: [lynis] %s: weekly audit — index=%s (was %s)\n' \
-        "$host" "${index:-?}" "${prev_index:-first}"
-    printf 'Content-Type: text/plain; charset=utf-8\n'
-    printf '\n'
+{
+    printf '=== %s weekly audit ===\n' "$(date -Iseconds)"
     printf 'Host:             %s\n' "$host"
     printf 'Hardening index:  %s (previous: %s)\n' "${index:-?}" "${prev_index:-first}"
     printf 'Warnings:         %s\n' "$nwarn"
     printf 'Suggestions:      %s\n' "$nsugg"
     printf '\nDelta vs last week (warnings + suggestions):\n'
-    printf '%s\n' "$diff_body"
-} | msmtp -a "$MAIL_ACCOUNT" "$MAIL_TO" 2>> "$LOG"; then
-    log "mailed weekly report (index=${index:-?})"
-else
-    log "FAILED to mail weekly report"
-fi
+    printf '%s\n\n' "$diff_body"
+} >> "$LOG"
+
+log "logged weekly report (index=${index:-?})"
 
 exit 0

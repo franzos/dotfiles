@@ -257,15 +257,6 @@
          "claude-code"
    ))))
 
-;; Security monitoring packages — only used by framework (scheduled via mcron).
-(define security-packages
-  (specifications->packages
-   (list
-         "aide"                      ;; file integrity baseline
-         "yara"                      ;; pattern matching on recent files
-         "lynis"                     ;; weekly user-context audit
-   )))
-
 ;; Files placed under $HOME, shared by all hosts.
 (define home-files-common
   `((".gitconfig" ,(local-file "gitconfig"))
@@ -308,13 +299,6 @@
     (".local/share/waybar-themes/style-light.css" ,(local-file (string-append current-theme-dir "/waybar-light.css")))
     (".local/share/waybar-themes/style-dark.css" ,(local-file (string-append current-theme-dir "/waybar-dark.css")))))
 
-;; Security monitoring scripts (scheduled via mcron on framework).
-(define home-files-security
-  `((".local/bin/security-aide-home" ,(local-file "security-aide-home" #:recursive? #t))
-    (".local/bin/security-aide-accept" ,(local-file "security-aide-accept" #:recursive? #t))
-    (".local/bin/security-yara-recent" ,(local-file "security-yara-recent" #:recursive? #t))
-    (".local/bin/security-lynis-weekly" ,(local-file "security-lynis-weekly" #:recursive? #t))))
-
 ;; XDG config files shared by all hosts.
 (define xdg-config-files-common
   `(("niri/config.kdl" ,(local-file "niri.kdl"))
@@ -352,10 +336,6 @@
     ("broot/skins/white.hjson" ,(local-file "broot/skins/white.hjson"))
     ;; ClamAV freshclam config (DB stored in ~/.local/share/clamav)
     ("clamav/freshclam.conf" ,(local-file "freshclam.conf"))))
-
-;; XDG config files for AIDE (used by security-aide-home).
-(define xdg-config-files-aide
-  `(("aide/aide.conf" ,(local-file "aide.conf"))))
 
 ;; Bash configuration shared by all hosts.
 (define bash-service

@@ -2,11 +2,21 @@
   #:use-module (common)
   #:use-module (gnu)
   #:use-module (guix)
+  #:use-module (guix gexp)
+  #:use-module (guix packages)                ;; package record
+  #:use-module (guix build-system trivial)    ;; trivial-build-system
+  #:use-module ((guix licenses) #:prefix license:)
   #:use-module (gnu services xorg)
+  #:use-module (gnu services desktop)         ;; elogind-service-type
   #:use-module (gnu services pm)              ;; power-profiles-daemon-service-type
   #:use-module (gnu services linux)           ;; zram-device-service-type
   #:use-module (gnu services base)            ;; udev-service-type
+  #:use-module (gnu services mcron)           ;; mcron-service-type
   #:use-module (gnu system file-systems)      ;; swap-space
+  #:use-module (gnu packages admin)           ;; aide, lynis
+  #:use-module (gnu packages base)            ;; coreutils, grep, diffutils
+  #:use-module (gnu packages bash)            ;; bash
+  #:use-module (gnu packages version-control) ;; git
   #:use-module (px packages linux)            ;; wireless-regdb-signed
   #:use-module (px packages networking)       ;; vpnmux
   #:use-module (nongnu packages linux)
@@ -14,6 +24,54 @@
   #:use-module (nongnu system linux-initrd)
   #:use-module (px services networking)       ;; mullvad-daemon-service-type, vpnmux-service-type
   #:use-module (px services usbguard))         ;; usbguard-service-type
+
+(define %aide-conf (local-file "aide-system.conf"))
+
+(define (security-wrapper name script)
+  (program-file name
+    #~(begin
+        (setenv "PATH"
+                (string-append
+                 #$(file-append coreutils "/bin") ":"
+                 #$(file-append aide "/bin") ":"
+                 #$(file-append lynis "/bin") ":"
+                 #$(file-append git "/bin") ":"
+                 #$(file-append grep "/bin") ":"
+                 #$(file-append diffutils "/bin")))
+        (setenv "AIDE_CONF" #$%aide-conf)
+        (execl #$(file-append bash "/bin/bash") "bash" #$script))))
+
+(define security-aide-system
+  (security-wrapper "security-aide-system" (local-file "security-aide-system")))
+(define security-aide-accept-program
+  (security-wrapper "security-aide-accept" (local-file "security-aide-accept")))
+(define security-lynis-weekly
+  (security-wrapper "security-lynis-weekly" (local-file "security-lynis-weekly")))
+
+;; Expose `security-aide-accept` on PATH (sudo security-aide-accept)
+(define security-cli
+  (package
+    (name "security-cli")
+    (version "1.0")
+    (source #f)
+    (build-system trivial-build-system)
+    (arguments
+     (list #:builder
+           #~(begin
+               (mkdir #$output)
+               (mkdir (string-append #$output "/bin"))
+               (symlink #$security-aide-accept-program
+                        (string-append #$output "/bin/security-aide-accept")))))
+    (home-page "")
+    (synopsis "Root-scope security CLI wrappers")
+    (description "Provides the @command{security-aide-accept} command for
+accepting a new system-scope AIDE baseline.")
+    (license license:gpl3+)))
+
+(define mcron-job-security-aide
+  #~(job "0 3 * * *" #$security-aide-system))
+(define mcron-job-security-lynis
+  #~(job "30 3 * * 1" #$security-lynis-weekly))
 
 (operating-system
  (inherit %common-os)
@@ -90,8 +148,8 @@
 
  ;; vpnmux CLI globally available (the service also adds it to the profile).
  (packages
-  (cons vpnmux
-        (operating-system-packages %common-os)))
+  (cons* vpnmux security-cli
+         (operating-system-packages %common-os)))
 
  (services
   (cons*
@@ -147,6 +205,30 @@
                                      "ATTR{vendor}==\"0x1022\", ATTR{device}==\"0x15c7\", "
                                      "TEST==\"power/control\", ATTR{power/control}=\"auto\"\n"))))
 
+   ;; Disable spurious s2idle wakeup sources. Hibernate (S4) is broken on
+   ;; this board (kernel snapshots RAM but can't open the swap writer:
+   ;; "Cannot get swap writer"), so the lid action is plain suspend and
+   ;; only the lid switch and power button should wake it. USB xHCI
+   ;; (XHC*), Thunderbolt (NHI*) and the upstream PCIe ports (GPP*/GP*)
+   ;; otherwise fire on their own and drain the battery. No ACTION== match
+   ;; (devices enumerated before udevd get no "add"); TEST==power/wakeup
+   ;; guards devices without the attribute. See SLEEP_DEBUGGING.md.
+   (simple-service 'disable-spurious-wakeups udev-service-type
+                   (list (udev-rule "90-disable-wakeups.rules"
+                                    (string-append
+                                     ;; PCIe ports GPP6 / GP11 / GP12
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:00:02.2\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:00:03.1\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:00:04.1\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"
+                                     ;; USB xHCI controllers XHC0 / XHC1 / XHC3 / XHC4
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:c1:00.3\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:c1:00.4\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:c3:00.3\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:c3:00.4\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"
+                                     ;; Thunderbolt NHI0 / NHI1
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:c3:00.5\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"
+                                     "SUBSYSTEM==\"pci\", KERNEL==\"0000:c3:00.6\", TEST==\"power/wakeup\", ATTR{power/wakeup}=\"disabled\"\n"))))
+
    ;; AMD NPU accelerator (amdxdna) — allow render group access
    (simple-service 'amdxdna-accel udev-service-type
                    (list (udev-rule "90-amdxdna.rules"
@@ -186,4 +268,21 @@
              (device-rules-with-port? #f)        ;; Yubikey works in any port
              (ipc-allowed-groups '("wheel"))))   ;; run `usbguard` CLI without sudo
 
-   %common-services)))
+   ;; Root-scope security auditing — AIDE file integrity (daily) and Lynis
+   ;; (weekly). Results land in /var/log/security-*.log; state is root-only
+   ;; under /var/lib. Review an AIDE diff, then `sudo security-aide-accept`.
+   (simple-service 'security-audit-cron mcron-service-type
+                   (list mcron-job-security-aide mcron-job-security-lynis))
+
+   ;; Hibernate (S4) is broken on this board — the kernel snapshots RAM
+   ;; but can't open the swap writer ("Cannot find swap device / Cannot
+   ;; get swap writer"), and the failed thaw wedges amdgpu (black screen,
+   ;; power LED only). Override the suspend-then-hibernate lid action
+   ;; inherited from common.scm and just suspend (s2idle). This platform
+   ;; has no S3 either. See SLEEP_DEBUGGING.md.
+   (modify-services %common-services
+     (elogind-service-type config =>
+       (elogind-configuration
+        (inherit config)
+        (handle-lid-switch 'suspend)
+        (handle-lid-switch-external-power 'suspend)))))))
