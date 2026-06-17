@@ -14,8 +14,13 @@
   #:use-module (gnu services cuirass)
   #:use-module (gnu services databases)
   #:use-module (gnu services mcron)
+  #:use-module (gnu services shepherd)
+  #:use-module (gnu packages bash)
+  #:use-module (gnu packages base)
+  #:use-module (gnu packages curl)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages rsync)
+  #:use-module (gnu packages ssh)
   #:use-module (gnu packages databases)
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages firmware)
@@ -111,6 +116,11 @@ COMMIT
         (define path-rx
           (make-regexp "\"path\":\"(/gnu/store/[^\"]+)\""))
 
+        (define status-rx
+          (make-regexp "\"buildstatus\":(-?[0-9]+)"))
+
+        ;; Per object the store path appears before "buildstatus":N, so pair each
+        ;; path with the first status after it and keep only succeeded (0) builds.
         (define (fetch-build-paths jobset)
           (call-with-values
               (lambda ()
@@ -123,8 +133,11 @@ COMMIT
                 (let loop ((start 0) (acc '()))
                   (let ((m (regexp-exec path-rx text start)))
                     (if m
-                        (loop (match:end m)
-                              (cons (match:substring m 1) acc))
+                        (let ((s (regexp-exec status-rx text (match:end m))))
+                          (loop (match:end m)
+                                (if (and s (string=? (match:substring s 1) "0"))
+                                    (cons (match:substring m 1) acc)
+                                    acc)))
                         acc)))))))
 
         (define (warm-path path)
@@ -150,22 +163,161 @@ COMMIT
                        jobset key args))))
          '("pantherx-packages" "proprietary-packages")))))
 
+;; Build a static file layout from the guix-publish cache, then rsync to the
+;; remote substitute server.
+;;
+;;   guix-publish cache: /var/cache/publish/zstd/<hash>-<name>.{narinfo,nar}
+;;   clients expect:     /<hash>.narinfo  and  /nar/zstd/<hash>-<name>
+(define %sync-substitutes
+  (program-file "sync-substitutes"
+    #~(begin
+        (setenv "PATH"
+                (string-append #$coreutils "/bin:"
+                               #$rsync "/bin:"
+                               #$openssh "/bin"))
+        (execl #$(file-append bash "/bin/bash") "bash" "-c" "
+set -euo pipefail
+
+CACHE=/var/cache/publish/zstd
+STATIC=/var/cache/publish/serve
+REMOTE=virt1
+
+if [ ! -d \"$CACHE\" ]; then
+    echo \"Cache not found at $CACHE\"
+    exit 1
+fi
+
+mkdir -p \"$STATIC/nar/zstd\"
+
+if [ -f /etc/guix/signing-key.pub ]; then
+    cp -u /etc/guix/signing-key.pub \"$STATIC/signing-key.pub\"
+fi
+
+if [ ! -f \"$STATIC/nix-cache-info\" ]; then
+    cat > \"$STATIC/nix-cache-info\" <<EOF
+StoreDir: /gnu/store
+WantMassQuery: 1
+Priority: 100
+EOF
+fi
+
+for narinfo in \"$CACHE\"/*.narinfo; do
+    [ -f \"$narinfo\" ] || continue
+    name=$(basename \"$narinfo\" .narinfo)
+    hash=${name%%-*}
+
+    ln -f \"$narinfo\" \"$STATIC/${hash}.narinfo\" 2>/dev/null \\
+      || cp -u \"$narinfo\" \"$STATIC/${hash}.narinfo\"
+
+    nar=\"$CACHE/${name}.nar\"
+    if [ -f \"$nar\" ]; then
+        ln -f \"$nar\" \"$STATIC/nar/zstd/${name}\" 2>/dev/null \\
+          || cp -u \"$nar\" \"$STATIC/nar/zstd/${name}\"
+    fi
+done
+
+for narinfo in \"$STATIC\"/*.narinfo; do
+    [ -f \"$narinfo\" ] || continue
+    hash=$(basename \"$narinfo\" .narinfo)
+    if ! ls \"$CACHE\"/${hash}-*.narinfo &>/dev/null; then
+        rm -f \"$narinfo\"
+        for nar in \"$STATIC/nar/zstd/${hash}-\"*; do
+            [ -f \"$nar\" ] && rm -f \"$nar\"
+        done
+    fi
+done
+
+echo \"Static layout: $(ls \"$STATIC\"/*.narinfo 2>/dev/null | wc -l) narinfos\"
+echo \"Nars: $(ls \"$STATIC/nar/zstd/\" 2>/dev/null | wc -l) files\"
+du -sh \"$STATIC\"
+
+rsync -az --delete \"$STATIC/\" \"$REMOTE:/srv/substitutes/\"
+"))))
+
 ;; Conservative GC — this is a workstation, not a dedicated build server
 (define %gc-job
   #~(job "0 4 * * 0"
          "guix gc --free-space=20G"
          #:user "root"))
 
+;; Poll the Cuirass queue and publish substitutes once each build batch settles,
+;; rather than on an arbitrary clock. An empty /api/queue means the current batch
+;; (including failures) has left the queue, so it is safe to warm + rsync.
+(define %substitute-sync-daemon
+  (program-file "substitute-sync-daemon"
+    #~(begin
+        (use-modules (web client)
+                     (web response)
+                     (rnrs bytevectors)
+                     (ice-9 format))
 
-(define %warmup-job
-  #~(job "0 */4 * * *"
-         #$%warmup-publish-cache
-         #:user "root"))
+        (define poll-interval 60)
+        (define debounce-polls 2)
 
-(define %sync-substitutes-job
-  #~(job "30 */4 * * *"
-         "/root/sync-substitutes.sh"
-         #:user "root"))
+        (define (log fmt . args)
+          (let ((ts (strftime "%Y-%m-%d %H:%M:%S" (localtime (current-time)))))
+            (apply format (current-error-port)
+                   (string-append "[~a] substitute-sync: " fmt "~%")
+                   ts args)
+            (force-output (current-error-port))))
+
+        ;; Queue body is "[]" (2 chars) when nothing is pending or running.
+        (define (queue-busy?)
+          (catch #t
+            (lambda ()
+              (call-with-values
+                  (lambda ()
+                    (http-get "http://localhost:8081/api/queue?nr=1"))
+                (lambda (response body)
+                  (if (>= (response-code response) 300)
+                      (begin (log "queue returned HTTP ~a, treating as settled"
+                                  (response-code response))
+                             #f)
+                      (let ((text (string-trim-both
+                                   (if (bytevector? body) (utf8->string body) body))))
+                        (not (string=? text "[]")))))))
+            (lambda (key . args)
+              (log "queue poll failed: ~a ~a" key args)
+              #f)))
+
+        ;; rsync exit code is the success signal for the whole sync.
+        (define (run-sync)
+          (catch #t
+            (lambda ()
+              (log "build batch settled, syncing substitutes")
+              (system* #$%warmup-publish-cache)
+              (let ((rc (status:exit-val (system* #$%sync-substitutes))))
+                (if (eqv? rc 0)
+                    (begin (log "sync complete") #t)
+                    (begin (log "sync failed (rsync exit ~a)" rc) #f))))
+            (lambda (key . args)
+              (log "sync errored: ~a ~a" key args)
+              #f)))
+
+        (log "starting (poll ~as, debounce ~a)" poll-interval debounce-polls)
+        (run-sync)
+        (let loop ((idle 0) (dirty #f) (fails 0))
+          (sleep (* poll-interval (min 8 (+ 1 fails))))
+          (if (queue-busy?)
+              (loop 0 #t 0)
+              (let ((idle (+ idle 1)))
+                (if (and dirty (>= idle debounce-polls))
+                    (if (run-sync)
+                        (loop idle #f 0)
+                        (loop idle #t (+ fails 1)))
+                    (loop idle dirty fails))))))))
+
+(define %substitute-sync-service
+  (shepherd-service
+   (provision '(substitute-sync))
+   (requirement '(user-processes networking guix-publish cuirass cuirass-web))
+   (documentation "Publish substitutes to the remote after each Cuirass build batch.")
+   (start #~(make-forkexec-constructor
+             (list #$%substitute-sync-daemon)
+             #:environment-variables
+             (cons "HOME=/root" (default-environment-variables))
+             #:log-file "/var/log/substitute-sync.log"))
+   (stop #~(make-kill-destructor))))
 
 (operating-system
  (inherit %common-os)
@@ -202,8 +354,8 @@ COMMIT
          (type luks-device-mapping))))
 
  (packages
-  (cons rsync
-        (operating-system-packages %common-os)))
+  (cons* curl rsync
+         (operating-system-packages %common-os)))
 
  (file-systems
   (append
@@ -262,7 +414,9 @@ COMMIT
                (cache "/var/cache/publish")
                (ttl (* 90 24 3600))))
      (simple-service 'build-server-jobs mcron-service-type
-                     (list %gc-job %warmup-job %sync-substitutes-job))
+                     (list %gc-job))
+     (simple-service 'substitute-sync shepherd-root-service-type
+                     (list %substitute-sync-service))
 
      %common-services)
     (iptables-service-type config =>
