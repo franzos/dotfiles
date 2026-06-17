@@ -381,10 +381,11 @@ rsync -az --delete \"$STATIC/\" \"$REMOTE:/srv/substitutes/\"
      (service openssh-service-type
            (openssh-configuration
              (x11-forwarding? #f)
-             (permit-root-login #f)
+             (permit-root-login 'prohibit-password)
              (password-authentication? #f)
              (authorized-keys
-              `(("franz" ,(plain-file "franz.pub" %franz-ssh-key))))))
+              `(("franz" ,(plain-file "franz.pub" %franz-ssh-key))
+                ("root" ,(plain-file "franz.pub" %franz-ssh-key))))))
      (service thermald-service-type)
      (udev-rules-service 'backlight %backlight-udev-rule)
      (service tlp-service-type
